@@ -656,6 +656,47 @@ def _einstein_delta_excesses(pressure, temperature, params):
     return (excesses, None)
 
 
+def _volume_ww_excesses(pressure, temperature, params):
+    """
+    Exponential (WW) volume-based correction expressed in Gibbs space.
+
+    Parameters in ``params``:
+    dV0
+        Amplitude of delta V at P = P0.
+    Pc
+        Characteristic pressure in Pa.
+    P0
+        Reference pressure in Pa. Defaults to zero.
+
+    The model is:
+        delta V(P) = dV0 * exp(-(P - P0) / Pc)
+        delta G(P) = dV0 * Pc * (1 - exp(-(P - P0) / Pc))
+    """
+    dV0 = params["dV0"]
+    Pc = params["Pc"]
+    P0 = params.get("P0", 0.0)
+
+    xP = pressure - P0
+
+    dGdP = dV0 * np.exp(-xP / Pc)
+    G = dV0 * Pc * (1.0 - np.exp(-xP / Pc))
+    d2GdP2 = -(dV0 / Pc) * np.exp(-xP / Pc)
+
+    dGdT = 0.0
+    d2GdT2 = 0.0
+    d2GdPdT = 0.0
+
+    excesses = {
+        "G": G,
+        "dGdT": dGdT,
+        "dGdP": dGdP,
+        "d2GdT2": d2GdT2,
+        "d2GdP2": d2GdP2,
+        "d2GdPdT": d2GdPdT,
+    }
+    return (excesses, None)
+
+
 def calculate_property_modifications(mineral):
     """
     Sums the excesses from all the modifiers.
@@ -707,6 +748,8 @@ def calculate_property_modifications(mineral):
             xs_function = _einstein_excesses
         elif modifier[0] == "einstein_delta":
             xs_function = _einstein_delta_excesses
+        elif modifier[0] == "volume_ww":
+            xs_function = _volume_ww_excesses
         else:
             raise Exception(
                 f"Property modifier label for {mineral.name} ({modifier[0]}) not recognised."
