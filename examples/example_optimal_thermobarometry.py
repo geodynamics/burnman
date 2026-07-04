@@ -104,6 +104,9 @@ if __name__ == "__main__":
     ol.set_composition([0.9, 0.1])
     wad.set_composition([1.0 - f_fwd, f_fwd])
 
+    assemblage.set_fractions([0.5, 0.5])
+    composition = assemblage.formula
+
     ol.compositional_covariances = np.diag(np.array([0.00001, 0.00001]) ** 2)
     wad.compositional_covariances = np.diag(np.array([0.01, 0.01]) ** 2)
 
@@ -147,6 +150,14 @@ if __name__ == "__main__":
     Ps = np.array([sol.assemblage.pressure for sol in sols])
     Ts = np.array([sol.assemblage.temperature for sol in sols])
 
+    temperatures_1 = np.linspace(600, 2000, 20)
+    equality_constraints = [["phase_fraction", (ol, 1.0)], ["T", temperatures_1]]
+    sols, prm = equilibrate(composition, assemblage, equality_constraints)
+    pressures_1 = np.array([sol.assemblage.pressure for sol in sols])
+    equality_constraints = [["phase_fraction", (ol, 0.0)], ["T", temperatures_1]]
+    sols, prm = equilibrate(composition, assemblage, equality_constraints)
+    pressures_2 = np.array([sol.assemblage.pressure for sol in sols])
+
     # Plot the uncertainty ellipse
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -155,6 +166,42 @@ if __name__ == "__main__":
     prior_cov = np.linalg.inv(assemblage.state_inverse_covariances)
     prior_cov[0, :] /= 1.0e9
     prior_cov[:, 0] /= 1.0e9
+    ax.fill_betweenx(
+        temperatures_1,
+        pressures_1 / 1.0e9,
+        pressures_2 / 1.0e9,
+        color="gray",
+        alpha=0.3,
+        label="nominal ol+wad field",
+    )
+
+    # Plot the equilibrium curve and estimated conditions
+    ax.scatter(Ps[2] / 1.0e9, Ts[2], s=40, color="purple")
+
+    # plot with an arrow to indicate the direction of increasing fwd
+    # transform so that the arrow head is not distorted by the aspect ratio of the plot
+    ax.annotate(
+        "",
+        xytext=(Ps[-2] / 1.0e9, Ts[-2]),
+        xy=(Ps[-1] / 1.0e9, Ts[-1]),
+        arrowprops=dict(arrowstyle="->", color="purple"),
+    )
+
+    ax.plot(Ps / 1.0e9, Ts, color="purple")
+    ax.scatter(
+        Ps / 1.0e9,
+        Ts,
+        s=10,
+        color="purple",
+        label="nominal eqm (fo$_{{{90}}}$, wad $x_{{{Fe}}}$=0.16$\\rightarrow$0.20)",
+    )
+
+    ax.scatter(
+        assemblage.state_priors[0] / 1.0e9,
+        assemblage.state_priors[1],
+        color="black",
+        label="Prior $P-T$ estimate",
+    )
     plot_cov_ellipse(
         prior_cov,
         assemblage.state_priors / np.array([1.0e9, 1.0]),
@@ -163,22 +210,11 @@ if __name__ == "__main__":
         facecolor="none",
         edgecolor="black",
         linestyle="--",
-        label="2-sigma prior uncertainty",
-    )
-
-    # Plot the equilibrium curve and estimated conditions
-    ax.scatter(Ps[2] / 1.0e9, Ts[2], s=40, color="purple")
-    ax.plot(Ps / 1.0e9, Ts, color="purple")
-    ax.scatter(
-        Ps / 1.0e9,
-        Ts,
-        s=10,
-        color="purple",
-        label="equilibrium (wd $x_{{{Fe}}}$=0.16-0.20)",
+        label="2$\\sigma$ uncertainty ($P-T$)",
     )
 
     # Plot the estimated conditions and uncertainty
-    ax.scatter(res.x[0] / 1.0e9, res.x[1], color="red", label="estimated conditions")
+    ax.scatter(res.x[0] / 1.0e9, res.x[1], color="red", label="Posterior P-T estimate")
     cov = res.xcov.copy()
     cov[0, :] /= 1.0e9
     cov[:, 0] /= 1.0e9
@@ -189,11 +225,11 @@ if __name__ == "__main__":
         ax=ax,
         facecolor="none",
         edgecolor="red",
-        label="2-sigma uncertainty",
+        label="2$\\sigma$ uncertainty (from $P-T$ + $X$ + $\\mathcal{H}_{mbr}$)",
     )
 
     ax.set_xlim(10, 16)
-    ax.set_ylim(800, 2000)
+    ax.set_ylim(600, 2000)
     ax.set_xlabel("Pressure (GPa)")
     ax.set_ylabel("Temperature (K)")
     ax.legend()
