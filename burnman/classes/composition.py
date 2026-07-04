@@ -407,3 +407,71 @@ class Composition(object):
 
         for key, value in sorted(c.items()):
             print(f"{key}: {value*f:0.{significant_figures}f}")
+
+    def __add__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only add another Composition object to this Composition."
+            )
+
+        new_mass_composition = self.mass_composition + other.mass_composition
+        return Composition(new_mass_composition, "mass")
+
+    def __sub__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only subtract another Composition object from this Composition."
+            )
+
+        new_mass_composition = self.mass_composition.copy()
+        for key, value in other.mass_composition.items():
+            new_mass_composition[key] = new_mass_composition.get(key, 0) - value
+        return Composition(new_mass_composition, "mass")
+
+    __radd__ = __add__
+    __rsub__ = __sub__
+
+    def __iadd__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only add another Composition object to this Composition."
+            )
+
+        self.add_components(other.mass_composition, unit_type="mass")
+        return self
+
+    def __isub__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only subtract another Composition object from this Composition."
+            )
+
+        self = self - other
+        return self
+
+    def __mul__(self, scalar):
+        if not isinstance(scalar, (int, float)):
+            raise TypeError("Can only multiply a Composition object by a scalar.")
+
+        new_mass_composition = OrderedCounter(
+            {k: v * scalar for k, v in self.mass_composition.items()}
+        )
+        return Composition(new_mass_composition, "mass")
+
+    def __truediv__(self, scalar):
+        if not isinstance(scalar, (int, float)):
+            raise TypeError("Can only divide a Composition object by a scalar.")
+
+        new_mass_composition = OrderedCounter(
+            {k: v / scalar for k, v in self.mass_composition.items()}
+        )
+        return Composition(new_mass_composition, "mass")
+
+    def __repr__(self):
+        string = "Composition (mass):\n"
+        for key, value in self.mass_composition.items():
+            string += f"  {key}: {value}\n"
+        return string
+
+    def __str__(self):
+        return self.__repr__()
