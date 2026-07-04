@@ -88,15 +88,38 @@ def expand_stresses(stresses):
 def contract_strains(strains):
     """
     Takes a stress tensor in standard (3x3) form
-    and returns the Voigt form (6). Note the factors
-    which are required to maintain the relationship
-    with the corresponding stiffness and strain tensors.
+    and returns the Voigt form (6).
+
+    The off-diagonal elements are multiplied by 2 in the
+    conversion from standard form to Voigt form
+    to maintain the correct relationship with the
+    corresponding stiffness and compliance tensors,
+    which are defined in terms of the engineering strain.
     """
     # next line creates a copy, not just a view.
     eps = strains[[0, 1, 2, 1, 0, 0], [0, 1, 2, 2, 2, 1]]
     # only overwrites values in eps, not the input array
     eps[3:] *= 2.0
     return eps
+
+
+def expand_strains(strains):
+    """
+    Takes a stress tensor in Voigt form (6)
+    and returns the standard form (3x3).
+
+    The last three elements are divided by 2 in
+    the conversion from Voigt form to standard form
+    to maintain the correct relationship with the
+    corresponding stiffness and compliance tensors.
+    """
+    return np.array(
+        [
+            [strains[0], strains[5] / 2.0, strains[4] / 2.0],
+            [strains[5] / 2.0, strains[1], strains[3] / 2.0],
+            [strains[4] / 2.0, strains[3] / 2.0, strains[2]],
+        ]
+    )
 
 
 def contract_compliances(compliances):
