@@ -110,6 +110,7 @@ if __name__ == "__main__":
     pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     print(f"Weighted sum of squares: {fitted_eos.WSS:.2f}")
     print(f"Goodness of fit: {fitted_eos.goodness_of_fit:.2f}")
+    print(f"Number of iterations: {fitted_eos.n_iterations}")
     print("")
 
     # Now define a weak prior on K_0' while leaving V_0 and K_0 free
@@ -133,6 +134,7 @@ if __name__ == "__main__":
     pretty_print_values(fitted_eos.popt, fitted_eos.pcov, fitted_eos.fit_params)
     print(f"Weighted sum of squares: {fitted_eos.WSS:.2f}")
     print(f"Goodness of fit: {fitted_eos.goodness_of_fit:.2f}")
+    print(f"Number of iterations: {fitted_eos.n_iterations}")
     print("")
 
     cp_bands_with_priors = burnman.nonlinear_fitting.confidence_prediction_bands(
