@@ -292,6 +292,7 @@ class AnisotropicMaterial(Material):
         Tik = self.christoffel_tensor(propagation_direction)
 
         eigenvalues, eigenvectors = np.linalg.eig(Tik)
+        eigenvectors = np.real_if_close(eigenvectors)
 
         # sort eigs by decreasing eigenvalue
         idx = np.flip(eigenvalues.argsort(axis=-1), axis=-1)
