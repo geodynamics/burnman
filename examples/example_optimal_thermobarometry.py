@@ -430,9 +430,9 @@ if __name__ == "__main__":
         ax.plot(x, red_chisqr, label=f"{labels[i]}")
         print(
             f"    {labels[i]}:\n"
-            f"        chisq(x={x[0]})={red_chisqr[0]:.2f},\n"
-            f"        chisq(x={x[25]})={red_chisqr[25]:.2f},\n"
-            f"        chisq(x={x[-1]})={red_chisqr[-1]:.2f}\n"
+            f"        chisq(x={x[0]})={red_chisqr[0]:.1f},\n"
+            f"        chisq(x={x[25]})={red_chisqr[25]:.1f},\n"
+            f"        chisq(x={x[-1]})={red_chisqr[-1]:.1f}\n"
         )
 
     ax.set_xlabel("Change in order relative to optimal value")
