@@ -72,7 +72,7 @@ def cell_parameters_to_vectors(cell_parameters, frame_convention):
     return MT
 
 
-def cell_vectors_to_parameters(vectors, frame_convention):
+def cell_vectors_to_parameters(vectors, frame_convention, rotate=False):
     """
     Converts unit cell vectors to cell parameters.
 
@@ -87,8 +87,12 @@ def cell_vectors_to_parameters(vectors, frame_convention):
         coordinate system.
         In common crystallographic shorthand, x[c[0]] // a[c[0]],
         x[c[2]] // a[c[2]]^* (i.e. perpendicular to a[c[0]] and a[c[1]]).
-
     :type frame_convention: list of three integers
+
+    :param rotate: If True, the input vectors are rotated to satisfy the
+        requested frame convention. If False, the input vectors are assumed
+        to already satisfy the requested frame convention.
+    :type rotate: bool
 
     :returns: An array containing the three lengths of the unit cell vectors [m],
         and the three angles [degrees].
@@ -98,29 +102,52 @@ def cell_vectors_to_parameters(vectors, frame_convention):
         (:math:`\\gamma`) to the angle between the first and second vectors.
     :rtype: numpy.array (1D)
     """
-
     c = frame_convention
-    assert np.abs(vectors[c[0], c[1]]) < np.finfo(float).eps
-    assert np.abs(vectors[c[0], c[2]]) < np.finfo(float).eps
-    assert np.abs(vectors[c[1], c[2]]) < np.finfo(float).eps
+
+    if rotate:
+        M_T = vectors
+        Q = np.empty((3, 3))
+        Q[c[0]] = M_T[c[0]] / np.linalg.norm(M_T[c[0]])
+        Q[c[2]] = np.cross(M_T[c[0]], M_T[c[1]]) / np.linalg.norm(
+            np.cross(M_T[c[0]], M_T[c[1]])
+        )
+        Q[c[1]] = np.cross(Q[c[2]], Q[c[0]])
+        cell_vectors = np.einsum("ij, jk->ik", M_T, Q.T)
+    else:
+        cell_vectors = vectors
+
+    scale = np.max(np.abs(cell_vectors))
+    tol = 100.0 * np.finfo(cell_vectors.dtype).eps * scale
+    if not (
+        abs(cell_vectors[c[0], c[1]]) <= tol
+        and abs(cell_vectors[c[0], c[2]]) <= tol
+        and abs(cell_vectors[c[1], c[2]]) <= tol
+    ):
+        raise ValueError(
+            "Cell vectors do not satisfy the requested frame convention. "
+            "Perhaps they need to be rotated? If so, consider setting "
+            "rotate=True in the function call. If rotate=True already, "
+            "there may be a bug in the implementation."
+        )
 
     lengths = np.empty(3)
     angles = np.empty(3)
 
-    lengths[c[0]] = vectors[c[0], c[0]]
+    lengths[c[0]] = cell_vectors[c[0], c[0]]
     lengths[c[1]] = np.sqrt(
-        np.power(vectors[c[1], c[0]], 2.0) + np.power(vectors[c[1], c[1]], 2.0)
+        np.power(cell_vectors[c[1], c[0]], 2.0)
+        + np.power(cell_vectors[c[1], c[1]], 2.0)
     )
     lengths[c[2]] = np.sqrt(
-        np.power(vectors[c[2], c[0]], 2.0)
-        + np.power(vectors[c[2], c[1]], 2.0)
-        + np.power(vectors[c[2], c[2]], 2.0)
+        np.power(cell_vectors[c[2], c[0]], 2.0)
+        + np.power(cell_vectors[c[2], c[1]], 2.0)
+        + np.power(cell_vectors[c[2], c[2]], 2.0)
     )
 
-    angles[c[2]] = np.arccos(vectors[c[1], c[0]] / lengths[c[1]])
-    angles[c[1]] = np.arccos(vectors[c[2], c[0]] / lengths[c[2]])
+    angles[c[2]] = np.arccos(cell_vectors[c[1], c[0]] / lengths[c[1]])
+    angles[c[1]] = np.arccos(cell_vectors[c[2], c[0]] / lengths[c[2]])
     angles[c[0]] = np.arccos(
-        vectors[c[2], c[1]] / lengths[c[2]] * np.sin(angles[c[2]])
+        cell_vectors[c[2], c[1]] / lengths[c[2]] * np.sin(angles[c[2]])
         + np.cos(angles[c[2]]) * np.cos(angles[c[1]])
     )
 
