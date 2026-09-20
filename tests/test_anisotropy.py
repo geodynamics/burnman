@@ -73,6 +73,27 @@ class test_anisotropy(BurnManTest):
 
         self.assertArraysAlmostEqual(array_1, array_2)
 
+    def test_christoffel_under_hydrostatic_stress(self):
+        """
+        Hydrostatic stress preserves the isotropic acoustic tensor in every direction.
+        """
+        lam, G = 0.4e11, 0.24e11
+        m = anisotropy.IsotropicMaterial(2735.0, [lam, G])
+        directions = np.array(
+            [[[1.0, 0.0, 0.0], [-1.0, 2.0, 3.0]], [[0.0, 2.0, 0.0], [3.0, 0.0, 4.0]]]
+        )
+        n = directions / np.linalg.norm(directions, axis=-1, keepdims=True)
+        expected = G * np.eye(3) + (lam + G) * np.einsum("...i,...k->...ik", n, n)
+
+        actual = m.christoffel_tensor(directions)
+        self.assertEqual(actual.shape, expected.shape)
+        self.assertArraysAlmostEqual(
+            (actual / G).flatten(),
+            (expected / G).flatten(),
+            tol=1.0e-12,
+            tol_zero=1.0e-12,
+        )
+
     def test_crystal_systems(self):
         m = anisotropy.IsotropicMaterial(3000.0, [1.0, 1.0])
         m = anisotropy.CubicMaterial(3000.0, [1.0, 1.0, 1])

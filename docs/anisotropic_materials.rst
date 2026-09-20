@@ -26,3 +26,4 @@ and the heat capacity at constant strain.
   anisotropic_materials_01_anisotropic_material
   anisotropic_materials_02_anisotropic_mineral
   anisotropic_materials_03_anisotropic_solution
+  anisotropic_materials_04_hyperelastic_mineral

@@ -1,0 +1,46 @@
+Shearing mineral between plates
+Normal load: 5.0 GPa; temperature: 1000 K
+In-plane stretches are fixed; the plate separation can relax.
+Positive gap change means thickening.
+
+Sliding along a, plate normal along b
+Initial shear modulus: 87.458 GPa
+Prediction: lambda - 1 = 0.957 gamma^2
+ gamma   gap change (%)   shear (GPa)        P (GPa)     P_hyd (GPa)   delta Phi (J/mol)
+  0.00             0.00          0.00           5.00            5.00                   0
+  0.01             0.01          0.87           5.00            4.99                 187
+  0.02             0.04          1.75           5.02            4.95                 748
+  0.03             0.09          2.61           5.04            4.88                1680
+  0.04             0.15          3.47           5.06            4.79                2982
+  0.05             0.24          4.32           5.10            4.68                4651
+  0.06             0.34          5.16           5.14            4.54                6681
+  0.07             0.47          5.99           5.19            4.37                9067
+  0.08             0.61          6.80           5.25            4.19               11803
+  0.09             0.77          7.59           5.31            3.97               14883
+  0.10             0.95          8.37           5.38            3.74               18297
+Integrated shear work: 18297 J/mol
+Final delta Phi:       18297 J/mol
+Relative work/energy discrepancy: 0.00 J/mol
+Final relative volume change: 0.953 %
+Leading-order prediction: 0.957 %
+Sliding along c, plate normal along b
+Initial shear modulus: 68.812 GPa
+Prediction: lambda - 1 = 0.725 gamma^2
+ gamma   gap change (%)   shear (GPa)        P (GPa)     P_hyd (GPa)   delta Phi (J/mol)
+  0.00             0.00          0.00           5.00            5.00                   0
+  0.01             0.01          0.69           5.00            4.99                 147
+  0.02             0.03          1.37           5.01            4.96                 588
+  0.03             0.07          2.06           5.03            4.91                1323
+  0.04             0.12          2.74           5.05            4.84                2349
+  0.05             0.18          3.41           5.07            4.76                3664
+  0.06             0.26          4.08           5.10            4.65                5267
+  0.07             0.36          4.74           5.14            4.52                7153
+  0.08             0.46          5.39           5.18            4.38                9320
+  0.09             0.59          6.03           5.23            4.22               11763
+  0.10             0.72          6.66           5.28            4.04               14476
+Integrated shear work: 14476 J/mol
+Final delta Phi:       14476 J/mol
+Relative work/energy discrepancy: 0.00 J/mol
+Final relative volume change: 0.724 %
+Leading-order prediction: 0.725 %
+The two shear directions give different gap changes and shear stresses.
