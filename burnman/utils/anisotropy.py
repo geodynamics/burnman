@@ -7,7 +7,7 @@ try:  # numpy.block was new in numpy version 1.13.0.
             [2.0 * np.ones((3, 3)), 4.0 * np.ones((3, 3))],
         ]
     )
-except:
+except AttributeError:
     block = np.array(
         np.bmat(
             [[[[1.0] * 3] * 3, [[2.0] * 3] * 3], [[[2.0] * 3] * 3, [[4.0] * 3] * 3]]
@@ -164,3 +164,37 @@ def voigt_array_from_cijs(cijs, index_lists):
             C[indices] = cijs[i]
             C[indices[::-1]] = cijs[i]
     return C
+
+
+def polar_decomposition(F, strain_measure="U"):
+    """
+    Perform polar decomposition of a deformation gradient F
+    into a rotation matrix R and a strain measure:
+    U (right stretch), V (left stretch), or
+    H (right Hencky strain).
+
+    :param F: Deformation gradient (3x3)
+    :type F: np.ndarray
+
+    :param strain_measure: The type of strain measure to return.
+    :type strain_measure: str
+
+    :return: Rotation matrix R and the specified strain measure.
+    :rtype: tuple of (np.ndarray, np.ndarray)
+    """
+    U_svd, s, Vt = np.linalg.svd(F)
+    R = U_svd @ Vt
+
+    if strain_measure == "U":
+        U = Vt.T @ np.diag(s) @ Vt
+        return R, U
+
+    if strain_measure == "V":
+        V = U_svd @ np.diag(s) @ U_svd.T
+        return R, V
+
+    if strain_measure == "H":
+        if np.any(s <= 0):
+            raise ValueError("Hencky strain requires positive singular values.")
+        H = Vt.T @ np.diag(np.log(s)) @ Vt
+        return R, H

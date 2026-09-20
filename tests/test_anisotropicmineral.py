@@ -4,6 +4,10 @@ import numpy as np
 
 from burnman import AnisotropicMineral
 from burnman.tools.eos import check_anisotropic_eos_consistency
+from burnman.utils.anisotropy import (
+    voigt_notation_to_stiffness_tensor,
+    contract_stiffnesses,
+)
 from burnman.minerals.SLB_2011 import periclase, forsterite
 
 
@@ -100,6 +104,31 @@ class test_anisotropic_mineral(BurnManTest):
             self.assertFloatEqual(Cij[3, 3], Cijkl[1, 2, 1, 2])
             self.assertFloatEqual(Cij[4, 4], Cijkl[0, 2, 0, 2])
             self.assertFloatEqual(Cij[5, 5], Cijkl[0, 1, 0, 1])
+
+    def test_stiffness_rotation(self):
+        m = make_forsterite(orthotropic=False)
+        m.set_state(1.0e9, 300.0)
+        Cij = m.isothermal_stiffness_tensor
+        Cij_unrotated = m._unrotated_isothermal_stiffness_tensor
+
+        R = m.rotation_matrix
+
+        # make sure R is not the identity matrix
+        self.assertFalse(np.allclose(R, np.eye(3)))
+
+        # convert the unrotated stiffness tensor to full 4th order tensor
+        Cijkl_unrotated = voigt_notation_to_stiffness_tensor(Cij_unrotated)
+
+        # rotate the stiffness tensor
+        Cijkl_rotated = np.einsum("ip,jq,kr,ls,pqrs->ijkl", R, R, R, R, Cijkl_unrotated)
+
+        # convert back to Voigt notation
+        Cij_rotated = contract_stiffnesses(Cijkl_rotated)
+
+        # check that the rotated stiffness tensor is equal to the original
+        self.assertArraysAlmostEqual(
+            Cij.flatten(), Cij_rotated.flatten(), tol_zero=1.0e-12
+        )
 
 
 if __name__ == "__main__":

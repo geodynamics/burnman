@@ -1,12 +1,14 @@
 import unittest
 from util import BurnManTest
 import numpy as np
+from scipy.linalg import logm
 
 from burnman.classes import anisotropy
 from burnman.utils.unitcell import (
     cell_parameters_to_vectors,
     cell_vectors_to_parameters,
 )
+from burnman.utils.anisotropy import polar_decomposition
 
 
 class test_anisotropy(BurnManTest):
@@ -165,6 +167,31 @@ class test_anisotropy(BurnManTest):
             )
             self.assertArraysAlmostEqual(cos_a, cos_a2)
             self.assertArraysAlmostEqual(lengths_orig, lengths)
+
+    def test_polar_decomposition(self):
+        F = np.array([[1.0, 0.2, 0.3], [0.0, 1.0, 0.4], [0.0, 0.0, 1.0]])
+        R1, U = polar_decomposition(F)
+        R2, U = polar_decomposition(F, "U")
+        R3, V = polar_decomposition(F, "V")
+        R4, H = polar_decomposition(F, "H")
+
+        # check that R is a proper rotation matrix
+        self.assertArraysAlmostEqual(
+            np.dot(R1.T, R1).flatten(), np.eye(3).flatten(), tol_zero=1e-12
+        )
+
+        # check that the rotation matrices are the same
+        self.assertArraysAlmostEqual(R1.flatten(), R2.flatten(), tol_zero=1e-12)
+        self.assertArraysAlmostEqual(R1.flatten(), R3.flatten(), tol_zero=1e-12)
+        self.assertArraysAlmostEqual(R1.flatten(), R4.flatten(), tol_zero=1e-12)
+
+        # check that F = R * U = V * R
+        self.assertArraysAlmostEqual(
+            np.dot(R1, U).flatten(), np.dot(V, R1).flatten(), tol_zero=1e-12
+        )
+
+        # check that H = logm(U)
+        self.assertArraysAlmostEqual(logm(U).flatten(), H.flatten(), tol_zero=1e-12)
 
 
 if __name__ == "__main__":
