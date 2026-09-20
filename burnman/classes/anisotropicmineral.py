@@ -580,6 +580,15 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             return contract_compliances(S_rotated)
 
     @material_property
+    def _unrotated_isothermal_stiffness_tensor(self):
+        """
+        :returns: The isothermal stiffness tensor [Pa]
+            in Voigt form (:math:`\\mathbb{C}_{\\text{T} pq}`).
+        :rtype: numpy.array (2D)
+        """
+        return np.linalg.inv(self._unrotated_S_T_Voigt)
+
+    @material_property
     def thermal_expansivity_tensor(self):
         """
         :returns: The tensor of thermal expansivities [1/K].
