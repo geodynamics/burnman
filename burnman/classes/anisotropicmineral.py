@@ -530,8 +530,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         return 1.0 / self.isothermal_bulk_modulus_reuss
 
-    beta_T = isothermal_compressibility_reuss
-
     @material_property
     def isothermal_compressibility_voigt(self):
         """
