@@ -72,6 +72,39 @@ def cell_parameters_to_vectors(cell_parameters, frame_convention):
     return MT
 
 
+def rotation_to_crystallographic_frame(cell_vectors, frame_convention):
+    """
+    Returns a rotation matrix Q that rotates a set of cell vectors to the
+    crystallographic frame defined by a given frame convention via the
+    transformation: cell_vectors (xtl) = (Q @ cell_vectors.T).T
+
+    :param cell_vectors: The three vectors defining the parallelopiped cell [m].
+    :type cell_vectors: numpy.array (2D)
+
+    :param frame_convention: A list (c) defining the reference frame
+        convention.  This function dictates that the c[0]th cell vector
+        is colinear with the c[0]th axis, the c[1]th cell vector is
+        perpendicular to the c[2]th axis,
+        and the c[2]th cell vector is defined to give a right-handed
+        coordinate system.
+        In common crystallographic shorthand, x[c[0]] // a[c[0]],
+        x[c[2]] // a[c[2]]^* (i.e. perpendicular to a[c[0]] and a[c[1]]).
+    :type frame_convention: list of three integers
+
+    :returns: The requested rotation matrix.
+    :rtype: numpy.array (2D)
+    """
+    c = frame_convention
+    M_T = cell_vectors
+    Q = np.empty((3, 3))
+    Q[c[0]] = M_T[c[0]] / np.linalg.norm(M_T[c[0]])
+    Q[c[2]] = np.cross(M_T[c[0]], M_T[c[1]]) / np.linalg.norm(
+        np.cross(M_T[c[0]], M_T[c[1]])
+    )
+    Q[c[1]] = np.cross(Q[c[2]], Q[c[0]])
+    return Q
+
+
 def cell_vectors_to_parameters(vectors, frame_convention, rotate=False):
     """
     Converts unit cell vectors to cell parameters.
@@ -102,20 +135,13 @@ def cell_vectors_to_parameters(vectors, frame_convention, rotate=False):
         (:math:`\\gamma`) to the angle between the first and second vectors.
     :rtype: numpy.array (1D)
     """
-    c = frame_convention
-
     if rotate:
-        M_T = vectors
-        Q = np.empty((3, 3))
-        Q[c[0]] = M_T[c[0]] / np.linalg.norm(M_T[c[0]])
-        Q[c[2]] = np.cross(M_T[c[0]], M_T[c[1]]) / np.linalg.norm(
-            np.cross(M_T[c[0]], M_T[c[1]])
-        )
-        Q[c[1]] = np.cross(Q[c[2]], Q[c[0]])
-        cell_vectors = np.einsum("ij, jk->ik", M_T, Q.T)
+        Q = rotation_to_crystallographic_frame(vectors, frame_convention)
+        cell_vectors = (Q @ vectors.T).T
     else:
         cell_vectors = vectors
 
+    c = frame_convention
     scale = np.max(np.abs(cell_vectors))
     tol = 100.0 * np.finfo(cell_vectors.dtype).eps * scale
     if not (
