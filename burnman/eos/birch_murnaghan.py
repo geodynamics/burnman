@@ -55,7 +55,6 @@ def pressure_third_order(invVrel, params):
         for the reference bulk modulus (params['K_0']).
     :rtype: float
     """
-
     return (
         3.0
         * params["K_0"]
@@ -84,14 +83,26 @@ def volume_third_order(pressure, params):
     def delta_pressure(volume):
         return pressure_third_order(params["V_0"] / volume, params) - pressure
 
+    # Ignore RuntimeWarnings for a guess that leads to a negative volume
+    # as long as a solution can be found.
     try:
-        sol = bracket(delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            sol = bracket(
+                delta_pressure,
+                params["V_0"],
+                1.0e-2 * params["V_0"],
+            )
     except ValueError:
         raise ValueError(
             "Cannot find a volume, perhaps you are outside of the "
             "range of validity for the equation of state?"
         )
-    return opt.brentq(delta_pressure, sol[0], sol[1])
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        root = opt.brentq(delta_pressure, sol[0], sol[1])
+    return root
 
 
 def bulk_modulus_fourth_order(volume, params):

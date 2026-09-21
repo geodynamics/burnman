@@ -8,6 +8,8 @@ Optimization functions
 (fitting and solving)
 """
 
+__lazy_modules__ = ["burnman.optimize"]
+
 from . import composition_fitting
 from . import eos_fitting
 from . import linear_fitting

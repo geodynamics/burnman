@@ -11,6 +11,8 @@ and share the same interface. The models are taken
 from a variety of published sources:
 """
 
+__lazy_modules__ = ["burnman.calibrants"]
+
 from . import Anderson_1989
 from . import Armentrout_2015
 from . import Campbell_2009

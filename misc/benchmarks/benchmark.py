@@ -14,6 +14,7 @@ import burnman.eos.slb as slb
 from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
 
 import matplotlib.image as mpimg
+import warnings
 
 
 def check_birch_murnaghan():
@@ -453,7 +454,10 @@ def check_slb_fig3():
     perovskite.params["V_0"] = molar_volume_from_unit_cell_volume(168.27, 4.0)
     perovskite.params["grueneisen_0"] = 1.63
     perovskite.params["q_0"] = 1.7
-    perovskite.set_method(slb.SLB2)
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        perovskite.set_method(slb.SLB2)
 
     Vrel = np.linspace(0.6, 1.0, 100)
     grueneisen_slb = np.empty_like(Vrel)

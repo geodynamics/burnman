@@ -27,6 +27,7 @@ from ..utils.math import bracket
 from ..utils.misc import copy_documentation
 from . import bukowinski_electronic as el
 from .anharmonic_debye import AnharmonicDebye as Anharmonic
+import warnings
 
 
 class ModularMGD(eos.EquationOfState):
@@ -92,12 +93,17 @@ class ModularMGD(eos.EquationOfState):
             return P - pressure
 
         try:
-            sol = bracket(func, params["V_0"], 1.0e-2 * params["V_0"])
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=RuntimeWarning)
+                sol = bracket(func, params["V_0"], 1.0e-2 * params["V_0"])
         except Exception:
             raise ValueError(
                 "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
             )
-        volume = opt.brentq(func, sol[0], sol[1])
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RuntimeWarning)
+            volume = opt.brentq(func, sol[0], sol[1])
         return volume
 
     def pressure(self, temperature, volume, params):

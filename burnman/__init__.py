@@ -220,7 +220,38 @@ Acknowledgement and Support
 
 """
 
+__lazy_modules__ = [
+    "burnman",
+    "burnman.constants",
+    "burnman.classes.material",
+    "burnman.classes.perplex",
+    "burnman.classes.mineral",
+    "burnman.classes.combinedmineral",
+    "burnman.classes.solution",
+    "burnman.classes.solutionmodel",
+    "burnman.classes.elasticsolutionmodel",
+    "burnman.classes.elasticsolution",
+    "burnman.classes.composite",
+    "burnman.classes.relaxedcomposite",
+    "burnman.classes.calibrant",
+    "burnman.classes.anisotropy",
+    "burnman.classes.anisotropicmineral",
+    "burnman.classes.anisotropicsolution",
+    "burnman.classes.mineral_helpers",
+    "burnman.classes.composition",
+    "burnman.classes.layer",
+    "burnman.classes.planet",
+    "burnman.classes.polytope",
+    "burnman.classes",
+    "burnman.tools.equilibration",
+    "burnman.tools.partitioning",
+    "burnman.optimize",
+]
+
 import importlib.metadata
+
+# Physical constants
+from . import constants
 
 # Low level utility functions
 from . import utils
