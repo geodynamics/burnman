@@ -131,6 +131,7 @@ class PerplexMaterial(Material):
         volumes = 1.0e-5 * properties["V,J/bar/mol"]
         molar_masses = densities * volumes
         molar_mass = np.mean(molar_masses)
+        properties["beta,1/bar"][properties["beta,1/bar"] == 0.0] = np.inf
 
         property_interpolators = {
             "rho": RegularGridInterpolator(
