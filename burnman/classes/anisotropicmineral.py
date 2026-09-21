@@ -11,6 +11,7 @@ from .anisotropy import AnisotropicMaterial
 from ..utils.misc import copy_documentation
 from ..utils.unitcell import cell_parameters_to_vectors
 from ..utils.unitcell import cell_vectors_to_parameters
+from ..utils.unitcell import rotation_to_crystallographic_frame
 from ..utils.anisotropy import (
     voigt_notation_to_compliance_tensor,
     voigt_notation_to_stiffness_tensor,
@@ -339,7 +340,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         :returns: The deformation gradient tensor describing the deformation of the
             mineral from its undeformed state
-            (i.e. the state at the reference pressure and temperature).
+            (i.e. the state at the reference pressure and temperature)
+            to its current state.
+            Note that this does not include the rotation of the mineral back into
+            the crystal frame, which is described by the rotation_matrix property.
         :rtype: numpy.array (2D)
         """
         return self._unrotated_F
@@ -372,14 +376,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         if self.orthotropic:
             return np.eye(3)
         else:
-            c = self.frame_convention
-            M_T = self.unrotated_cell_vectors
-            Q = np.empty((3, 3))
-            Q[c[0]] = M_T[c[0]] / np.linalg.norm(M_T[c[0]])
-            Q[c[2]] = np.cross(M_T[c[0]], M_T[c[1]]) / np.linalg.norm(
-                np.cross(M_T[c[0]], M_T[c[1]])
+            Q = rotation_to_crystallographic_frame(
+                self.unrotated_cell_vectors, self.frame_convention
             )
-            Q[c[1]] = np.cross(Q[c[2]], Q[c[0]])
             return Q
 
     @material_property
@@ -529,8 +528,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         :rtype: float
         """
         return 1.0 / self.isothermal_bulk_modulus_reuss
-
-    beta_T = isothermal_compressibility_reuss
 
     @material_property
     def isothermal_compressibility_voigt(self):
