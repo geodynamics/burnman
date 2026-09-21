@@ -7,9 +7,9 @@
 """
 Equation of State
 -----------------
-
-
 """
+
+__lazy_modules__ = ["burnman.eos"]
 
 from .equation_of_state import EquationOfState, IsothermalEquationOfState
 from .murnaghan import Murnaghan

@@ -7,6 +7,8 @@
 BurnMan object classes
 """
 
+__lazy_modules__ = ["burnman.classes"]
+
 from . import material
 from . import perplex
 from . import mineral

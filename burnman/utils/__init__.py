@@ -15,6 +15,8 @@ They do not depend on any other BurnMan objects apart from
 those in constants.py.
 """
 
+__lazy_modules__ = ["burnman.utils"]
+
 from . import chemistry
 from . import math
 from . import misc
