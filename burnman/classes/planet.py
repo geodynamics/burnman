@@ -572,7 +572,7 @@ class Planet(object):
         :returns: Isothermal compressibility in [1/Pa].
         :rtype: array of floats
         """
-        return self.evaluate(["istothermal_compressibility"])
+        return self.evaluate(["isothermal_compressibility_reuss"])
 
     @material_property
     def isentropic_compressibility_reuss(self):

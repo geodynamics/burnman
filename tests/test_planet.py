@@ -1,4 +1,6 @@
 import unittest
+
+from burnman.classes import planet
 from util import BurnManTest
 import numpy as np
 
@@ -41,9 +43,79 @@ class test_planet(BurnManTest):
 
     def test_evaluate(self):
         myplanet, core, mantle = make_simple_planet()
-        alpha, rho = myplanet.evaluate(["alpha", "rho"], myplanet.radii)
-        self.assertFloatEqual(alpha[-2], myplanet.alpha[-2])
-        self.assertFloatEqual(rho[-2], myplanet.density[-2])
+
+        # point-by-point properties
+        property_names = [
+            "depth",
+            "gravity",
+            "temperature",
+            "molar_internal_energy",
+            "molar_gibbs",
+            "molar_helmholtz",
+            "molar_mass",
+            "molar_volume",
+            "molar_entropy",
+            "molar_enthalpy",
+            "isothermal_bulk_modulus_reuss",
+            "isentropic_bulk_modulus_reuss",
+            "isothermal_compressibility_reuss",
+            "isentropic_compressibility_reuss",
+            "bulk_sound_velocity",
+            "grueneisen_parameter",
+            "thermal_expansivity",
+            "molar_heat_capacity_v",
+            "molar_heat_capacity_p",
+            "P",
+            "T",
+            "energy",
+            "helmholtz",
+            "gibbs",
+            "V",
+            "rho",
+            "S",
+            "H",
+            "K_T",
+            "K_S",
+            "beta_T",
+            "beta_S",
+            "v_phi",
+            "gr",
+            "alpha",
+            "C_v",
+            "C_p",
+        ]
+        properties = myplanet.evaluate(property_names, myplanet.radii)
+
+        for i, name in enumerate(property_names):
+            self.assertFloatEqual(properties[i][-2], getattr(myplanet, name)[-2])
+
+        # layer-by-layer properties
+        property_names = [
+            "average_density",
+            "mass",
+            "moment_of_inertia",
+            "moment_of_inertia_factor",
+        ]
+        for name in property_names:
+            self.assertTrue(isinstance(getattr(myplanet, name), float))
+
+        # solid properties
+        property_names = [
+            "bullen",
+            "brunt_vasala",
+            "shear_modulus",
+            "p_wave_velocity",
+            "shear_wave_velocity",
+            "G",
+            "v_p",
+            "v_s",
+        ]
+        properties = myplanet.evaluate(property_names, myplanet.layers[1].radii[1:-1])
+
+        for i, name in enumerate(property_names):
+            self.assertFloatEqual(
+                properties[i][-1], getattr(myplanet.layers[1], name)[-2]
+            )
 
 
 if __name__ == "__main__":
