@@ -446,13 +446,13 @@ class Layer(object):
         kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
         phi = self.bulk_sound_velocity * self.bulk_sound_velocity
         try:
-            dkappadP = np.gradient(kappa, edge_order=2) / np.gradient(
-                self.pressures, edge_order=2
-            )
-            dphidr = (
-                np.gradient(phi, edge_order=2)
-                / np.gradient(self.radii, edge_order=2)
-                / self.gravity
+            dkappadP = np.gradient(kappa, self.pressures, edge_order=2)
+            grad_phi = np.gradient(phi, self.radii, edge_order=2)
+            dphidr = np.divide(
+                grad_phi,
+                self.gravity,
+                out=np.full_like(grad_phi, np.nan, dtype=float),
+                where=np.abs(self.gravity) > 1e-12,
             )
         except:
             dkappadP = np.gradient(kappa) / np.gradient(self.pressures)
