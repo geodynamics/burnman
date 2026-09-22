@@ -25,22 +25,22 @@ def make_nonorthotropic_mineral(a, b, c, alpha, beta, gamma, d, e, f):
     constants = np.zeros((6, 6, 3, 1))
     constants[:, :, 1, 0] = np.array(
         [
-            [0.44, -0.12, -0.1, d, e, f],
-            [-0.12, 0.78, -0.22, 0.0, 0.0, 0.0],
-            [-0.1, -0.22, 0.66, 0.0, 0.0, 0.0],
-            [d, 0.0, 0.0, 1.97, 0.0, 0.0],
-            [e, 0.0, 0.0, 0.0, 1.61, 0.0],
-            [f, 0.0, 0.0, 0.0, 0.0, 1.55],
+            [0.44, -0.12, -0.1, 0.0, d, 0.0],
+            [-0.12, 0.78, -0.22, 0.0, e, 0.0],
+            [-0.1, -0.22, 0.66, 0.0, f, 0.0],
+            [0.0, 0.0, 0.0, 1.97, 0.0, 0.0],
+            [d, e, f, 0.0, 1.61, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 1.55],
         ]
     )
     constants[:, :, 2, 0] = np.array(
         [
-            [0.24, -0.12, -0.1, 0.0, 0.0, 0.0],
-            [-0.12, 0.38, -0.22, d, d, d],
-            [-0.1, -0.22, 0.26, f, e, d],
-            [0.0, d, f, 0.0, 0.0, 0.0],
-            [0.0, d, e, 0.0, 0.0, 0.0],
-            [0.0, d, d, 0.0, 0.0, 0.0],
+            [0.24, -0.12, -0.1, 0.0, d, 0.0],
+            [-0.12, 0.38, -0.22, 0.0, d, 0.0],
+            [-0.1, -0.22, 0.26, 0.0, e, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, f],
+            [d, d, e, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, f, 0.0, 0.0],
         ]
     )
 
@@ -48,17 +48,25 @@ def make_nonorthotropic_mineral(a, b, c, alpha, beta, gamma, d, e, f):
     return m
 
 
-def make_nonorthotropic_solution(two_fos=False):
+def make_nonorthotropic_solution(two_fos=False, monoclinic=False):
 
     cell_lengths_A = np.array([4.7646, 10.2296, 5.9942])
     lth = cell_lengths_A * 1.0e-10 * np.cbrt(Avogadro / 4.0)
 
-    m1 = make_nonorthotropic_mineral(
-        lth[0], lth[1], lth[2], 85.0, 80.0, 87.0, 0.4, -1.0, -0.6
-    )
-    m2 = make_nonorthotropic_mineral(
-        lth[0] * 1.2, lth[1] * 1.4, lth[2], 90.0, 90.0, 90.0, 0.4, -1.0, -0.6
-    )
+    if not monoclinic:
+        m1 = make_nonorthotropic_mineral(
+            lth[0], lth[1], lth[2], 85.0, 80.0, 87.0, 0.4, -1.0, -0.6
+        )
+        m2 = make_nonorthotropic_mineral(
+            lth[0] * 1.2, lth[1] * 1.4, lth[2], 90.0, 90.0, 90.0, 0.4, -1.0, -0.6
+        )
+    else:
+        m1 = make_nonorthotropic_mineral(
+            lth[0], lth[1], lth[2], 90.0, 100.0, 90.0, 0.1, 0.2, 0.4
+        )
+        m2 = make_nonorthotropic_mineral(
+            lth[0] * 1.2, lth[1] * 1.4, lth[2], 90.0, 100.0, 90.0, 0.9, 0.2, 0.1
+        )
 
     if two_fos:
         n_mbrs = 3
@@ -152,6 +160,30 @@ class test_two_member_solution(BurnManTest):
         self.assertFloatEqual(Cij[3, 3], Cijkl[1, 2, 1, 2])
         self.assertFloatEqual(Cij[4, 4], Cijkl[0, 2, 0, 2])
         self.assertFloatEqual(Cij[5, 5], Cijkl[0, 1, 0, 1])
+
+    def test_monoclinic_solution_consistency(self):
+        ss = make_nonorthotropic_solution(two_fos=False, monoclinic=True)
+        ss.set_composition([0.3, 0.7])
+        self.assertTrue(
+            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-6)
+        )
+
+        ss.set_state(20.0e9, 1000.0)
+
+        ST = ss.isothermal_compliance_tensor
+        SS = ss.isentropic_compliance_tensor
+        CT = ss.isothermal_stiffness_tensor
+        CS = ss.isentropic_stiffness_tensor
+        CT_unrotated = ss._unrotated_isothermal_stiffness_tensor
+
+        # 14, 16, 24, 26, 34, 36, 45, 56 should be equal to zero,
+        # and alpha and gamma are 90 degrees.
+        for i, j in [(0, 3), (0, 5), (1, 3), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5)]:
+            self.assertFloatEqual(ST[i, j], 0.0)
+            self.assertFloatEqual(SS[i, j], 0.0)
+            self.assertFloatEqual(CT[i, j], 0.0)
+            self.assertFloatEqual(CS[i, j], 0.0)
+            self.assertFloatEqual(CT_unrotated[i, j], 0.0)
 
 
 if __name__ == "__main__":
