@@ -4,7 +4,7 @@
 # GPL v2 or later.
 import numpy as np
 import copy
-from scipy.linalg import expm, logm
+from scipy.linalg import expm, expm_frechet, logm
 from scipy.optimize import minimize
 from .solution import Solution
 from .anisotropicmineral import (
@@ -198,13 +198,14 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         with respect to molar proportions at constant
         volume and temperature under hydrostatic conditions.
         """
-        lnM0_ones = np.einsum("ij, k->kij", logm(self.cell_vectors_0.T), self.ones)
-        dp = 1.0e-5
-
-        dlnM0 = np.einsum("ijk->kij", self._logm_M0_mbr) * dp / 2.0
-        logmM0_0 = lnM0_ones - dlnM0
-        logmM0_1 = lnM0_ones + dlnM0
-        return np.einsum("kij->ijk", (expm(logmM0_1) - expm(logmM0_0)) / dp)
+        lnM0 = np.einsum("ijk,k->ij", self._logm_M0_mbr, self.molar_fractions)
+        return np.stack(
+            [
+                expm_frechet(lnM0, direction, compute_expm=False)
+                for direction in np.moveaxis(self._logm_M0_mbr, -1, 0)
+            ],
+            axis=-1,
+        )
 
     @material_property
     def _unrotated_dFdp_fixed_VT(self):
@@ -213,13 +214,13 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         with respect to molar proportions at constant
         volume and temperature under hydrostatic conditions.
         """
-        dp = 1.0e-5
-        PsiI_ones = np.einsum("ij, k->kij", self._PsiI, self.ones)
-        dPsiI = np.einsum("ijk->kij", self._PsiI_mbr + self._dPsiIdp_xs) * dp / 2.0
-        PsiI_0 = PsiI_ones - dPsiI
-        PsiI_1 = PsiI_ones + dPsiI
-
-        return np.einsum("kij->ijk", (expm(PsiI_1) - expm(PsiI_0)) / dp)
+        return np.stack(
+            [
+                expm_frechet(self._PsiI, direction, compute_expm=False)
+                for direction in np.moveaxis(self._PsiI_mbr + self._dPsiIdp_xs, -1, 0)
+            ],
+            axis=-1,
+        )
 
     @material_property
     def _unrotated_dMdn_fixed_VT(self):

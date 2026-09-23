@@ -3,7 +3,7 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 import numpy as np
-from scipy.linalg import expm
+from scipy.linalg import expm, expm_frechet
 from numpy.linalg import cond
 from .mineral import Mineral
 from .material import Material, material_property
@@ -90,16 +90,11 @@ def deformation_gradient_alpha_and_compliance(
         and the unrotated isothermal compliance tensor in Voigt form (6x6).
     :rtype: Tuple of four objects of type numpy.array (2D)
     """
-    # Numerical derivatives with respect to f and T
-    df = 1.0e-7
-    F0 = expm(PsiI - dPsiIdf_T * df / 2.0)
-    F1 = expm(PsiI + dPsiIdf_T * df / 2.0)
-    dFdf_T = (F1 - F0) / df
-
-    dT = 0.1
-    F0 = expm(PsiI - dPsiIdT_f * dT / 2.0)
-    F1 = expm(PsiI + dPsiIdT_f * dT / 2.0)
-    dFdT_f = (F1 - F0) / dT
+    # Differentiate the matrix exponential using the Frechet derivative,
+    # which handles noncommuting PsiI and dPsiI and is
+    # more accurate than finite differences.
+    F, dFdf_T = expm_frechet(PsiI, dPsiIdf_T)
+    dFdT_f = expm_frechet(PsiI, dPsiIdT_f, compute_expm=False)
 
     # Convert to pressure and temperature derivatives
     dFdP_T = -beta_TR * dFdf_T
@@ -107,7 +102,6 @@ def deformation_gradient_alpha_and_compliance(
 
     # Calculate the unrotated isothermal compressibility
     # and unrotated thermal expansivity tensors
-    F = expm(PsiI)
     invF = np.linalg.inv(F)
     LP = np.einsum("ij,kj->ik", dFdP_T, invF)
     beta_T = -0.5 * (LP + LP.T)

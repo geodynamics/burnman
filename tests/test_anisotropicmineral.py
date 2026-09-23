@@ -3,6 +3,7 @@ from util import BurnManTest
 import numpy as np
 
 from burnman import AnisotropicMineral
+from burnman.classes.anisotropicmineral import deformation_gradient_alpha_and_compliance
 from burnman.tools.eos import check_anisotropic_eos_consistency
 from burnman.utils.anisotropy import (
     voigt_notation_to_stiffness_tensor,
@@ -80,6 +81,46 @@ def make_mineral(crystal_system="orthorhombic"):
 
 
 class test_anisotropic_mineral(BurnManTest):
+    def test_matrix_exponential_derivatives(self):
+        """
+        Check Frechet derivatives against the closed form for diagonal PsiI.
+        """
+        eigenvalues = np.array([-0.1, -0.2, 0.15])
+        PsiI = np.diag(eigenvalues)
+        dPsiIdf = np.array([[0.2, 0.1, -0.04], [0.1, 0.3, 0.02], [-0.04, 0.02, 0.5]])
+        dPsiIdT = 1.0e-5 * np.array(
+            [[0.4, -0.2, 0.1], [-0.2, 0.2, 0.3], [0.1, 0.3, -0.6]]
+        )
+        alpha_V = 2.0e-5
+        F, dFdf, alpha, _ = deformation_gradient_alpha_and_compliance(
+            alpha_V, 1.0e-11, PsiI, np.eye(6), dPsiIdf, dPsiIdT
+        )
+
+        # L_exp(diag(lam), E)_ij = E_ij (exp(lam_i)-exp(lam_j))/(lam_i-lam_j).
+        divided_difference = np.empty((3, 3))
+        for i in range(3):
+            for j in range(3):
+                if i == j:
+                    divided_difference[i, j] = np.exp(eigenvalues[i])
+                else:
+                    delta = eigenvalues[i] - eigenvalues[j]
+                    divided_difference[i, j] = (
+                        np.exp(eigenvalues[j]) * np.expm1(delta) / delta
+                    )
+        expected_F = np.diag(np.exp(eigenvalues))
+        expected_dFdf = divided_difference * dPsiIdf
+        expected_dFdT = divided_difference * (dPsiIdT + alpha_V * dPsiIdf)
+        L = expected_dFdT @ np.diag(np.exp(-eigenvalues))
+        self.assertArraysAlmostEqual(
+            F.flatten(), expected_F.flatten(), tol=1.0e-12, tol_zero=1.0e-14
+        )
+        self.assertArraysAlmostEqual(
+            dFdf.flatten(), expected_dFdf.flatten(), tol=1.0e-12, tol_zero=1.0e-14
+        )
+        self.assertArraysAlmostEqual(
+            alpha.flatten(), (0.5 * (L + L.T)).flatten(), tol=1.0e-12, tol_zero=1.0e-18
+        )
+
     def test_isotropic_grueneisen(self):
         per = periclase()
         a = np.cbrt(per.params["V_0"])
@@ -105,11 +146,13 @@ class test_anisotropic_mineral(BurnManTest):
         per2.set_state(P, T)
 
         gr = per.grueneisen_parameter
-        self.assertArraysAlmostEqual(np.diag(per2.grueneisen_tensor), [gr, gr, gr])
+        self.assertArraysAlmostEqual(
+            np.diag(per2.grueneisen_tensor), [gr, gr, gr], tol=1.0e-12
+        )
 
     def test_orthotropic_consistency(self):
         m = make_mineral(crystal_system="orthorhombic")
-        self.assertTrue(check_anisotropic_eos_consistency(m))
+        self.assertTrue(check_anisotropic_eos_consistency(m, tol=1.0e-6))
 
     def test_non_orthotropic_consistency(self):
         m = make_mineral(crystal_system="triclinic")
@@ -122,15 +165,15 @@ class test_anisotropic_mineral(BurnManTest):
             Cijkl = m.full_isothermal_stiffness_tensor
             Cij = m.isothermal_stiffness_tensor
 
-            self.assertFloatEqual(Cij[0, 0], Cijkl[0, 0, 0, 0])
-            self.assertFloatEqual(Cij[1, 1], Cijkl[1, 1, 1, 1])
-            self.assertFloatEqual(Cij[2, 2], Cijkl[2, 2, 2, 2])
-            self.assertFloatEqual(Cij[0, 1], Cijkl[0, 0, 1, 1])
-            self.assertFloatEqual(Cij[0, 2], Cijkl[0, 0, 2, 2])
-            self.assertFloatEqual(Cij[1, 2], Cijkl[1, 1, 2, 2])
-            self.assertFloatEqual(Cij[3, 3], Cijkl[1, 2, 1, 2])
-            self.assertFloatEqual(Cij[4, 4], Cijkl[0, 2, 0, 2])
-            self.assertFloatEqual(Cij[5, 5], Cijkl[0, 1, 0, 1])
+            self.assertEqual(Cij[0, 0], Cijkl[0, 0, 0, 0])
+            self.assertEqual(Cij[1, 1], Cijkl[1, 1, 1, 1])
+            self.assertEqual(Cij[2, 2], Cijkl[2, 2, 2, 2])
+            self.assertEqual(Cij[0, 1], Cijkl[0, 0, 1, 1])
+            self.assertEqual(Cij[0, 2], Cijkl[0, 0, 2, 2])
+            self.assertEqual(Cij[1, 2], Cijkl[1, 1, 2, 2])
+            self.assertEqual(Cij[3, 3], Cijkl[1, 2, 1, 2])
+            self.assertEqual(Cij[4, 4], Cijkl[0, 2, 0, 2])
+            self.assertEqual(Cij[5, 5], Cijkl[0, 1, 0, 1])
 
     def test_stiffness_rotation(self):
         m = make_mineral(crystal_system="triclinic")
@@ -154,7 +197,10 @@ class test_anisotropic_mineral(BurnManTest):
 
         # check that the rotated stiffness tensor is equal to the original
         self.assertArraysAlmostEqual(
-            Cij.flatten(), Cij_rotated.flatten(), tol_zero=1.0e-12
+            Cij.flatten() / np.max(np.abs(Cij)),
+            Cij_rotated.flatten() / np.max(np.abs(Cij)),
+            tol=1.0e-12,
+            tol_zero=1.0e-13,
         )
 
     def test_monoclinic_consistency(self):

@@ -101,6 +101,44 @@ def make_nonorthotropic_solution(two_fos=False, monoclinic=False):
 
 
 class test_two_member_solution(BurnManTest):
+    def test_composition_derivatives_at_fixed_volume(self):
+        """Compare cell and deformation derivatives with composition changes."""
+        ss = make_nonorthotropic_solution()
+        fractions = np.array([0.8, 0.2])
+        direction = np.array([1.0, -1.0])
+        ss.set_composition(fractions)
+        ss.set_state(2.0e10, 1000.0)
+        volume, temperature = ss.V, ss.T
+        dM0 = np.einsum("ijk,k->ij", ss._dM0dp_fixed_VT, direction)
+        dF = np.einsum("ijk,k->ij", ss._unrotated_dFdp_fixed_VT, direction)
+
+        # Keep a large enough reference step to avoid cancellation in M0.
+        dp = 1.0e-4
+        try:
+            ss.set_composition(fractions + dp * direction)
+            ss.set_state_with_volume(volume, temperature)
+            M0_plus = ss.cell_vectors_0.T.copy()
+            F_plus = ss._unrotated_F.copy()
+            ss.set_composition(fractions - dp * direction)
+            ss.set_state_with_volume(volume, temperature)
+            M0_minus = ss.cell_vectors_0.T.copy()
+            F_minus = ss._unrotated_F.copy()
+            self.assertArraysAlmostEqual(
+                dM0.flatten(),
+                ((M0_plus - M0_minus) / (2.0 * dp)).flatten(),
+                tol=1.0e-8,
+                tol_zero=1.0e-14,
+            )
+            self.assertArraysAlmostEqual(
+                dF.flatten(),
+                ((F_plus - F_minus) / (2.0 * dp)).flatten(),
+                tol=1.0e-8,
+                tol_zero=1.0e-12,
+            )
+        finally:
+            ss.set_composition(fractions)
+            ss.set_state_with_volume(volume, temperature)
+
     def test_volume(self):
         ss = make_nonorthotropic_solution()
         ps = [0.2, 0.8]
@@ -108,7 +146,7 @@ class test_two_member_solution(BurnManTest):
         Vs = np.array([np.linalg.det(mbr[0].cell_vectors_0) for mbr in ss.endmembers])
         V1 = np.power(Vs[0], ps[0]) * np.power(Vs[1], ps[1])
         V2 = np.linalg.det(ss.cell_vectors_0)
-        self.assertFloatEqual(V1, V2)
+        self.assertFloatEqual(V1, V2, tol=1.0e-12, tol_zero=0.0)
 
     def test_non_orthotropic_endmember_consistency(self):
         ss = make_nonorthotropic_solution()
@@ -119,7 +157,7 @@ class test_two_member_solution(BurnManTest):
         ss = make_nonorthotropic_solution()
         ss.set_composition([0.8, 0.2])
         self.assertTrue(
-            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-6)
+            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=2.0e-7)
         )
 
     def test_relaxed_non_orthotropic_solution_consistency(self):
@@ -129,7 +167,7 @@ class test_two_member_solution(BurnManTest):
         )
         ss.set_composition([0.8, 0.2], relaxed=False)
         self.assertTrue(
-            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=1.0e-6)
+            check_anisotropic_eos_consistency(ss, P=2.0e10, T=1000.0, tol=2.0e-7)
         )
 
     def test_non_orthotropic_solution_clone(self):
@@ -141,7 +179,9 @@ class test_two_member_solution(BurnManTest):
         ss.set_composition([0.8, 0.2])
         ss.set_state(2.0e10, 1000.0)
         self.assertFloatEqual(
-            ss.isothermal_bulk_modulus_reuss, ss1.isothermal_bulk_modulus_reuss
+            ss.isothermal_bulk_modulus_reuss,
+            ss1.isothermal_bulk_modulus_reuss,
+            tol=1.0e-12,
         )
 
     def test_stiffness(self):
@@ -151,15 +191,15 @@ class test_two_member_solution(BurnManTest):
         Cijkl = ss.full_isothermal_stiffness_tensor
         Cij = ss.isothermal_stiffness_tensor
 
-        self.assertFloatEqual(Cij[0, 0], Cijkl[0, 0, 0, 0])
-        self.assertFloatEqual(Cij[1, 1], Cijkl[1, 1, 1, 1])
-        self.assertFloatEqual(Cij[2, 2], Cijkl[2, 2, 2, 2])
-        self.assertFloatEqual(Cij[0, 1], Cijkl[0, 0, 1, 1])
-        self.assertFloatEqual(Cij[0, 2], Cijkl[0, 0, 2, 2])
-        self.assertFloatEqual(Cij[1, 2], Cijkl[1, 1, 2, 2])
-        self.assertFloatEqual(Cij[3, 3], Cijkl[1, 2, 1, 2])
-        self.assertFloatEqual(Cij[4, 4], Cijkl[0, 2, 0, 2])
-        self.assertFloatEqual(Cij[5, 5], Cijkl[0, 1, 0, 1])
+        self.assertEqual(Cij[0, 0], Cijkl[0, 0, 0, 0])
+        self.assertEqual(Cij[1, 1], Cijkl[1, 1, 1, 1])
+        self.assertEqual(Cij[2, 2], Cijkl[2, 2, 2, 2])
+        self.assertEqual(Cij[0, 1], Cijkl[0, 0, 1, 1])
+        self.assertEqual(Cij[0, 2], Cijkl[0, 0, 2, 2])
+        self.assertEqual(Cij[1, 2], Cijkl[1, 1, 2, 2])
+        self.assertEqual(Cij[3, 3], Cijkl[1, 2, 1, 2])
+        self.assertEqual(Cij[4, 4], Cijkl[0, 2, 0, 2])
+        self.assertEqual(Cij[5, 5], Cijkl[0, 1, 0, 1])
 
     def test_monoclinic_solution_consistency(self):
         ss = make_nonorthotropic_solution(two_fos=False, monoclinic=True)
