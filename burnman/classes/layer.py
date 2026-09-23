@@ -447,17 +447,17 @@ class Layer(object):
         phi = self.bulk_sound_velocity * self.bulk_sound_velocity
         try:
             dkappadP = np.gradient(kappa, self.pressures, edge_order=2)
-            grad_phi = np.gradient(phi, self.radii, edge_order=2)
-            dphidr = np.divide(
-                grad_phi,
+            dphidr = np.gradient(phi, self.radii, edge_order=2)
+            dphidr_over_g = np.divide(
+                dphidr,
                 self.gravity,
-                out=np.full_like(grad_phi, np.nan, dtype=float),
+                out=np.full_like(dphidr, np.nan, dtype=float),
                 where=np.abs(self.gravity) > 1e-12,
             )
-        except:
-            dkappadP = np.gradient(kappa) / np.gradient(self.pressures)
-            dphidr = np.gradient(phi) / np.gradient(self.radii) / self.gravity
-        bullen = dkappadP + dphidr
+        except Exception:
+            dkappadP = np.gradient(kappa, self.pressures)
+            dphidr = np.gradient(phi, self.radii) / self.gravity
+        bullen = dkappadP + dphidr_over_g
         return bullen
 
     @property
