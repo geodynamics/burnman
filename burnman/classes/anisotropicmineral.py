@@ -370,10 +370,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         if self.orthotropic:
             return np.eye(3)
         else:
-            Q = rotation_to_crystallographic_frame(
+            R = rotation_to_crystallographic_frame(
                 self.unrotated_cell_vectors, self.frame_convention
             )
-            return Q
+            return R
 
     @material_property
     def cell_vectors(self):
