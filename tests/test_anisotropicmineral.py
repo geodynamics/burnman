@@ -176,17 +176,31 @@ class test_anisotropic_mineral(BurnManTest):
             self.assertEqual(Cij[5, 5], Cijkl[0, 1, 0, 1])
 
     def test_stiffness_rotation(self):
+        """
+        Check that cell vectors, elastic stiffnesses and
+        thermal expansivity share the crystal frame.
+        """
         m = make_mineral(crystal_system="triclinic")
-        m.set_state(1.0e9, 300.0)
+        m.set_state(1.0e9, 1000.0)
         Cij = m.isothermal_stiffness_tensor
         Cij_unrotated = m._unrotated_isothermal_stiffness_tensor
 
-        R = m.rotation_matrix
+        # Obtain the transformation from the cell vectors, independently of the
+        # rotation property. The [0, 1, 2] convention puts a along x and b in xy.
+        cell_vectors = m.cell_vectors
+        self.assertArraysAlmostEqual(
+            cell_vectors[[0, 0, 1], [1, 2, 2]], np.zeros(3), tol_zero=1.0e-14
+        )
+        self.assertTrue(np.all(np.diag(cell_vectors) > 0.0))
+        R = cell_vectors.T @ np.linalg.inv(m.unrotated_cell_vectors.T)
+        self.assertArraysAlmostEqual(
+            m.rotation_matrix.flatten(), R.flatten(), tol=1.0e-12, tol_zero=1.0e-14
+        )
 
         # make sure R is not the identity matrix
         self.assertFalse(np.allclose(R, np.eye(3)))
 
-        # convert the unrotated stiffness tensor to full 4th order tensor
+        # convert the unrotated stiffness tensor to a full 4th order tensor
         Cijkl_unrotated = voigt_notation_to_stiffness_tensor(Cij_unrotated)
 
         # rotate the stiffness tensor
@@ -195,15 +209,57 @@ class test_anisotropic_mineral(BurnManTest):
         # convert back to Voigt notation
         Cij_rotated = contract_stiffnesses(Cijkl_rotated)
 
-        # check that the rotated stiffness tensor is equal to the original
+        # check that the rotated stiffness tensor is equal to that
+        # obtained from the mineral object
         self.assertArraysAlmostEqual(
             Cij.flatten() / np.max(np.abs(Cij)),
             Cij_rotated.flatten() / np.max(np.abs(Cij)),
             tol=1.0e-12,
             tol_zero=1.0e-13,
         )
+        self.assertArraysAlmostEqual(
+            m.thermal_expansivity_tensor.flatten(),
+            (R @ m._unrotated_alpha @ R.T).flatten(),
+            tol=1.0e-12,
+            tol_zero=1.0e-18,
+        )
+
+    def test_elastic_energy_rotation(self):
+        """
+        Check that the rotation is implemented correctly by ensuring that
+        the quadratic elastic energy is unchanged from
+        the unrotated to the rotated frame.
+        """
+        m = make_mineral(crystal_system="triclinic")
+        m.set_state(20.0e9, 1000.0)
+        strain = 1.0e-3 * np.array(
+            [[1.0, 0.2, -0.3], [0.2, -0.4, 0.15], [-0.3, 0.15, -0.6]]
+        )
+        # Infer the rotation from the cell vectors,
+        # not the rotation_matrix property.
+        R = m.cell_vectors.T @ np.linalg.inv(m.unrotated_cell_vectors.T)
+        strain_rotated = R @ strain @ R.T
+        C = voigt_notation_to_stiffness_tensor(m._unrotated_isothermal_stiffness_tensor)
+        energy = 0.5 * m.V * np.einsum("ij,ijkl,kl", strain, C, strain)
+        energy_rotated = (
+            0.5
+            * m.V
+            * np.einsum(
+                "ij,ijkl,kl",
+                strain_rotated,
+                m.full_isothermal_stiffness_tensor,
+                strain_rotated,
+            )
+        )
+        self.assertFloatEqual(energy_rotated, energy, tol=1.0e-12)
 
     def test_monoclinic_consistency(self):
+        """
+        Test that the monoclinic mineral has the correct zero elements
+        in the stiffness and compliance tensors
+        after rotation to the crystallographic frame,
+        and that the cell parameters are also consistent.
+        """
         m = make_mineral(crystal_system="monoclinic")
         self.assertTrue(check_anisotropic_eos_consistency(m))
 
@@ -223,6 +279,10 @@ class test_anisotropic_mineral(BurnManTest):
             self.assertFloatEqual(CT[i, j], 0.0)
             self.assertFloatEqual(CS[i, j], 0.0)
             self.assertFloatEqual(CT_unrotated[i, j], 0.0)
+
+        p = m.cell_parameters
+        self.assertFloatEqual(p[3], 90.0)
+        self.assertFloatEqual(p[5], 90.0)
 
 
 if __name__ == "__main__":

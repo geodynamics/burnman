@@ -359,12 +359,12 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         )
 
     @material_property
-    def deformed_coordinate_frame(self):
+    def rotation_matrix(self):
         """
-        :returns: The orientations of the three spatial coordinate axes
-            after deformation of the mineral [m]. For orthotropic minerals,
-            this is equal to the identity matrix, as hydrostatic stresses only
-            induce rotations in monoclinic and triclinic crystals.
+        :returns: The rotation from the unrotated frame into the
+            crystallographic frame. Column vectors transform as ``R @ v``
+            and second-order tensors as ``R @ A @ R.T``. For orthotropic
+            minerals, this is the identity matrix.
         :rtype: numpy.array (2D)
         """
         if self.orthotropic:
@@ -374,16 +374,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                 self.unrotated_cell_vectors, self.frame_convention
             )
             return Q
-
-    @material_property
-    def rotation_matrix(self):
-        """
-        :returns: The matrix required to rotate the properties of the deformed
-            mineral into the deformed coordinate frame. For orthotropic
-            minerals, this is equal to the identity matrix.
-        :rtype: numpy.array (2D)
-        """
-        return self.deformed_coordinate_frame.T
 
     @material_property
     def cell_vectors(self):
@@ -398,10 +388,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         if self.orthotropic:
             return self.unrotated_cell_vectors
         else:
-            vectors = np.einsum(
-                "ij, jk->ik", self.unrotated_cell_vectors, self.rotation_matrix
-            )
-            return vectors
+            return (self.rotation_matrix @ self.unrotated_cell_vectors.T).T
 
     @material_property
     def cell_parameters(self):

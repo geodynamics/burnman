@@ -316,7 +316,8 @@ def check_anisotropic_eos_consistency(
     m.set_state(P + 0.5 * dP, T + 0.5 * dT)
     equilibration_function(m)
 
-    Q = m.deformed_coordinate_frame
+    # Compare with derivatives of F in the unrotated frame.
+    Q = m.rotation_matrix.T
     beta1 = m.isothermal_compressibility_tensor
     alpha1 = m.thermal_expansivity_tensor
 
