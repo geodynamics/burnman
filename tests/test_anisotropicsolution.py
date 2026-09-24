@@ -139,6 +139,52 @@ class test_two_member_solution(BurnManTest):
             ss.set_composition(fractions)
             ss.set_state_with_volume(volume, temperature)
 
+    def test_strain_derivatives_in_crystal_frame(self):
+        """
+        Check cell tensor and strain derivatives at constant V, T.
+        """
+        ss = make_nonorthotropic_solution()
+        fractions = np.array([0.8, 0.2])
+        ss.set_composition(fractions)
+        ss.set_state(2.0e10, 1000.0)
+        volume, temperature = ss.V, ss.T
+        M = ss.cell_vectors.T.copy()
+
+        R = M @ np.linalg.inv(ss.unrotated_cell_vectors.T)
+        dMdn = ss._dMdn_fixed_VT.copy()
+        depsdn = ss.depsdn_fixed_VT.copy()
+        dn = 1.0e-5
+
+        try:
+            for direction in [np.array([1.0, -1.0]), np.array([1.0, 0.0])]:
+                with self.subTest(direction=direction):
+                    cell_vectors = []
+                    for sign in [1.0, -1.0]:
+                        amounts = fractions + sign * dn * direction
+                        n = np.sum(amounts)
+                        ss.set_composition(amounts / n)
+                        ss.set_state_with_volume(volume / n, temperature)
+                        cell_vectors.append(
+                            R @ ss.unrotated_cell_vectors.T * np.cbrt(n)
+                        )
+                    dM = (cell_vectors[0] - cell_vectors[1]) / (2.0 * dn)
+                    L = dM @ np.linalg.inv(M)
+                    self.assertArraysAlmostEqual(
+                        np.einsum("ijk,k->ij", dMdn, direction).flatten(),
+                        dM.flatten(),
+                        tol=1.0e-7,
+                        tol_zero=1.0e-11,
+                    )
+                    self.assertArraysAlmostEqual(
+                        np.einsum("ijk,k->ij", depsdn, direction).flatten(),
+                        (0.5 * (L + L.T)).flatten(),
+                        tol=1.0e-7,
+                        tol_zero=1.0e-9,
+                    )
+        finally:
+            ss.set_composition(fractions)
+            ss.set_state_with_volume(volume, temperature)
+
     def test_volume(self):
         ss = make_nonorthotropic_solution()
         ps = [0.2, 0.8]

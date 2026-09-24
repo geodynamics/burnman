@@ -255,10 +255,12 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
     def _dMdn_fixed_VT(self):
         """
         Gradient in cell tensor with respect to composition
-        at fixed volume and temperature under hydrostatic conditions.
+        at fixed volume and temperature under hydrostatic conditions,
+        expressed in the crystallographic frame held fixed at this state.
+        Only the spatial index rotates; columns label lattice vectors.
         """
         R = self.rotation_matrix
-        return np.einsum("mi, nj, ijk->mnk", R, R, self._unrotated_dMdn_fixed_VT)
+        return np.einsum("mi, ijk->mjk", R, self._unrotated_dMdn_fixed_VT)
 
     @material_property
     def depsdn_fixed_VT(self):
@@ -267,7 +269,7 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         at fixed volume and temperature under hydrostatic conditions.
         """
         invM = np.linalg.inv(self.cell_vectors.T)
-        Ln = np.einsum("ijm,kj->ikm", self._dMdn_fixed_VT, invM)
+        Ln = np.einsum("ijm,jk->ikm", self._dMdn_fixed_VT, invM)
         LnT = np.einsum("ikm->kim", Ln)
         return 0.5 * (Ln + LnT)
 
