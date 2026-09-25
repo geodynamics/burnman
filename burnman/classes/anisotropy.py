@@ -178,19 +178,49 @@ class AnisotropicMaterial(Material):
 
     def christoffel_tensor(self, propagation_direction):
         """
-        :returns: The Christoffel tensor from an elastic stiffness
-            tensor and a propagation direction for a seismic wave
-            relative to the stiffness tensor:
-            T_ik = C_ijkl n_j n_l.
-        :rtype: float
+        Calculates the adiabatic Christoffel tensor.
+
+        The isentropic stiffness tensors provided in this and other
+        anisotropic classes correspond to the isentropic derivative
+        of stress with respect to symmetric infinitesimal strain.
+        This corresponds to the isentropic elastic tensor B
+        of Wallace (1967; doi:10.1103/PhysRev.162.776).
+
+        The Christoffel (acoustic) matrix is the contraction
+        T_ik = S_ijkl n_j n_l, where S is Wallace's
+        isentropic equation-of-motion tensor
+        (not to be confused with the isentropic compliance tensor).
+        For a unit direction n, contracting S gives
+        T = sym(T_B) + ((n . sigma . n) I - sigma) / 2,
+        where T_B_ik = B_ijkl n_j n_l and sigma is the tension-positive
+        Cauchy stress. This derivation follows from Wallace (1967),
+        using his Equations (2.24), (2.28), and (2.36).
+
+        :param propagation_direction: Direction or array of directions with
+            shape (..., 3), expressed in the same frame as the stress and
+            stiffness tensors. Each direction is normalized before contraction.
+        :returns: Christoffel tensor in Pa, with shape (..., 3, 3).
+        :rtype: numpy.ndarray
         """
-        propagation_direction = unit_normalize(propagation_direction)
-        Tik = np.einsum(
-            "ijkl, ...j, ...l",
-            self.full_isentropic_stiffness_tensor,
-            propagation_direction,
-            propagation_direction,
+        n = np.asarray(propagation_direction, dtype=float)
+        norms = np.linalg.norm(n, axis=-1, keepdims=True)
+        n = n / np.where(norms == 0.0, 1.0, norms)
+        Q_B = np.einsum(
+            "ijkl,...j,...l->...ik", self.full_isentropic_stiffness_tensor, n, n
         )
+        try:
+            stress = self.cauchy_stress
+            normal_stress = np.einsum("ij,...i,...j->...", stress, n, n)
+            correction = 0.5 * (
+                normal_stress[..., None, None] * np.eye(3)
+                - np.sum(n * n, axis=-1)[..., None, None] * stress
+            )
+            Tik = 0.5 * (Q_B + Q_B.swapaxes(-1, -2)) + correction
+        except AttributeError:
+            # If the subclass does not define a cauchy_stress property,
+            # assume hydrostatic stress
+            # (and therefore a correction equal to zero).
+            Tik = Q_B
         return Tik
 
     def isentropic_linear_compressibility(self, direction):

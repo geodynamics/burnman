@@ -25,3 +25,4 @@ from . import mineral_helpers
 from . import calibrant
 from . import seismic
 from . import geotherm
+from . import hyperelastic
