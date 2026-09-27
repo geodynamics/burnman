@@ -4,6 +4,7 @@ More Advanced Examples
 ======================
 
 Advanced examples:
+  - :mod:`~examples.example_hyperelastic_stress_rates`,
   - :mod:`~examples.example_spintransition`,
   - :mod:`~examples.example_spintransition_thermal`,
   - :mod:`~examples.example_user_input_material`,
@@ -17,6 +18,8 @@ Advanced examples:
   - :mod:`~examples.example_optimal_thermobarometry`,
   - :mod:`~examples.example_equilibrate`, and
   - :mod:`~examples.example_olivine_binary`.
+
+.. automodule:: examples.example_hyperelastic_stress_rates
 
 .. automodule:: examples.example_spintransition
 
