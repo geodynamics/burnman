@@ -87,7 +87,7 @@ def bracket(fn, x0, dx, args=(), ratio=1.618, maxiter=100):
     if (f0 - f_left) * (f_right - f0) < 0.0:
         while (
             (f0 - f_left) * (f_right - f0) < 0.0
-            and dx > np.finfo("float").eps
+            and dx > np.finfo(np.float64).eps
             and niter < maxiter
         ):
             dx /= ratio

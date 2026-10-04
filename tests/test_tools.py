@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 import burnman
 from burnman import Composite
+from burnman.eos.slb import SLBDomainError
 from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.chemistry import equilibrium_pressure
 from burnman.tools.chemistry import hugoniot
@@ -198,13 +199,13 @@ class test_tools(BurnManTest):
     def test_bracket_failure(self):
         mineral = burnman.minerals.SLB_2011.fayalite()
         # This should be too high pressure for the EoS
-        mineral.set_state(300.0e9, 300.0)
+        mineral.set_state(2300.0e9, 300.0)
 
         def fn():
             return mineral.molar_volume
 
         with np.errstate(all="ignore"):
-            self.assertRaises(Exception, fn)
+            self.assertRaises(SLBDomainError, fn)
 
     def test_padding_1D(self):
         array = np.array([1.0, 2.0, 3.0, 5.0])
