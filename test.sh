@@ -105,15 +105,19 @@ fi
 
 echo "*** checking test suite ..."
 
-# check for tabs in code:
-for f in `find . -name \*.py | grep -v ipython/`
+# Check for tabs in tracked Python files, excluding ipython scripts.
+while IFS= read -r -d '' f
 do
+    case "$f" in
+        *ipython/*) continue ;;
+    esac
 
-    grep $'\t' -q $f && \
-	echo "ERROR: tabs found in '$f':" && \
-	grep -n $'\t' $f && exit 0
-done
-
+    if grep -q $'\t' -- "$f"; then
+        echo "ERROR: tabs found in '$f':"
+        grep -n $'\t' -- "$f"
+        exit 1
+    fi
+done < <(git ls-files -z -- '*.py')
 
 $PYTHON -m unittest discover ./tests || (echo "ERROR: unittests failed"; exit 1) || exit 1
 echo ""
