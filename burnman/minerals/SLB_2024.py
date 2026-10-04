@@ -2020,9 +2020,10 @@ class SLB3Stishovite(SLB3):
             Cs = Cs0 - Ast / (PcQ - pressure + 3.0 * PminusPc)  # Eq B3
 
         # VRH-like average of the bare shear modulus with softened (C11-C12)/2.
-        G = 0.5 * (13.0 / 15.0 * G_bare + 2.0 / 15.0 * Cs) + 0.5 / (
-            13.0 / 15.0 / G_bare + 2.0 / 15.0 / Cs
-        )  # Eq B5
+        G = 0.5 * (13.0 / 15.0 * G_bare + 2.0 / 15.0 * Cs)  # Eq B5
+        # The Reuss contribution tends to zero at the soft-mode pressure.
+        if Cs != 0.0:
+            G += 0.5 / (13.0 / 15.0 / G_bare + 2.0 / 15.0 / Cs)
 
         debye_T = self._debye_temperature(params["V_0"] / volume, params)
         eta_s = self._isotropic_eta_s(params["V_0"] / volume, params)

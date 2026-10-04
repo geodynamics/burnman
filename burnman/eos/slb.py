@@ -28,6 +28,43 @@ from . import equation_of_state as eos
 from . import bukowinski_electronic as el
 from ..utils.math import bracket
 
+# Compile the existing bracketer for the scalar SLB pressure kernel.
+_compiled_bracket = jit(nopython=True)(bracket)
+
+
+def _slb_parameters(params, conductive):
+    bel_0, gel = (params["bel_0"], params["gel"]) if conductive else (0.0, 1.0)
+    return (
+        params["V_0"],
+        params["T_0"],
+        params["Debye_0"],
+        params["n"],
+        params["grueneisen_0"],
+        params["q_0"],
+        params["K_0"],
+        params["Kprime_0"],
+        bel_0,
+        gel,
+    )
+
+
+def _pressure_args(pressure, temperature, data):
+    V_0, T_0, Debye_0, n, gruen_0, q_0, K_0, Kprime_0, bel_0, gel = data
+    return (
+        pressure,
+        temperature,
+        V_0,
+        T_0,
+        Debye_0,
+        n,
+        6.0 * gruen_0,
+        -12.0 * gruen_0 + 36.0 * pow(gruen_0, 2.0) - 18.0 * q_0 * gruen_0,
+        9.0 * K_0,
+        27.0 * K_0 * (Kprime_0 - 4.0),
+        bel_0,
+        gel,
+    )
+
 
 @jit(nopython=True)
 def _grueneisen_parameter_slb(V_0, volume, gruen_0, q_0):
@@ -56,8 +93,12 @@ def _delta_pressure(
     bel_0,
     gel,
 ):
+    if not np.isfinite(x) or x <= 0.0:
+        return np.nan
     f = 0.5 * (pow(V_0 / x, 2.0 / 3.0) - 1.0)
     nu_o_nu0_sq = 1.0 + a1_ii * f + 1.0 / 2.0 * a2_iikk * f * f
+    if not np.isfinite(nu_o_nu0_sq) or nu_o_nu0_sq <= 0.0:
+        return np.nan
     debye_temperature = Debye_0 * np.sqrt(nu_o_nu0_sq)
     E_th = debye.thermal_energy(
         temperature, debye_temperature, n
@@ -87,6 +128,85 @@ def _delta_pressure(
     )  # EQ 21
 
 
+@jit(nopython=True)
+def _bracket_pressure(V_0, args):
+    return _compiled_bracket(_delta_pressure, V_0, 1.0e-2 * V_0, args)
+
+
+@jit(nopython=True)
+def _bulk_modulus_slb(volume, temperature, data):
+    """Compiled SLB bulk modulus."""
+    V_0, T_0, Debye_0, n, gruen_0, q_0, K_0, Kprime_0, bel_0, gel = data
+    if not np.isfinite(volume) or volume <= 0.0:
+        return np.nan
+    x = V_0 / volume
+    f = 0.5 * (pow(x, 2.0 / 3.0) - 1.0)
+    a1_ii = 6.0 * gruen_0
+    a2_iikk = -12.0 * gruen_0 + 36.0 * pow(gruen_0, 2.0) - 18.0 * q_0 * gruen_0
+    nu_o_nu0_sq = 1.0 + a1_ii * f + 0.5 * a2_iikk * f * f
+    if not np.isfinite(nu_o_nu0_sq) or nu_o_nu0_sq <= 0.0:
+        return np.nan
+    debye_T = Debye_0 * np.sqrt(nu_o_nu0_sq)
+    gr = _grueneisen_parameter_slb(V_0, volume, gruen_0, q_0)
+    if np.abs(gruen_0) < 1.0e-10:
+        q = 1.0 / 9.0 * (18.0 * gr - 6.0)
+    else:
+        q = (
+            1.0
+            / 9.0
+            * (
+                18.0 * gr
+                - 6.0
+                - 0.5 / nu_o_nu0_sq * (2.0 * f + 1.0) * (2.0 * f + 1.0) * a2_iikk / gr
+            )
+        )
+    K = pow(1.0 + 2.0 * f, 5.0 / 2.0) * (
+        K_0
+        + (3.0 * K_0 * Kprime_0 - 5 * K_0) * f
+        + 27.0 / 2.0 * (K_0 * Kprime_0 - 4.0 * K_0) * f * f
+    )
+    E_th = debye.thermal_energy(temperature, debye_T, n)
+    E_th_ref = debye.thermal_energy(T_0, debye_T, n)
+    C_v = debye.molar_heat_capacity_v(temperature, debye_T, n)
+    C_v_ref = debye.molar_heat_capacity_v(T_0, debye_T, n)
+    K += (gr + 1.0 - q) * (gr / volume) * (E_th - E_th_ref)
+    K -= (pow(gr, 2.0) / volume) * (C_v * temperature - C_v_ref * T_0)
+    if bel_0 != 0.0:
+        Pel = (
+            0.5
+            * gel
+            * bel_0
+            * np.power(volume / V_0, gel)
+            * (temperature * temperature - T_0 * T_0)
+            / volume
+        )
+        K += volume * (-(gel - 1.0) * Pel / volume)
+    return K
+
+
+@jit(nopython=True)
+def _stable_volume_path(volume, temperature, data):
+    """Check positive K_T from V_0 to the root."""
+    V_0 = data[0]
+    target = volume / V_0
+    ratio = 1.0
+    for _ in range(300):
+        K = _bulk_modulus_slb(ratio * V_0, temperature, data)
+        if not np.isfinite(K) or K <= 0.0:
+            return False
+        if ratio == target:
+            return True
+        if target < 1.0:
+            ratio = max(target, ratio / 1.025)
+        else:
+            ratio = min(target, ratio * 1.025)
+    return False
+
+
+class SLBDomainError(ValueError):
+    """A state outside the real, mechanically stable domain of an SLB EOS."""
+
+
 class SLBBase(eos.EquationOfState):
     """
     Base class for the finite strain-Mie-Grueneiesen-Debye equation of state
@@ -100,6 +220,8 @@ class SLBBase(eos.EquationOfState):
         Finite strain approximation for Debye Temperature [K]
         x = ref_vol/vol
         """
+        if not np.isfinite(x) or x <= 0.0:
+            raise SLBDomainError("SLB requires a finite, positive volume.")
         f = 1.0 / 2.0 * (pow(x, 2.0 / 3.0) - 1.0)
         a1_ii = 6.0 * params["grueneisen_0"]  # EQ 47
         a2_iikk = (
@@ -111,7 +233,7 @@ class SLBBase(eos.EquationOfState):
         if nu_o_nu0_sq > 0.0:
             return params["Debye_0"] * np.sqrt(nu_o_nu0_sq)
         else:
-            raise Exception(
+            raise SLBDomainError(
                 f"This volume (V = {1./x:.2f}*V_0) exceeds the "
                 "valid range of the thermal "
                 "part of the slb equation of state."
@@ -176,166 +298,124 @@ class SLBBase(eos.EquationOfState):
 
     def volume(self, pressure, temperature, params):
         """
-        Returns molar volume. :math:`[m^3]`
+        Returns molar volume on the stable branch connected to V_0. :math:`[m^3]`
+
+        Raises :class:`SLBDomainError` beyond the spinodal or Debye limit.
         """
-        T_0 = params["T_0"]
-        Debye_0 = params["Debye_0"]
-        V_0 = params["V_0"]
-        dV = 1.0e-2 * params["V_0"]
-        n = params["n"]
-
-        a1_ii = 6.0 * params["grueneisen_0"]  # EQ 47
-        a2_iikk = (
-            -12.0 * params["grueneisen_0"]
-            + 36.0 * pow(params["grueneisen_0"], 2.0)
-            - 18.0 * params["q_0"] * params["grueneisen_0"]
-        )  # EQ 47
-
-        b_iikk = 9.0 * params["K_0"]  # EQ 28
-        b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29z
-
-        bel_0, gel = 0.0, 1.0
-        if self.conductive:
-            bel_0, gel = params["bel_0"], params["gel"]
-
-        # Finding the volume at a given pressure requires a
-        # root-finding scheme. Here we use brentq to find the root.
-
-        # Root-finding using brentq requires bounds to be specified.
-        # We do this using a bracketing function.
-        args = (
-            pressure,
-            temperature,
-            V_0,
-            T_0,
-            Debye_0,
-            n,
-            a1_ii,
-            a2_iikk,
-            b_iikk,
-            b_iikkmm,
-            bel_0,
-            gel,
-        )
-
-        try:
-            # The first attempt to find a bracket for
-            # root finding uses V_0 as a starting point
-            sol = bracket(_delta_pressure, V_0, dV, args)
-        except Exception:
-            # At high temperature, the naive bracketing above may
-            # try a volume guess that exceeds the point at which the
-            # bulk modulus goes negative at that temperature.
-            # In this case, we try a more nuanced approach by
-            # first finding the volume at which the bulk modulus goes
-            # negative, and then either (a) raising an exception if the
-            # desired pressure is less than the pressure at that volume,
-            # or (b) using that pressure to create a better bracket for
-            # brentq.
-            def _K_T(V, T, params):
-                return self.isothermal_bulk_modulus_reuss(0.0, T, V, params)
-
-            sol_K_T = bracket(_K_T, V_0, dV, args=(temperature, params))
-            V_crit = opt.brentq(
-                _K_T, sol_K_T[0], sol_K_T[1], args=(temperature, params)
-            )
-            P_min = self.pressure(temperature, V_crit, params)
-            if P_min > pressure:
-                raise Exception(
-                    "The desired pressure is not achievable "
-                    "at this temperature. The minimum pressure "
-                    f"achievable is {P_min:.2e} Pa."
+        if not np.isfinite(pressure) or not np.isfinite(temperature) or temperature < 0:
+            raise ValueError("SLB requires finite pressure and T >= 0 K.")
+        data = _slb_parameters(params, self.conductive)
+        V_0 = data[0]
+        # Keep the original bracket and strict root tolerance for ordinary states.
+        if (
+            type(self).pressure is SLBBase.pressure
+            and type(self).isothermal_bulk_modulus_reuss
+            is SLBBase.isothermal_bulk_modulus_reuss
+        ):
+            args = _pressure_args(pressure, temperature, data)
+            try:
+                sol = _bracket_pressure(V_0, args)
+                root = opt.brentq(
+                    _delta_pressure,
+                    sol[0],
+                    sol[1],
+                    args=args,
+                    xtol=min(1.0e-24, 1.0e-18 * V_0),
                 )
-            else:
-                try:
-                    sol = bracket(_delta_pressure, V_crit - dV, dV, args)
-                except Exception:
-                    raise Exception(
-                        "Cannot find a volume, perhaps you are "
-                        "outside of the range of validity for "
-                        "the equation of state?"
+                if _stable_volume_path(root, temperature, data):
+                    return root
+            except (ValueError, ZeroDivisionError, OverflowError):
+                pass
+        return self._volume_near_domain_boundary(pressure, temperature, params)
+
+    def _volume_near_domain_boundary(self, pressure, temperature, params):
+        """Recover a stable root when the ordinary bracket leaves the domain."""
+        V_0 = params["V_0"]
+
+        def state(ratio):
+            try:
+                volume = ratio * V_0
+                p = self.pressure(temperature, volume, params)
+                k = self.isothermal_bulk_modulus_reuss(
+                    pressure, temperature, volume, params
+                )
+                return p, np.isfinite(p) and np.isfinite(k) and k > 0.0
+            except SLBDomainError:
+                return np.nan, False
+
+        def fail(reason):
+            raise SLBDomainError(f"{params.get('name', 'SLB phase')}: {reason}")
+
+        ratio = 1.0
+        for _ in range(201):
+            p, valid = state(ratio)
+            if valid:
+                break
+            ratio *= 0.975
+        else:
+            fail("no mechanically stable reference-connected volume.")
+        if p == pressure:
+            return ratio * V_0
+
+        step = 1.025 if p > pressure else 1.0 / 1.025
+        for _ in range(300):
+            next_ratio = ratio * step
+            next_p, valid = state(next_ratio)
+
+            if not valid:
+                # Refine the first domain boundary from its stable side.
+                stable, unstable = ratio, next_ratio
+                for _ in range(60):
+                    middle = 0.5 * (stable + unstable)
+                    _, admissible = state(middle)
+                    if admissible:
+                        stable = middle
+                    else:
+                        unstable = middle
+                next_ratio = stable
+                next_p, _ = state(stable)
+                if (p - pressure) * (next_p - pressure) > 0.0:
+                    fail(
+                        f"pressure is outside the stable EOS branch at T={temperature} K; "
+                        f"limiting pressure={next_p} Pa."
                     )
 
-        return opt.brentq(_delta_pressure, sol[0], sol[1], args=args, xtol=1.0e-24)
+            if (p - pressure) * (next_p - pressure) <= 0.0:
+                lo, hi = sorted((ratio, next_ratio))
+                root = opt.brentq(
+                    lambda volume: self.pressure(temperature, volume, params)
+                    - pressure,
+                    lo * V_0,
+                    hi * V_0,
+                    xtol=1.0e-18 * V_0,
+                )
+                _, valid = state(root / V_0)
+                if not valid:
+                    fail("volume root has nonpositive K_T.")
+                return root
+            ratio, p = next_ratio, next_p
+        fail("cannot bracket a stable volume.")
 
     def pressure(self, temperature, volume, params):
         """
         Returns the pressure of the mineral at a given temperature and volume
         [Pa]
         """
-        T_0 = params["T_0"]
-        Debye_0 = params["Debye_0"]
-        V_0 = params["V_0"]
-        n = params["n"]
-
-        a1_ii = 6.0 * params["grueneisen_0"]  # EQ 47
-        a2_iikk = (
-            -12.0 * params["grueneisen_0"]
-            + 36.0 * pow(params["grueneisen_0"], 2.0)
-            - 18.0 * params["q_0"] * params["grueneisen_0"]
-        )  # EQ 47
-
-        b_iikk = 9.0 * params["K_0"]  # EQ 28
-        b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29z
-
-        bel_0, gel = 0.0, 1.0
-        if self.conductive:
-            bel_0, gel = params["bel_0"], params["gel"]
-
-        return _delta_pressure(
-            volume,
-            0.0,
-            temperature,
-            V_0,
-            T_0,
-            Debye_0,
-            n,
-            a1_ii,
-            a2_iikk,
-            b_iikk,
-            b_iikkmm,
-            bel_0,
-            gel,
-        )
+        if not np.isfinite(volume) or volume <= 0.0:
+            raise SLBDomainError("SLB requires a finite, positive volume.")
+        # Check the real Debye domain before entering the JIT pressure kernel.
+        self._debye_temperature(params["V_0"] / volume, params)
+        data = _slb_parameters(params, self.conductive)
+        return _delta_pressure(volume, *_pressure_args(0.0, temperature, data))
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
         """
         Returns isothermal bulk modulus :math:`[Pa]`
         """
-        T_0 = params["T_0"]
-        debye_T = self._debye_temperature(params["V_0"] / volume, params)
-        gr = _grueneisen_parameter_slb(
-            params["V_0"], volume, params["grueneisen_0"], params["q_0"]
+        self._debye_temperature(params["V_0"] / volume, params)
+        return _bulk_modulus_slb(
+            volume, temperature, _slb_parameters(params, self.conductive)
         )
-
-        # thermal energy at temperature T
-        E_th = debye.thermal_energy(temperature, debye_T, params["n"])
-        # thermal energy at reference temperature
-        E_th_ref = debye.thermal_energy(T_0, debye_T, params["n"])
-
-        # heat capacity at temperature T
-        C_v = debye.molar_heat_capacity_v(temperature, debye_T, params["n"])
-        # heat capacity at reference temperature
-        C_v_ref = debye.molar_heat_capacity_v(T_0, debye_T, params["n"])
-
-        q = self._volume_dependent_q(params["V_0"] / volume, params)
-
-        K = (
-            bm.bulk_modulus_third_order(volume, params)
-            + (gr + 1.0 - q) * (gr / volume) * (E_th - E_th_ref)
-            - (pow(gr, 2.0) / volume) * (C_v * temperature - C_v_ref * T_0)
-        )
-
-        if self.conductive:
-            K += volume * el.KToverV(
-                temperature,
-                volume,
-                params["T_0"],
-                params["V_0"],
-                params["bel_0"],
-                params["gel"],
-            )
-        return K
 
     def shear_modulus(self, pressure, temperature, volume, params):
         """
