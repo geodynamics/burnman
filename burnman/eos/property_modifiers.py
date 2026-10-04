@@ -573,32 +573,55 @@ def magnetic_excesses_chs(pressure, temperature, params):
 
     A = (518.0 / 1125.0) + (11692.0 / 15975.0) * ((1.0 / structural_parameter) - 1.0)
     if tau < 1:
-        f = 1.0 - (1.0 / A) * (
-            79.0 / (140.0 * structural_parameter * tau)
-            + (474.0 / 497.0)
-            * (1.0 / structural_parameter - 1.0)
+        # Differentiate h = T*f directly. Its polynomial form has a finite
+        # T=0 limit and avoids cancellation of singular derivatives of f.
+        c = 79.0 / (140.0 * structural_parameter * A)
+        d = (474.0 / 497.0) * (1.0 / structural_parameter - 1.0) / A
+        h = (
+            temperature
+            - c * curie_temperature
+            - d * curie_temperature * (tau**4 / 6.0 + tau**10 / 135.0 + tau**16 / 600.0)
+        )
+        h_T = 1.0 - d * (
+            4.0 * tau**3 / 6.0 + 10.0 * tau**9 / 135.0 + 16.0 * tau**15 / 600.0
+        )
+        h_TT = (
+            -d
+            / curie_temperature
+            * (12.0 * tau**2 / 6.0 + 90.0 * tau**8 / 135.0 + 240.0 * tau**14 / 600.0)
+        )
+        h_C = -c + d * (
+            3.0 * tau**4 / 6.0 + 9.0 * tau**10 / 135.0 + 15.0 * tau**16 / 600.0
+        )
+        h_CC = (
+            -d
+            / curie_temperature
+            * (12.0 * tau**4 / 6.0 + 90.0 * tau**10 / 135.0 + 240.0 * tau**16 / 600.0)
+        )
+        h_TC = (
+            d
+            / curie_temperature
+            * (12.0 * tau**3 / 6.0 + 90.0 * tau**9 / 135.0 + 240.0 * tau**15 / 600.0)
+        )
+        log_moment = np.log1p(magnetic_moment)
+        log_moment_P = dmagnetic_momentdP / (magnetic_moment + 1.0)
+        log_moment_PP = -(log_moment_P**2)
+        curie_P = params["curie_temperature"][1]
+        excesses = {
+            "G": gas_constant * log_moment * h,
+            "dGdT": gas_constant * log_moment * h_T,
+            "dGdP": gas_constant * (log_moment_P * h + log_moment * h_C * curie_P),
+            "d2GdT2": gas_constant * log_moment * h_TT,
+            "d2GdP2": gas_constant
             * (
-                np.power(tau, 3.0) / 6.0
-                + np.power(tau, 9.0) / 135.0
-                + np.power(tau, 15.0) / 600.0
-            )
-        )
-        dfdtau = -(1.0 / A) * (
-            -79.0 / (140.0 * structural_parameter * tau * tau)
-            + (474.0 / 497.0)
-            * (1.0 / structural_parameter - 1.0)
-            * (tau * tau / 2.0 + np.power(tau, 8.0) / 15.0 + np.power(tau, 14.0) / 40.0)
-        )
-        d2fdtau2 = -(1.0 / A) * (
-            2.0 * 79.0 / (140.0 * structural_parameter * np.power(tau, 3.0))
-            + (474.0 / 497.0)
-            * (1.0 / structural_parameter - 1.0)
-            * (
-                tau
-                + 8.0 * np.power(tau, 7.0) / 15.0
-                + 14.0 * np.power(tau, 13.0) / 40.0
-            )
-        )
+                log_moment_PP * h
+                + 2.0 * log_moment_P * h_C * curie_P
+                + log_moment * h_CC * curie_P**2
+            ),
+            "d2GdPdT": gas_constant
+            * (log_moment_P * h_T + log_moment * h_TC * curie_P),
+        }
+        return (excesses, None)
 
     else:
         f = -(1.0 / A) * (
