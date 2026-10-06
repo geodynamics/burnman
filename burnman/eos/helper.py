@@ -17,6 +17,7 @@ from . import dks_liquid
 from . import dks_solid
 from . import hp
 from . import cork
+from . import pitzer_sterner
 from . import vinet
 from . import morse_potential
 from . import reciprocal_kprime
@@ -76,6 +77,7 @@ eos_names["hp_tmtL"] = (
     "Holland and Powell Modified Tait Thermal Liquid EoS (Holland and Powell, 2011)"
 )
 eos_names["cork"] = "CORK EoS (Holland and Powell, 1991)"
+eos_names["pitzer-sterner"] = "Pitzer-Sterner Fluid EoS (Pitzer and Sterner, 1994)"
 eos_names["brosh_calphad"] = "Brosh CALPHAD EoS (Brosh, 2007)"
 eos_names["aa"] = "Liquid Metal EoS (Anderson and Ahrens, 1994)"
 eos_methods = OrderedDict()
@@ -102,6 +104,7 @@ eos_methods["hp98"] = hp.HP98
 eos_methods["hp_tmt"] = hp.HP_TMT
 eos_methods["hp_tmtL"] = hp.HP_TMTL
 eos_methods["cork"] = cork.CORK
+eos_methods["pitzer-sterner"] = pitzer_sterner.PitzerSterner
 eos_methods["brosh_calphad"] = brosh_calphad.BroshCalphad
 eos_methods["aa"] = aa.AA
 eos_methods["combined"] = CombinedMineralMethod

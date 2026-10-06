@@ -4,6 +4,9 @@ coverage.*
 .python-version
 .vscode
 /burnman/data/*
+!/burnman/data/input_raw_endmember_datasets/
+/burnman/data/input_raw_endmember_datasets/*
+!/burnman/data/input_raw_endmember_datasets/HP636data_to_burnman.py
 /contrib/tutorial/uncertainty.dat
 /misc/*.pdf
 /examples/example_woutput.txt

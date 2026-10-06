@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic
 # and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2026 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 """
@@ -22,6 +22,11 @@ Contains the following solutions:
 * cpx
 * spn
 * ilm
+
+The original H18 liq model is omitted because its authors withdrew it
+after discovering an algebraic error. The corrected G25 replacement
+requires endmember dataset 6.36. See:
+https://hpxeosandthermocalc.org/the-hpx-eos/the-hpx-eos-families/hpx-eos-igneous-sets/
 
 The values in this document are all in S.I. units,
 unlike those in the original THERMOCALC file.
@@ -177,12 +182,6 @@ cfm = CombinedMineral(
     [np.float64(0.0), np.float64(-0.0), np.float64(0.0)],
     "cfm",
 )
-anC = CombinedMineral(
-    [HGP_2018_ds633.an()],
-    [1.0],
-    [np.float64(7030.0), np.float64(4.66), np.float64(0.0)],
-    "anC",
-)
 knom = CombinedMineral(
     [HGP_2018_ds633.knor()],
     [1.0],
@@ -275,7 +274,7 @@ cen = CombinedMineral(
     [np.float64(3500.0), np.float64(2.0), np.float64(4.800000000000001e-07)],
     "cen",
 )
-cfm = CombinedMineral(
+cfm_cpx = CombinedMineral(
     [HGP_2018_ds633.en(), HGP_2018_ds633.fs()],
     [0.5, 0.5],
     [np.float64(-1600.0), np.float64(2.0), np.float64(4.6500000000000005e-07)],
@@ -374,7 +373,7 @@ class pl4tr(Solution):
             ],
             alphas=[0.674, 0.55, 1.0],
             energy_interaction=[[14600.0, 24100.0], [48500.0]],
-            entropy_interaction=[[0.00935, 0.00957], [-0.0]],
+            entropy_interaction=[[9.350000000000001, 9.57], [-0.0]],
             volume_interaction=[
                 [-4.0000000000000003e-07, 3.3800000000000007e-06],
                 [-1.3e-06],
@@ -403,7 +402,7 @@ class k4tr(Solution):
             ],
             alphas=[0.674, 0.55, 1.0],
             energy_interaction=[[14600.0, 24100.0], [48500.0]],
-            entropy_interaction=[[0.00935, 0.00957], [-0.0]],
+            entropy_interaction=[[9.350000000000001, 9.57], [-0.0]],
             volume_interaction=[
                 [-4.0000000000000003e-07, 3.3800000000000007e-06],
                 [-1.3e-06],
@@ -432,7 +431,7 @@ class pli(Solution):
             ],
             alphas=[0.643, 1.0, 1.0],
             energy_interaction=[[15000.0, 25100.0], [40000.0]],
-            entropy_interaction=[[-0.0, 0.0108], [-0.0]],
+            entropy_interaction=[[-0.0, 10.8], [-0.0]],
             volume_interaction=[[0.0, 3.3800000000000007e-06], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -458,7 +457,7 @@ class plc(Solution):
             ],
             alphas=[0.643, 1.0, 1.0],
             energy_interaction=[[3100.0, 25100.0], [40000.0]],
-            entropy_interaction=[[-0.0, 0.0108], [-0.0]],
+            entropy_interaction=[[-0.0, 10.8], [-0.0]],
             volume_interaction=[[0.0, 3.3800000000000007e-06], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -513,7 +512,7 @@ class ksp(Solution):
             ],
             alphas=[1.0, 0.643, 1.0],
             energy_interaction=[[25100.0, 40000.0], [3100.0]],
-            entropy_interaction=[[0.0108, -0.0], [-0.0]],
+            entropy_interaction=[[10.8, -0.0], [-0.0]],
             volume_interaction=[[3.3800000000000007e-06, 0.0], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -552,10 +551,10 @@ class g(Solution):
                 [0.0],
             ],
             entropy_interaction=[
-                [-0.0, 0.01, 0.01, -0.0, -0.0],
-                [0.01, 0.01, -0.0, -0.0],
-                [-0.0, 0.01, -0.0],
-                [0.01, -0.0],
+                [-0.0, 10.0, 10.0, -0.0, -0.0],
+                [10.0, 10.0, -0.0, -0.0],
+                [-0.0, 10.0, -0.0],
+                [10.0, -0.0],
                 [-0.0],
             ],
             volume_interaction=[
@@ -637,7 +636,7 @@ class cpx(Solution):
         * [cbuf, "[Mgmone1/2Timone1/2][Camtwo][Sit1/2Alt1/2]1/2"]
         * [HGP_2018_ds633.jd(), "[Almone][Namtwo][Sit]1/2"]
         * [cen, "[Mgmone][Mgmtwo][Sit]1/2"]
-        * [cfm, "[Mgmone][Femtwo][Sit]1/2"]
+        * [cfm_cpx, "[Mgmone][Femtwo][Sit]1/2"]
         * [kjd, "[Almone][Kmtwo][Sit]1/2"]
 
         This is implemented as an asymmetric solution.
@@ -653,7 +652,7 @@ class cpx(Solution):
                 [cbuf, "[Mgmone1/2Timone1/2][Camtwo][Sit1/2Alt1/2]1/2"],
                 [HGP_2018_ds633.jd(), "[Almone][Namtwo][Sit]1/2"],
                 [cen, "[Mgmone][Mgmtwo][Sit]1/2"],
-                [cfm, "[Mgmone][Femtwo][Sit]1/2"],
+                [cfm_cpx, "[Mgmone][Femtwo][Sit]1/2"],
                 [kjd, "[Almone][Kmtwo][Sit]1/2"],
             ],
             alphas=[1.2, 1.0, 1.9, 1.9, 1.9, 1.9, 1.2, 1.0, 1.0, 1.2],

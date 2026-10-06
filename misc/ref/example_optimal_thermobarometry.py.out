@@ -7,14 +7,14 @@ Estimated conditions for olivine-wadsleyite equilibrium:
     Temperature: 1380 +/- 83 K
 
 Estimated conditions for mu-bi-g-ilmm-st-q assemblage:
-    Pressure: 0.43 +/- 0.04 GPa
-    Temperature: 888 +/- 11 K
-    Correlation between P and T: 0.11
+    Pressure: 0.45 +/- 0.04 GPa
+    Temperature: 891 +/- 11 K
+    Correlation between P and T: 0.1
     Number of Reactions: 11
     Number of Parameters: 4
     Degrees of Freedom: 7
-    Reduced Chi-squared: 0.25
-    Fit (sqrt reduced chi-squared): 0.50
+    Reduced Chi-squared: 0.30
+    Fit (sqrt reduced chi-squared): 0.54
 
     Mineral compositions and site occupancies:
     mu:
@@ -30,7 +30,7 @@ Estimated conditions for mu-bi-g-ilmm-st-q assemblage:
     ilmm:
         free site occupancy vector: [Fe-0.50Ti0.50][Ti-0.50Fe0.50]
         composition: Mg0.05Ti0.9Mn0.05FeO3.0
-        site occupancies: [Fe0.37Ti0.43Fe3+0.10Mg0.05Mn0.05][Ti0.47Fe0.43Fe3+0.10]
+        site occupancies: [Fe0.41Ti0.39Fe3+0.10Mg0.05Mn0.05][Ti0.51Fe0.39Fe3+0.10]
     st:
         composition: Mg0.72Ti0.12Mn0.05Fe3.3Al17.77Si7.5O48.0H4.0
         site occupancies: [Mg0.18Fe0.81Mn0.01]4[Al0.89Fe3+0.03Ti0.06V0.02]2
@@ -41,7 +41,7 @@ Estimated conditions for mu-bi-g-ilmm-st-q assemblage:
     bi Fe-Mg order:
         chisq(x=-0.1)=0.4,
         chisq(x=0.0)=0.3,
-        chisq(x=0.1)=0.5
+        chisq(x=0.1)=0.6
 
     ilmm Fe-Ti order:
         chisq(x=-0.1)=0.3,

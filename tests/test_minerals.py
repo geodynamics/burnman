@@ -39,9 +39,32 @@ class instantiate_minerals(BurnManTest):
                 if isinstance(m, burnman.SolidSolution):
                     m.set_composition([1.0 / m.n_endmembers] * m.n_endmembers)
 
-                # test that it works
-                m.set_state(P, T)
-                V = m.molar_volume
+                # Respect the common domain of the material and all of its
+                # endmembers (including components of CombinedMinerals).
+                parameter_sets = []
+                pending = [m]
+                while pending:
+                    component = pending.pop()
+                    parameter_sets.append(component.params)
+                    if isinstance(component, burnman.CombinedMineral):
+                        pending.append(component.mixture)
+                    elif isinstance(component, burnman.SolidSolution):
+                        pending.extend(
+                            endmember for endmember, _ in component.endmembers
+                        )
+                pressure = min(
+                    P, min(params.get("P_max", P) for params in parameter_sets)
+                )
+                temperature = min(
+                    T, min(params.get("T_max", T) for params in parameter_sets)
+                )
+                temperature = max(
+                    temperature,
+                    max(params.get("T_min", 0.0) for params in parameter_sets),
+                )
+                with self.subTest(library=minlib_name, mineral=mineral_.__name__):
+                    m.set_state(pressure, temperature)
+                    V = m.molar_volume
 
 
 if __name__ == "__main__":
