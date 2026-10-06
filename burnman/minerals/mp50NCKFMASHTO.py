@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic
 # and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2026 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 """
@@ -131,12 +131,6 @@ anC = CombinedMineral(
     [np.float64(7030.0), np.float64(4.66), np.float64(0.0)],
     "anC",
 )
-anC = CombinedMineral(
-    [HP_2011_ds62.an()],
-    [1.0],
-    [np.float64(7030.0), np.float64(4.66), np.float64(0.0)],
-    "anC",
-)
 mut = CombinedMineral(
     [HP_2011_ds62.mu()],
     [1.0],
@@ -172,12 +166,6 @@ mat = CombinedMineral(
     [1.0],
     [np.float64(5000.0), np.float64(-0.0), np.float64(0.0)],
     "mat",
-)
-fmu = CombinedMineral(
-    [HP_2011_ds62.andr(), HP_2011_ds62.gr(), HP_2011_ds62.mu()],
-    [0.5, -0.5, 1.0],
-    [np.float64(25000.0), np.float64(-0.0), np.float64(0.0)],
-    "fmu",
 )
 annm = CombinedMineral(
     [HP_2011_ds62.ann()],
@@ -280,32 +268,6 @@ ctdo = CombinedMineral(
     [0.25, -0.25, 1.0],
     [np.float64(13500.0), np.float64(-0.0), np.float64(0.0)],
     "ctdo",
-)
-oilm = CombinedMineral(
-    [ilm_nood],
-    [1.0],
-    [
-        np.float64(1444.0572257227777),
-        np.float64(1.5923196732102785),
-        np.float64(1.836386612201713e-07),
-    ],
-    "oilm",
-)
-dilm = CombinedMineral(
-    [ilm_nood],
-    [1.0],
-    [
-        np.float64(17044.35722572278),
-        np.float64(13.118319673210278),
-        np.float64(1.836386612201713e-07),
-    ],
-    "dilm",
-)
-dhem = CombinedMineral(
-    [hem_nood],
-    [1.0],
-    [np.float64(9522.770803030953), np.float64(12.937668369038724), np.float64(0.0)],
-    "dhem",
 )
 oilm = CombinedMineral(
     [ilm_nood],

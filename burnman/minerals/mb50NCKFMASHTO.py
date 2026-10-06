@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic
 # and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2026 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 """
@@ -216,7 +216,7 @@ fmc = CombinedMineral(
     [np.float64(-1600.0), np.float64(2.0), np.float64(4.6500000000000005e-07)],
     "fmc",
 )
-acmm = CombinedMineral(
+acmm_dio = CombinedMineral(
     [HP_2011_ds62.acm()],
     [1.0],
     [np.float64(-7000.0), np.float64(-0.0), np.float64(0.0)],
@@ -282,43 +282,11 @@ anC = CombinedMineral(
     [np.float64(7030.0), np.float64(4.66), np.float64(0.0)],
     "anC",
 )
-anC = CombinedMineral(
-    [HP_2011_ds62.an()],
-    [1.0],
-    [np.float64(7030.0), np.float64(4.66), np.float64(0.0)],
-    "anC",
-)
 abhI = CombinedMineral(
     [HP_2011_ds62.abh()],
     [1.0],
     [np.float64(570.0), np.float64(4.12), np.float64(0.0)],
     "abhI",
-)
-oilm = CombinedMineral(
-    [ilm_nood],
-    [1.0],
-    [
-        np.float64(1444.0572257227777),
-        np.float64(1.5923196732102785),
-        np.float64(1.836386612201713e-07),
-    ],
-    "oilm",
-)
-dilm = CombinedMineral(
-    [ilm_nood],
-    [1.0],
-    [
-        np.float64(17044.35722572278),
-        np.float64(13.118319673210278),
-        np.float64(1.836386612201713e-07),
-    ],
-    "dilm",
-)
-dhem = CombinedMineral(
-    [hem_nood],
-    [1.0],
-    [np.float64(9522.770803030953), np.float64(12.937668369038724), np.float64(0.0)],
-    "dhem",
 )
 oilm = CombinedMineral(
     [ilm_nood],
@@ -568,7 +536,7 @@ class dio(Solution):
         * [HP_2011_ds62.jd(), "[Almonem]1/2[Almonea]1/2[Namtwoc]1/2[Namtwon]1/2"]
         * [HP_2011_ds62.di(), "[Mgmonem]1/2[Mgmonea]1/2[Camtwoc]1/2[Camtwon]1/2"]
         * [HP_2011_ds62.hed(), "[Femonem]1/2[Femonea]1/2[Camtwoc]1/2[Camtwon]1/2"]
-        * [acmm, "[Fethreemonem]1/2[Fethreemonea]1/2[Namtwoc]1/2[Namtwon]1/2"]
+        * [acmm_dio, "[Fethreemonem]1/2[Fethreemonea]1/2[Namtwoc]1/2[Namtwon]1/2"]
         * [om, "[Mgmonem]1/2[Almonea]1/2[Camtwoc]1/2[Namtwon]1/2"]
         * [cfm, "[Femonem]1/2[Mgmonea]1/2[Camtwoc]1/2[Camtwon]1/2"]
         * [jac, "[Almonem]1/2[Fethreemonea]1/2[Namtwoc]1/2[Namtwon]1/2"]
@@ -584,7 +552,10 @@ class dio(Solution):
                     HP_2011_ds62.hed(),
                     "[Femonem]1/2[Femonea]1/2[Camtwoc]1/2[Camtwon]1/2",
                 ],
-                [acmm, "[Fethreemonem]1/2[Fethreemonea]1/2[Namtwoc]1/2[Namtwon]1/2"],
+                [
+                    acmm_dio,
+                    "[Fethreemonem]1/2[Fethreemonea]1/2[Namtwoc]1/2[Namtwon]1/2",
+                ],
                 [om, "[Mgmonem]1/2[Almonea]1/2[Camtwoc]1/2[Namtwon]1/2"],
                 [cfm, "[Femonem]1/2[Mgmonea]1/2[Camtwoc]1/2[Camtwon]1/2"],
                 [jac, "[Almonem]1/2[Fethreemonea]1/2[Namtwoc]1/2[Namtwon]1/2"],

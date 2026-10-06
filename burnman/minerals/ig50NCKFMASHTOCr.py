@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic
 # and thermodynamic toolkit for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2026 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 """
@@ -182,12 +182,6 @@ cfm = CombinedMineral(
     [np.float64(0.0), np.float64(-0.0), np.float64(0.0)],
     "cfm",
 )
-anC = CombinedMineral(
-    [HGP_2018_ds633.an()],
-    [1.0],
-    [np.float64(7030.0), np.float64(4.66), np.float64(0.0)],
-    "anC",
-)
 mam = CombinedMineral(
     [HGP_2018_ds633.ma()],
     [1.0],
@@ -316,7 +310,7 @@ cen = CombinedMineral(
     [np.float64(3500.0), np.float64(2.0), np.float64(4.800000000000001e-07)],
     "cen",
 )
-cfm = CombinedMineral(
+cfm_cpx = CombinedMineral(
     [HGP_2018_ds633.en(), HGP_2018_ds633.fs()],
     [0.5, 0.5],
     [np.float64(-1600.0), np.float64(2.0), np.float64(4.6500000000000005e-07)],
@@ -863,7 +857,7 @@ class cpx(Solution):
         * [cbuf, "[Mgmone1/2Timone1/2][Camtwo][Sit1/2Alt1/2]1/2"]
         * [HGP_2018_ds633.jd(), "[Almone][Namtwo][Sit]1/2"]
         * [cen, "[Mgmone][Mgmtwo][Sit]1/2"]
-        * [cfm, "[Mgmone][Femtwo][Sit]1/2"]
+        * [cfm_cpx, "[Mgmone][Femtwo][Sit]1/2"]
         * [kjd, "[Almone][Kmtwo][Sit]1/2"]
 
         This is implemented as an asymmetric solution.
@@ -879,7 +873,7 @@ class cpx(Solution):
                 [cbuf, "[Mgmone1/2Timone1/2][Camtwo][Sit1/2Alt1/2]1/2"],
                 [HGP_2018_ds633.jd(), "[Almone][Namtwo][Sit]1/2"],
                 [cen, "[Mgmone][Mgmtwo][Sit]1/2"],
-                [cfm, "[Mgmone][Femtwo][Sit]1/2"],
+                [cfm_cpx, "[Mgmone][Femtwo][Sit]1/2"],
                 [kjd, "[Almone][Kmtwo][Sit]1/2"],
             ],
             alphas=[1.2, 1.0, 1.9, 1.9, 1.9, 1.9, 1.2, 1.0, 1.0, 1.2],

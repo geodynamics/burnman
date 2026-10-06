@@ -5,10 +5,10 @@
 
 
 # This is a script that converts a HPx-eos data format into the standard burnman
-# format (printed to stdout). For example, the dataset file
+# format (written to burnman/minerals/). For example, the dataset file
 # tc-thermoinput-igneous-2022-01-23/tc-ig50NCKFMASHTOCr.txt
-# can be processed  via the commands
-# python hpx_eos_to_burnman.py > ../../minerals/ig50NCKFMASHTOCr.py; black ../../minerals/ig50NCKFMASHTOCr.py
+# can be processed via the command
+# python hpx_eos_to_burnman.py
 # the text "from . import ig50NCKFMASHTOCr must then be added to the minerals __init__.py
 
 import numpy as np
@@ -19,6 +19,7 @@ from sympy.parsing.sympy_parser import parse_expr
 from burnman.constants import gas_constant
 from datetime import date
 import importlib
+import keyword
 import re
 import subprocess
 from pathlib import Path
@@ -142,7 +143,28 @@ def replace_numbers(match):
     return "".join(digit_map[d] for d in num_str)
 
 
-for solution_file, mbr_dataset in ds:
+class UniqueNames:
+    """Allocate module identifiers without overwriting imports or other objects."""
+
+    def __init__(self, reserved_names, source_names):
+        self.used_names = set(reserved_names) | set(keyword.kwlist)
+        self.source_names = set(source_names)
+
+    def allocate(self, name, context):
+        identifier = name
+        if identifier in self.used_names:
+            stem = f"{name}_{context}"
+            identifier = stem
+            suffix = 2
+            while identifier in self.used_names or identifier in self.source_names:
+                identifier = f"{stem}_{suffix}"
+                suffix += 1
+        self.used_names.add(identifier)
+        return identifier
+
+
+def convert_dataset(solution_file, mbr_dataset):
+    """Return the Python source for one HPx-eos solution dataset."""
     logging.debug(f"{solution_file}, {mbr_dataset}")
 
     dataset = importlib.import_module(f"burnman.minerals.{mbr_dataset}")
@@ -176,9 +198,26 @@ for solution_file, mbr_dataset in ds:
                     if int(d[1]) > 1.1:
                         start_indices.append(i_d)
 
-    n_data = len(data)
-
-    noods = []
+    identifiers = UniqueNames(
+        [
+            "np",
+            "array",
+            "nan",
+            mbr_dataset,
+            "Mineral",
+            "Solution",
+            "SymmetricRegularSolution",
+            "AsymmetricRegularSolution",
+            "CombinedMineral",
+        ],
+        [line[0] for line in data],
+    )
+    # Allocate classes first so that endmembers cannot shadow solution names.
+    solution_identifiers = {
+        ind: identifiers.allocate(data[ind][0], "solution") for ind in start_indices
+    }
+    noods = {}
+    combined_endmembers = {}
     names = []
     for ind in start_indices:
         i = ind
@@ -200,6 +239,9 @@ for solution_file, mbr_dataset in ds:
             mbr_proportions.append(data[i : i + n_lines])
             i += n_lines
         logging.debug(mbr_proportions)
+
+        if len(set(mbr_names)) != len(mbr_names):
+            raise ValueError(f"Duplicate endmember names in solution '{name}'")
 
         formulation = data[i][0]
         logging.debug(f"formulation: {formulation}")
@@ -314,39 +356,39 @@ for solution_file, mbr_dataset in ds:
                 delG *= [1.0e3, -1.0e3, 1.0e-5]
                 n_make = int(make[0])
                 el = 1
-                combined_mbrs = "["
-                combined_amounts = "["
+                combined_mbrs = []
+                combined_amounts = []
                 for j in range(n_make):
-                    if make[el] == "ordered":
+                    if make[el] in ("ordered", "disordered"):
+                        ordered = make[el] == "ordered"
                         el += 1
                         m_string = make[el]
                         m_amount = float(parse_expr(make[el + 1]))
                         mineral = getattr(dataset, m_string)()
                         property_modifier = mineral.property_modifiers[0]
-                        delG += ordering_modifier(property_modifier, True) * m_amount
-                        combined_mbrs += f"{make[el]}_nood, "
-                        noods.append(make[el])
-                    elif make[el] == "disordered":
-                        el += 1
-                        m_string = make[el]
-                        m_amount = float(parse_expr(make[el + 1]))
-                        mineral = getattr(dataset, m_string)()
-                        property_modifier = mineral.property_modifiers[0]
-                        delG += ordering_modifier(property_modifier, False) * m_amount
-                        combined_mbrs += f"{make[el]}_nood, "
-                        noods.append(make[el])
+                        delG += ordering_modifier(property_modifier, ordered) * m_amount
+                        if m_string not in noods:
+                            noods[m_string] = identifiers.allocate(
+                                f"{m_string}_nood", "endmember"
+                            )
+                        combined_mbrs.append(noods[m_string])
                     elif make[el] == "equilibrium":
                         el += 1
-                        combined_mbrs += f"{mbr_dataset}.{make[el]}(), "
+                        combined_mbrs.append(f"{mbr_dataset}.{make[el]}()")
                     else:
-                        combined_mbrs += f"{mbr_dataset}.{make[el]}(), "
-                    combined_amounts += f"{float(parse_expr(make[el+1]))}, "
+                        combined_mbrs.append(f"{mbr_dataset}.{make[el]}()")
+                    combined_amounts.append(float(parse_expr(make[el + 1])))
                     el += 2
-                combined_mbrs = combined_mbrs[:-2]
-                combined_amounts = combined_amounts[:-2]
-                combined_mbrs += "]"
-                combined_amounts += "]"
-                out_make += f'{mbr} = CombinedMineral({combined_mbrs}, {combined_amounts}, {list(delG)}, "{mbr}")\n'
+                # Endmember labels are local to each solution. Reuse identical
+                # definitions regardless of component order, but keep distinct
+                # recipes and energy adjustments under unique identifiers.
+                recipe = tuple(sorted(zip(combined_mbrs, combined_amounts)))
+                definition = (mbr, recipe, tuple(delG))
+                if definition not in combined_endmembers:
+                    identifier = identifiers.allocate(mbr, name)
+                    combined_endmembers[definition] = identifier
+                    out_make += f'{identifier} = CombinedMineral([{", ".join(combined_mbrs)}], {combined_amounts}, {list(delG)}, "{mbr}")\n'
+                mbr = combined_endmembers[definition]
             n_occs = int(f[0][2])
             site_occ = [[] for ln in range(n_sites)]
             site_occ_list = f[0][3:]
@@ -397,7 +439,7 @@ for solution_file, mbr_dataset in ds:
             doc += "\n        This is implemented as a symmetric solution.\n"
         doc += '        """\n'
 
-        out_ss += f"class {name}(Solution):\n"
+        out_ss += f"class {solution_identifiers[ind]}(Solution):\n"
         out_ss += "    def __init__(self, molar_fractions=None):\n"
         out_ss += doc
         out_ss += f'        self.name = "{name}"\n'
@@ -425,14 +467,13 @@ for solution_file, mbr_dataset in ds:
         logging.debug("")
 
     out_noods = ""
-    noods = np.unique(sorted(noods))
-    for nood in noods:
+    for nood in sorted(noods):
         mineral = getattr(dataset, nood)()
         params = mineral.params
-        out_noods += f"{nood}_nood = Mineral({params})\n\n"
+        out_noods += f"{noods[nood]} = Mineral({params})\n\n"
 
     # Preamble
-    solution_dataset = solution_file.split("-")[-1].split(".")[0]
+    solution_dataset = Path(solution_file).stem.removeprefix("tc-")
     underline = "^" * len(solution_dataset)
     preamble = (
         "# This file is part of BurnMan - a thermoelastic\n"
@@ -468,13 +509,24 @@ for solution_file, mbr_dataset in ds:
 
     output_string = f"{preamble}\n{out_noods}\n{out_make}\n{out_ss}"
 
-    output_file = f"../../minerals/{solution_dataset}.py"
+    return output_string
 
-    with open(output_file, "w") as text_file:
+
+def main():
+    source_directory = Path(__file__).resolve().parent
+    output_directory = source_directory.parent.parent / "minerals"
+    output_files = []
+    for solution_file, mbr_dataset in ds:
+        output_string = convert_dataset(source_directory / solution_file, mbr_dataset)
+        solution_dataset = Path(solution_file).stem.removeprefix("tc-")
+        output_file = output_directory / f"{solution_dataset}.py"
+        output_file.write_text(output_string)
+        output_files.append(str(output_file))
         print(f"from . import {solution_dataset}")
-        text_file.write(output_string)
 
-print("Copy the above to ../../minerals/__init__.py.\n")
+    print("Copy the above to ../../minerals/__init__.py.\n")
+    subprocess.run([sys.executable, "-m", "black", *output_files], check=True)
 
-directory = Path("../../minerals/")
-subprocess.run(["black", str(directory)])
+
+if __name__ == "__main__":
+    main()
