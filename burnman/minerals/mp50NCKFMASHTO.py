@@ -12,6 +12,7 @@ dataset HP_2011_ds62.
 
 Contains the following solutions:
 * g
+* liq
 * pl4tr
 * k4tr
 * plc
@@ -125,6 +126,30 @@ kho = CombinedMineral(
     [np.float64(27000.0), np.float64(-0.0), np.float64(0.0)],
     "kho",
 )
+q4L = CombinedMineral(
+    [HP_2011_ds62.qL()],
+    [4.0],
+    [np.float64(0.0), np.float64(-0.0), np.float64(0.0)],
+    "q4L",
+)
+slL = CombinedMineral(
+    [HP_2011_ds62.silL()],
+    [1.6],
+    [np.float64(-23000.0), np.float64(-0.0), np.float64(0.0)],
+    "slL",
+)
+fo2L = CombinedMineral(
+    [HP_2011_ds62.foL()],
+    [2.0],
+    [np.float64(-10000.0), np.float64(-0.0), np.float64(0.0)],
+    "fo2L",
+)
+fa2L = CombinedMineral(
+    [HP_2011_ds62.faL()],
+    [2.0],
+    [np.float64(-9000.0), np.float64(-0.0), np.float64(-1.3000000000000001e-05)],
+    "fa2L",
+)
 anC = CombinedMineral(
     [HP_2011_ds62.an()],
     [1.0],
@@ -230,7 +255,7 @@ ospr = CombinedMineral(
 mstm = CombinedMineral(
     [HP_2011_ds62.mst()],
     [1.0],
-    [np.float64(0.0), np.float64(-0.0), np.float64(0.0)],
+    [np.float64(-8000.0), np.float64(-0.0), np.float64(0.0)],
     "mstm",
 )
 msto = CombinedMineral(
@@ -339,6 +364,64 @@ class g(Solution):
         Solution.__init__(self, molar_fractions=molar_fractions)
 
 
+class liq(Solution):
+    def __init__(self, molar_fractions=None):
+        """
+        Initialisation for a liq solution object.
+        Contains the following endmembers with associated site occupancies:
+        * [q4L, "[Fac1/2Pq1/2]2[]0"]
+        * [HP_2011_ds62.abL(), "[Fac1/2Xab1/2]2[]0"]
+        * [HP_2011_ds62.kspL(), "[Fac1/2Xksp1/2]2[]0"]
+        * [HP_2011_ds62.anL(), "[Fac1/2Pan1/2]2[]0"]
+        * [slL, "[Fac1/2Psil1/2]2[]0"]
+        * [fo2L, "[Fac1/2Pol1/2]2[Xmg]5"]
+        * [fa2L, "[Fac1/2Pol1/2]2[Xfe]5"]
+        * [HP_2011_ds62.h2oL(), "[Phtwoo]2[]0"]
+
+        This is implemented as a symmetric solution.
+        """
+        self.name = "liq"
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [q4L, "[Fac1/2Pq1/2]2[]0"],
+                [HP_2011_ds62.abL(), "[Fac1/2Xab1/2]2[]0"],
+                [HP_2011_ds62.kspL(), "[Fac1/2Xksp1/2]2[]0"],
+                [HP_2011_ds62.anL(), "[Fac1/2Pan1/2]2[]0"],
+                [slL, "[Fac1/2Psil1/2]2[]0"],
+                [fo2L, "[Fac1/2Pol1/2]2[Xmg]5"],
+                [fa2L, "[Fac1/2Pol1/2]2[Xfe]5"],
+                [HP_2011_ds62.h2oL(), "[Phtwoo]2[]0"],
+            ],
+            energy_interaction=[
+                [12000.0, -2000.0, 5000.0, 12000.0, 12000.0, 14000.0, 17000.0],
+                [-6000.0, 0.0, 12000.0, 10000.0, 2000.0, -1500.0],
+                [0.0, 12000.0, 12000.0, 12000.0, 9500.0],
+                [0.0, 0.0, 0.0, 7500.0],
+                [12000.0, 12000.0, 11000.0],
+                [18000.0, 11000.0],
+                [12000.0],
+            ],
+            volume_interaction=[
+                [
+                    -4.000000000000001e-06,
+                    -5e-06,
+                    0.0,
+                    0.0,
+                    -4.000000000000001e-06,
+                    0.0,
+                    -5e-06,
+                ],
+                [3.0000000000000004e-05, 0.0, 0.0, 0.0, 0.0, -3e-06],
+                [-1e-05, 0.0, 0.0, 0.0, -3e-06],
+                [0.0, 0.0, 0.0, -5e-06],
+                [0.0, 0.0, 0.0],
+                [0.0, -5e-06],
+                [0.0],
+            ],
+        )
+        Solution.__init__(self, molar_fractions=molar_fractions)
+
+
 class pl4tr(Solution):
     def __init__(self, molar_fractions=None):
         """
@@ -359,7 +442,7 @@ class pl4tr(Solution):
             ],
             alphas=[0.674, 0.55, 1.0],
             energy_interaction=[[14600.0, 24100.0], [48500.0]],
-            entropy_interaction=[[0.00935, 0.00957], [-0.0]],
+            entropy_interaction=[[9.350000000000001, 9.57], [-0.0]],
             volume_interaction=[
                 [-4.0000000000000003e-07, 3.3800000000000007e-06],
                 [-1.3e-06],
@@ -388,7 +471,7 @@ class k4tr(Solution):
             ],
             alphas=[0.674, 0.55, 1.0],
             energy_interaction=[[14600.0, 24100.0], [48500.0]],
-            entropy_interaction=[[0.00935, 0.00957], [-0.0]],
+            entropy_interaction=[[9.350000000000001, 9.57], [-0.0]],
             volume_interaction=[
                 [-4.0000000000000003e-07, 3.3800000000000007e-06],
                 [-1.3e-06],
@@ -417,7 +500,7 @@ class plc(Solution):
             ],
             alphas=[0.643, 1.0, 1.0],
             energy_interaction=[[3100.0, 25100.0], [40000.0]],
-            entropy_interaction=[[-0.0, 0.0108], [-0.0]],
+            entropy_interaction=[[-0.0, 10.8], [-0.0]],
             volume_interaction=[[0.0, 3.3800000000000007e-06], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -443,7 +526,7 @@ class ksp(Solution):
             ],
             alphas=[1.0, 0.643, 1.0],
             energy_interaction=[[25100.0, 40000.0], [3100.0]],
-            entropy_interaction=[[0.0108, -0.0], [-0.0]],
+            entropy_interaction=[[10.8, -0.0], [-0.0]],
             volume_interaction=[[3.3800000000000007e-06, 0.0], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -505,7 +588,7 @@ class ma(Solution):
                 [35000.0],
             ],
             entropy_interaction=[
-                [-0.0, -0.0, -0.0034, -0.0, -0.0],
+                [-0.0, -0.0, -3.4, -0.0, -0.0],
                 [-0.0, -0.0, -0.0, -0.0],
                 [-0.0, -0.0, -0.0],
                 [-0.0, -0.0],
@@ -555,7 +638,7 @@ class mu(Solution):
                 [35000.0],
             ],
             entropy_interaction=[
-                [-0.0, -0.0, -0.0034, -0.0, -0.0],
+                [-0.0, -0.0, -3.4, -0.0, -0.0],
                 [-0.0, -0.0, -0.0, -0.0],
                 [-0.0, -0.0, -0.0],
                 [-0.0, -0.0],

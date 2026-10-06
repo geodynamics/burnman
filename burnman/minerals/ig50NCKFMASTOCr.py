@@ -23,6 +23,11 @@ Contains the following solutions:
 * spn
 * ilm
 
+The original H18 liq model is omitted because its authors withdrew it
+after discovering an algebraic error. The corrected G25 replacement
+requires endmember dataset 6.36. See:
+https://hpxeosandthermocalc.org/the-hpx-eos/the-hpx-eos-families/hpx-eos-igneous-sets/
+
 The values in this document are all in S.I. units,
 unlike those in the original THERMOCALC file.
 
@@ -368,7 +373,7 @@ class pl4tr(Solution):
             ],
             alphas=[0.674, 0.55, 1.0],
             energy_interaction=[[14600.0, 24100.0], [48500.0]],
-            entropy_interaction=[[0.00935, 0.00957], [-0.0]],
+            entropy_interaction=[[9.350000000000001, 9.57], [-0.0]],
             volume_interaction=[
                 [-4.0000000000000003e-07, 3.3800000000000007e-06],
                 [-1.3e-06],
@@ -397,7 +402,7 @@ class k4tr(Solution):
             ],
             alphas=[0.674, 0.55, 1.0],
             energy_interaction=[[14600.0, 24100.0], [48500.0]],
-            entropy_interaction=[[0.00935, 0.00957], [-0.0]],
+            entropy_interaction=[[9.350000000000001, 9.57], [-0.0]],
             volume_interaction=[
                 [-4.0000000000000003e-07, 3.3800000000000007e-06],
                 [-1.3e-06],
@@ -426,7 +431,7 @@ class pli(Solution):
             ],
             alphas=[0.643, 1.0, 1.0],
             energy_interaction=[[15000.0, 25100.0], [40000.0]],
-            entropy_interaction=[[-0.0, 0.0108], [-0.0]],
+            entropy_interaction=[[-0.0, 10.8], [-0.0]],
             volume_interaction=[[0.0, 3.3800000000000007e-06], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -452,7 +457,7 @@ class plc(Solution):
             ],
             alphas=[0.643, 1.0, 1.0],
             energy_interaction=[[3100.0, 25100.0], [40000.0]],
-            entropy_interaction=[[-0.0, 0.0108], [-0.0]],
+            entropy_interaction=[[-0.0, 10.8], [-0.0]],
             volume_interaction=[[0.0, 3.3800000000000007e-06], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -507,7 +512,7 @@ class ksp(Solution):
             ],
             alphas=[1.0, 0.643, 1.0],
             energy_interaction=[[25100.0, 40000.0], [3100.0]],
-            entropy_interaction=[[0.0108, -0.0], [-0.0]],
+            entropy_interaction=[[10.8, -0.0], [-0.0]],
             volume_interaction=[[3.3800000000000007e-06, 0.0], [0.0]],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
@@ -546,10 +551,10 @@ class g(Solution):
                 [0.0],
             ],
             entropy_interaction=[
-                [-0.0, 0.01, 0.01, -0.0, -0.0],
-                [0.01, 0.01, -0.0, -0.0],
-                [-0.0, 0.01, -0.0],
-                [0.01, -0.0],
+                [-0.0, 10.0, 10.0, -0.0, -0.0],
+                [10.0, 10.0, -0.0, -0.0],
+                [-0.0, 10.0, -0.0],
+                [10.0, -0.0],
                 [-0.0],
             ],
             volume_interaction=[

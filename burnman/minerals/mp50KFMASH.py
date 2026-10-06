@@ -12,6 +12,7 @@ dataset HP_2011_ds62.
 
 Contains the following solutions:
 * g
+* liq
 * mu
 * bi
 * opx
@@ -37,6 +38,30 @@ from ..classes.solutionmodel import SymmetricRegularSolution
 from ..classes.solutionmodel import AsymmetricRegularSolution
 from ..classes.combinedmineral import CombinedMineral
 
+q4L = CombinedMineral(
+    [HP_2011_ds62.qL()],
+    [4.0],
+    [np.float64(0.0), np.float64(-0.0), np.float64(0.0)],
+    "q4L",
+)
+slL = CombinedMineral(
+    [HP_2011_ds62.silL()],
+    [1.6],
+    [np.float64(-23000.0), np.float64(-0.0), np.float64(0.0)],
+    "slL",
+)
+fo2L = CombinedMineral(
+    [HP_2011_ds62.foL()],
+    [2.0],
+    [np.float64(-10000.0), np.float64(-0.0), np.float64(0.0)],
+    "fo2L",
+)
+fa2L = CombinedMineral(
+    [HP_2011_ds62.faL()],
+    [2.0],
+    [np.float64(-9000.0), np.float64(-0.0), np.float64(-1.3000000000000001e-05)],
+    "fa2L",
+)
 annm = CombinedMineral(
     [HP_2011_ds62.ann()],
     [1.0],
@@ -70,7 +95,7 @@ spro = CombinedMineral(
 mstm = CombinedMineral(
     [HP_2011_ds62.mst()],
     [1.0],
-    [np.float64(0.0), np.float64(-0.0), np.float64(0.0)],
+    [np.float64(-8000.0), np.float64(-0.0), np.float64(0.0)],
     "mstm",
 )
 ochl1 = CombinedMineral(
@@ -104,6 +129,48 @@ class g(Solution):
                 [HP_2011_ds62.alm(), "[Fex]3"],
             ],
             energy_interaction=[[2500.0]],
+        )
+        Solution.__init__(self, molar_fractions=molar_fractions)
+
+
+class liq(Solution):
+    def __init__(self, molar_fractions=None):
+        """
+        Initialisation for a liq solution object.
+        Contains the following endmembers with associated site occupancies:
+        * [q4L, "[Fac1/2Pq1/2]2[]0"]
+        * [HP_2011_ds62.kspL(), "[Fac1/2Xksp1/2]2[]0"]
+        * [slL, "[Fac1/2Psil1/2]2[]0"]
+        * [fo2L, "[Fac1/2Pol1/2]2[Xmg]5"]
+        * [fa2L, "[Fac1/2Pol1/2]2[Xfe]5"]
+        * [HP_2011_ds62.h2oL(), "[Phtwoo]2[]0"]
+
+        This is implemented as a symmetric solution.
+        """
+        self.name = "liq"
+        self.solution_model = SymmetricRegularSolution(
+            endmembers=[
+                [q4L, "[Fac1/2Pq1/2]2[]0"],
+                [HP_2011_ds62.kspL(), "[Fac1/2Xksp1/2]2[]0"],
+                [slL, "[Fac1/2Psil1/2]2[]0"],
+                [fo2L, "[Fac1/2Pol1/2]2[Xmg]5"],
+                [fa2L, "[Fac1/2Pol1/2]2[Xfe]5"],
+                [HP_2011_ds62.h2oL(), "[Phtwoo]2[]0"],
+            ],
+            energy_interaction=[
+                [-2000.0, 12000.0, 12000.0, 14000.0, 17000.0],
+                [12000.0, 12000.0, 12000.0, 9500.0],
+                [12000.0, 12000.0, 11000.0],
+                [18000.0, 11000.0],
+                [12000.0],
+            ],
+            volume_interaction=[
+                [-5e-06, 0.0, -4.000000000000001e-06, 0.0, -5e-06],
+                [0.0, 0.0, 0.0, -3e-06],
+                [0.0, 0.0, 0.0],
+                [0.0, -5e-06],
+                [0.0],
+            ],
         )
         Solution.__init__(self, molar_fractions=molar_fractions)
 

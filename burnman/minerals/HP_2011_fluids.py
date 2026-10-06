@@ -10,6 +10,7 @@ HP_2011_fluids
 
 Fluids from Holland and Powell 2011 and references therein.
 CORK parameters are taken from various sources.
+Water uses PS1994 with the HP2011 Table 2a thermal reference.
 
 CHO gases from Holland and Powell, 1991:
   - ["CO2",304.2,0.0738]
@@ -40,6 +41,32 @@ Individual terms are divided through by P, P, P^1.5, P^2, so:
 
 from ..classes.mineral import Mineral
 from ..utils.chemistry import dictionarize_formula, formula_mass
+from .Pitzer_Sterner_1994 import H2O_Pitzer_Sterner as _PS1994Water
+
+
+class H2O(_PS1994Water):
+    """PS1994 water with the HP2011 Table 2a ideal-gas thermal reference.
+
+    The fluid is valid for 500 <= T <= 1700 K and 0 < P <= 5 GPa.
+    This reference is compatible with the HPx-eos mineral datasets.
+    """
+
+    def __init__(self):
+        super().__init__()
+        for key in ("F_0", "Cv_0", "Debye_0", "Debye_n"):
+            del self.params[key]
+        self.params.update(
+            {
+                "name": "H2O",
+                "H_0": -241810.0,
+                "S_0": 188.80,
+                "Cp": [40.1, 0.008656, 487500.0, -251.2],
+                "T_min": 500.0,
+                "T_max": 1700.0,
+                "P_max": 5.0e9,
+            }
+        )
+        self.set_method("pitzer-sterner")
 
 
 class CO2(Mineral):

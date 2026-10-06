@@ -32,9 +32,13 @@ from . import Matas_etal_2007
 # Holland, Powell and coworkers
 from . import HP_2011_ds62
 from . import HP_2011_fluids
+from . import HPx_ds636
+from . import Pitzer_Sterner_1994
 from . import HHPH_2013
 from . import JH_2015
 from . import HGP_2018_ds633
+from . import ig51W24
+from . import ig51G25
 from . import ig50NCKFMASHTOCr
 from . import ig50NCKFMASTOCr
 from . import mb50NCKFMASHTO
