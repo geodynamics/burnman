@@ -191,8 +191,8 @@ def landau_slb_2022_excesses(pressure, temperature, params):
                 * params["V_D"]
                 / (params["S_D"] * params["Tc_0"] * Q2)
             )
-            d2GdT2 = -0.5 * params["S_D"] / (Tc * Q2)
-            d2GdPdT = 0.5 * params["V_D"] / (Tc * Q2)
+            d2GdT2 = -0.5 * params["S_D"] / (params["Tc_0"] * Q2)
+            d2GdPdT = 0.5 * params["V_D"] / (params["Tc_0"] * Q2)
         else:
             # Wolfram input to check partial differentials
             # x = T, y = P, a = S, c = Tc0, d = V
