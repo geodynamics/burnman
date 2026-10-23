@@ -28,8 +28,10 @@ from ..utils.math import bracket
 
 
 @jit(nopython=True)
-def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
-    """global function with plain parameters so jit will work"""
+def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0, power_law=True):
+    """Global function with plain parameters so jit will work."""
+    if power_law:
+        return gruen_0 * pow(volume / V_0, q_0)
     x = V_0 / volume
     f = 1.0 / 2.0 * (pow(x, 2.0 / 3.0) - 1.0)
     a1_ii = 6.0 * gruen_0  # EQ 47
@@ -38,27 +40,42 @@ def _grueneisen_parameter_fast(V_0, volume, gruen_0, q_0):
     return 1.0 / 6.0 / nu_o_nu0_sq * (2.0 * f + 1.0) * (a1_ii + a2_iikk * f)
 
 
-def _intgroverVdV(V_0, volume, gruen_0, q_0):
+def _intgroverVdV(V_0, volume, gruen_0, q_0, power_law=True):
+    if power_law:
+        # Original de Koker aktintvto_220.f. expm1 avoids cancellation near V_0
+        # and the logarithmic branch gives the continuous q_0 = 0 limit.
+        log_ratio = np.log(volume / V_0)
+        return gruen_0 * (log_ratio if q_0 == 0.0 else np.expm1(q_0 * log_ratio) / q_0)
     return integrate.quad(
-        lambda x: _grueneisen_parameter_fast(V_0, x, gruen_0, q_0) / x, V_0, volume
+        lambda x: _grueneisen_parameter_fast(V_0, x, gruen_0, q_0, False) / x,
+        V_0,
+        volume,
     )[0]
 
 
 @jit(nopython=True)
 def _delta_pressure(
-    x, pressure, temperature, V_0, T_0, Cv, a1_ii, a2_iikk, b_iikk, b_iikkmm
+    x,
+    pressure,
+    temperature,
+    V_0,
+    T_0,
+    Cv,
+    gruen_0,
+    q_0,
+    b_iikk,
+    b_iikkmm,
+    power_law=True,
 ):
     f = 0.5 * (pow(V_0 / x, 2.0 / 3.0) - 1.0)
-    nu_o_nu0_sq = 1.0 + a1_ii * f + (1.0 / 2.0) * a2_iikk * f * f  # EQ 41
-    gr = 1.0 / 6.0 / nu_o_nu0_sq * (2.0 * f + 1.0) * (a1_ii + a2_iikk * f)
-
+    gr = _grueneisen_parameter_fast(V_0, x, gruen_0, q_0, power_law)
     return (
         (1.0 / 3.0)
-        * (pow(1.0 + 2.0 * f, 5.0 / 2.0))
-        * ((b_iikk * f) + (0.5 * b_iikkmm * f * f))
+        * pow(1.0 + 2.0 * f, 5.0 / 2.0)
+        * (b_iikk * f + 0.5 * b_iikkmm * f * f)
         + gr * Cv * (temperature - T_0) / x
         - pressure
-    )  # EQ 21
+    )
 
 
 class DKS_S(eos.EquationOfState):
@@ -66,8 +83,12 @@ class DKS_S(eos.EquationOfState):
     Base class for the finite strain solid equation of state detailed
     in :cite:`deKoker2013` (supplementary materials).
 
-    This equation of state is a somewhat modified version of that described
-    in :cite:`Stixrude2005`.
+    The default thermal relation matches de Koker's original Fortran model:
+    gamma(V) = gamma_0 (V/V_0)^q_0, with constant isochoric heat capacity.
+    The DKS_2013 solid coefficients were supplied with this relation.
+    Set ``power_law_grueneisen=False`` to recover the later finite-strain
+    Gruneisen relation (and its optional shear treatment). The original
+    power-law model supplies no shear modulus.
 
     .. list-table::
         :widths: 25 75 20
@@ -112,11 +133,17 @@ class DKS_S(eos.EquationOfState):
 
     """
 
+    # Reference implementation: aktintvto_220.f and pintvto_220.f, archived in
+    # BurnMan revision 415b06103ea0127570475379406ef118167ac839 under
+    # stx_liquids/MgO-SiO2_param_files/.
+
     def _volume_dependent_q(self, x, params):
         """
         Finite strain approximation for :math:`q`, the isotropic volume strain
         derivative of the grueneisen parameter.
         """
+        if params.get("power_law_grueneisen", True):
+            return params["q_0"]
         f = 1.0 / 2.0 * (pow(x, 2.0 / 3.0) - 1.0)
         a1_ii = 6.0 * params["grueneisen_0"]  # EQ 47
         a2_iikk = (
@@ -178,26 +205,36 @@ class DKS_S(eos.EquationOfState):
         V_0 = params["V_0"]
         Cv = params["Cv"]
 
-        a1_ii = 6.0 * params["grueneisen_0"]  # EQ 47
-        a2_iikk = (
-            -12.0 * params["grueneisen_0"]
-            + 36.0 * pow(params["grueneisen_0"], 2.0)
-            - 18.0 * params["q_0"] * params["grueneisen_0"]
-        )  # EQ 47
+        gruen_0 = params["grueneisen_0"]
+        q_0 = params["q_0"]
+        power_law = params.get("power_law_grueneisen", True)
 
         b_iikk = 9.0 * params["K_0"]  # EQ 28
         b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29z
 
         # we need to have a sign change in [a,b] to find a zero. Let us start with a
         # conservative guess:
-        args = (pressure, temperature, V_0, T_0, Cv, a1_ii, a2_iikk, b_iikk, b_iikkmm)
+        args = (
+            pressure,
+            temperature,
+            V_0,
+            T_0,
+            Cv,
+            gruen_0,
+            q_0,
+            b_iikk,
+            b_iikkmm,
+            power_law,
+        )
         try:
             sol = bracket(_delta_pressure, params["V_0"], 1.0e-2 * params["V_0"], args)
         except ValueError:
             raise Exception(
                 "Cannot find a volume, perhaps you are outside of the range of validity for the equation of state?"
             )
-        return opt.brentq(_delta_pressure, sol[0], sol[1], args=args)
+        return opt.brentq(
+            _delta_pressure, sol[0], sol[1], args=args, xtol=1.0e-12 * V_0
+        )
 
     def pressure(self, temperature, volume, params):
         """
@@ -223,7 +260,11 @@ class DKS_S(eos.EquationOfState):
         Returns grueneisen parameter :math:`[unitless]`
         """
         return _grueneisen_parameter_fast(
-            params["V_0"], volume, params["grueneisen_0"], params["q_0"]
+            params["V_0"],
+            volume,
+            params["grueneisen_0"],
+            params["q_0"],
+            params.get("power_law_grueneisen", True),
         )
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
@@ -246,6 +287,8 @@ class DKS_S(eos.EquationOfState):
         """
         Returns shear modulus. :math:`[Pa]`
         """
+        if params.get("power_law_grueneisen", True):
+            return float("nan")
         eta_s = self._isotropic_eta_s(params["V_0"] / volume, params)
 
         E_th_diff = params["Cv"] * (temperature - params["T_0"])
@@ -292,7 +335,13 @@ class DKS_S(eos.EquationOfState):
         q_0 = params["q_0"]
         S_th = params["Cv"] * (
             np.log(temperature / params["T_0"])
-            + _intgroverVdV(params["V_0"], volume, gruen_0, q_0)
+            + _intgroverVdV(
+                params["V_0"],
+                volume,
+                gruen_0,
+                q_0,
+                params.get("power_law_grueneisen", True),
+            )
         )
 
         return S_0 + S_th
@@ -318,7 +367,15 @@ class DKS_S(eos.EquationOfState):
         F_th = (
             -S_0 * (T - T_0)
             - Cv * (T * np.log(T / T_0) - (T - T_0))
-            - Cv * (T - T_0) * _intgroverVdV(V_0, volume, gruen_0, q_0)
+            - Cv
+            * (T - T_0)
+            * _intgroverVdV(
+                V_0,
+                volume,
+                gruen_0,
+                q_0,
+                params.get("power_law_grueneisen", True),
+            )
         )
 
         return F_0 + F_cmp + F_th
@@ -327,6 +384,7 @@ class DKS_S(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
+        params.setdefault("power_law_grueneisen", True)
         if "T_0" not in params:
             params["T_0"] = 300.0
 
