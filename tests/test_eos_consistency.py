@@ -107,7 +107,7 @@ class EosConsistency(BurnManTest):
         T = 3000.0
         params = burnman.minerals.DKS_2013_solids.periclase().params
         # The finite-strain option allows shear properties to be calculated.
-        params["dks_s_power_law_grueneisen"] = False
+        params["power_law_grueneisen"] = False
         params2 = burnman.minerals.SLB_2011.periclase().params
         for p in ["G_0", "Gprime_0", "eta_s_0"]:
             params[p] = params2[p]

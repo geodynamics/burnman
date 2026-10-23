@@ -86,7 +86,7 @@ class DKS_S(eos.EquationOfState):
     The default thermal relation matches de Koker's original Fortran model:
     gamma(V) = gamma_0 (V/V_0)^q_0, with constant isochoric heat capacity.
     The DKS_2013 solid coefficients were supplied with this relation.
-    Set ``dks_s_power_law_grueneisen=False`` to recover the later finite-strain
+    Set ``power_law_grueneisen=False`` to recover the later finite-strain
     Gruneisen relation (and its optional shear treatment). The original
     power-law model supplies no shear modulus.
 
@@ -142,7 +142,7 @@ class DKS_S(eos.EquationOfState):
         Finite strain approximation for :math:`q`, the isotropic volume strain
         derivative of the grueneisen parameter.
         """
-        if params.get("dks_s_power_law_grueneisen", True):
+        if params.get("power_law_grueneisen", True):
             return params["q_0"]
         f = 1.0 / 2.0 * (pow(x, 2.0 / 3.0) - 1.0)
         a1_ii = 6.0 * params["grueneisen_0"]  # EQ 47
@@ -207,7 +207,7 @@ class DKS_S(eos.EquationOfState):
 
         gruen_0 = params["grueneisen_0"]
         q_0 = params["q_0"]
-        power_law = params.get("dks_s_power_law_grueneisen", True)
+        power_law = params.get("power_law_grueneisen", True)
 
         b_iikk = 9.0 * params["K_0"]  # EQ 28
         b_iikkmm = 27.0 * params["K_0"] * (params["Kprime_0"] - 4.0)  # EQ 29z
@@ -264,7 +264,7 @@ class DKS_S(eos.EquationOfState):
             volume,
             params["grueneisen_0"],
             params["q_0"],
-            params.get("dks_s_power_law_grueneisen", True),
+            params.get("power_law_grueneisen", True),
         )
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
@@ -287,7 +287,7 @@ class DKS_S(eos.EquationOfState):
         """
         Returns shear modulus. :math:`[Pa]`
         """
-        if params.get("dks_s_power_law_grueneisen", True):
+        if params.get("power_law_grueneisen", True):
             return float("nan")
         eta_s = self._isotropic_eta_s(params["V_0"] / volume, params)
 
@@ -340,7 +340,7 @@ class DKS_S(eos.EquationOfState):
                 volume,
                 gruen_0,
                 q_0,
-                params.get("dks_s_power_law_grueneisen", True),
+                params.get("power_law_grueneisen", True),
             )
         )
 
@@ -374,7 +374,7 @@ class DKS_S(eos.EquationOfState):
                 volume,
                 gruen_0,
                 q_0,
-                params.get("dks_s_power_law_grueneisen", True),
+                params.get("power_law_grueneisen", True),
             )
         )
 
@@ -384,7 +384,7 @@ class DKS_S(eos.EquationOfState):
         """
         Check for existence and validity of the parameters
         """
-        params.setdefault("dks_s_power_law_grueneisen", True)
+        params.setdefault("power_law_grueneisen", True)
         if "T_0" not in params:
             params["T_0"] = 300.0
 
