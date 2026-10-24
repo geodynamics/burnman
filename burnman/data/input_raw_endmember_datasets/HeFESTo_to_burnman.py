@@ -329,7 +329,7 @@ for f in mbrdir.iterdir():
                     {
                         "Tc_0": float(idict["T_crit"]),
                         "S_D": float(idict["S_crit"]),
-                        "V_D": float(idict["V_crit"]),
+                        "V_D": float(idict["V_crit"]) / 1.0e6,
                     },
                 ]
             ]
