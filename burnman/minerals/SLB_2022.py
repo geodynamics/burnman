@@ -1377,7 +1377,7 @@ class neph(Mineral):
         }
 
         self.property_modifiers = [
-            ["landau_slb_2022", {"Tc_0": 467.0, "S_D": 10.0, "V_D": 0.8}]
+            ["landau_slb_2022", {"Tc_0": 467.0, "S_D": 10.0, "V_D": 8.0e-7}]
         ]
 
         Mineral.__init__(self)
@@ -1501,7 +1501,7 @@ class qtz(Mineral):
         }
 
         self.property_modifiers = [
-            ["landau_slb_2022", {"Tc_0": 847.0, "S_D": 5.76, "V_D": 1.35936}]
+            ["landau_slb_2022", {"Tc_0": 847.0, "S_D": 5.76, "V_D": 1.35936e-6}]
         ]
 
         Mineral.__init__(self)

@@ -67,5 +67,31 @@ class instantiate_minerals(BurnManTest):
                     V = m.molar_volume
 
 
+class SLB2022LandauVolumes(BurnManTest):
+    def test_critical_volumes_are_converted_from_cubic_centimetres(self):
+        # HeFESTo parameter set 010121 gives critical volumes in cm^3/mol.
+        # The molar quantities already use one chemical formula unit.
+        pressure, temperature = 10.0e9, 800.0
+        for name, critical_volume, entropy, critical_temperature in (
+            ("neph", 0.8, 10.0, 467.0),
+            ("qtz", 1.35936, 5.76, 847.0),
+        ):
+            with self.subTest(mineral=name):
+                phase = getattr(minerals.SLB_2022, name)()
+                params = phase.property_modifiers[0][1]
+                self.assertAlmostEqual(
+                    params["V_D"] * 1.0e6, critical_volume, places=12
+                )
+                # HeFESTo uses pressure in GPa and volume in cm^3/mol.
+                tc = critical_temperature + critical_volume * 10.0 / (0.001 * entropy)
+                self.assertAlmostEqual(
+                    params["Tc_0"] + params["V_D"] * pressure / params["S_D"], tc
+                )
+                phase.set_state(pressure, temperature)
+                self.assertGreater(phase.molar_volume, 0.0)
+                self.assertGreater(phase.density, 0.0)
+                self.assertGreater(phase.shear_wave_velocity, 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
