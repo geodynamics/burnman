@@ -36,6 +36,7 @@ class BroshCalphad(eos.EquationOfState):
             Format is a list of lists, where each sublist contains the maximum temperature for
             that segment and the coefficients in the following order:
             [const, T, T*ln(T), T^(-1), T^(-2), T^(-3), T^(-9), T^2, T^3, T^4, T^7, T^(1/2), ln(T)]
+            The final segment is cautiously extrapolated above its maximum temperature.
           - varies
         * - ``V_0``
           - Reference volume.
@@ -62,7 +63,7 @@ class BroshCalphad(eos.EquationOfState):
           - Parameter array for thermal excitation (length 2 array).
           - Dimensionless
         * - ``theta_0``
-          - Reference Debye temperature.
+          - Reference Einstein temperature.
           - :math:`\\text{K}`
         * - ``grueneisen_0``
           - Reference Grüneisen parameter.
@@ -74,48 +75,23 @@ class BroshCalphad(eos.EquationOfState):
         """
         Returns volume :math:`[m^3]` as a function of pressure :math:`[Pa]`.
         """
-        X = [
-            1.0
-            / (
-                1.0
-                - params["a"][i - 2]
-                + params["a"][i - 2]
-                * np.power(
-                    1.0 + i / (3.0 * params["a"][i - 2]) * pressure / params["K_0"],
-                    1.0 / float(i),
-                )
-            )
-            for i in range(2, 6)
-        ]
-        V_c = params["V_0"] * np.sum(
-            [params["c"][i - 2] * np.power(X[i - 2], 3.0) for i in range(2, 6)]
-        )
+        X = self._X(pressure, params)
+        V_c = params["V_0"] * np.dot(params["c"], np.power(X, 3.0))
 
-        nu = self._theta(pressure, params) / temperature
-        dthetadP = self._dtheta_dP(pressure, params)
-        V_qh = (
-            3.0
-            * params["n"]
-            * gas_constant
-            * np.exp(-nu)
-            / (1.0 - np.exp(-nu))
-            * dthetadP
-        )  # eq. 6
+        if temperature == 0.0:
+            V_qh = 0.0
+        else:
+            nu = self._theta(pressure, params) / temperature
+            V_qh = (
+                3.0
+                * params["n"]
+                * gas_constant
+                * np.exp(-nu)
+                / -np.expm1(-nu)
+                * self._dtheta_dP(pressure, params)
+            )  # eq. 6
 
-        f = np.sqrt(
-            1.0
-            + 2.0
-            * params["b"][1]
-            * (1.0 + params["delta"][1])
-            * pressure
-            / params["K_0"]
-        )
-        dIdP = (
-            (1.0 + params["delta"][1])
-            / (params["K_0"] * (1.0 + params["b"][1]))
-            * np.exp((1.0 - f) / params["b"][1])
-        )
-        V_th = self._C_T(temperature, params) * dIdP
+        V_th = -self._C_T(temperature, params) * self._dI_dP(pressure, params)
 
         # V = dG_c/dP + dG_qh/dP - C_T*(dI_P/dP)
         return V_c + V_qh + V_th
@@ -144,14 +120,15 @@ class BroshCalphad(eos.EquationOfState):
         dthetadP = self._dtheta_dP(pressure, params)
         d2thetadP2 = self._d2theta_dP2(pressure, params)
 
-        nu = theta / temperature
-        exp_neg_nu = np.exp(-nu)
-        denom = 1.0 - exp_neg_nu
-
-        factor1 = -(exp_neg_nu) / (denom**2) * (dthetadP**2) / temperature
-        factor2 = (exp_neg_nu) / denom * d2thetadP2
-
-        dV_qh_dP = 3.0 * n * gas_constant * (factor1 + factor2)
+        if temperature == 0.0:
+            dV_qh_dP = 0.0
+        else:
+            nu = theta / temperature
+            exp_neg_nu = np.exp(-nu)
+            denom = -np.expm1(-nu)
+            factor1 = -exp_neg_nu / denom**2 * dthetadP**2 / temperature
+            factor2 = exp_neg_nu / denom * d2thetadP2
+            dV_qh_dP = 3.0 * n * gas_constant * (factor1 + factor2)
 
         alpha = 2.0 * b * (1.0 + delta) / K_0
         f = np.sqrt(1.0 + alpha * pressure)
@@ -192,14 +169,16 @@ class BroshCalphad(eos.EquationOfState):
         """
         return 0.0
 
-    def _Cp_1bar(self, temperature, params):
-        # first, identify which of the piecewise segments we're in
-        i = np.argmax(
-            [T > temperature for T in list(zip(*params["gibbs_coefficients"]))[0]]
-        )
+    def _sgte_coefficients(self, temperature, params):
+        # Interior boundaries select the next segment. Extrapolate the last
+        # segment above its upper limit, rather than wrapping to the first.
+        for upper_temperature, coefficients in params["gibbs_coefficients"]:
+            if temperature < upper_temperature:
+                return coefficients
+        return params["gibbs_coefficients"][-1][1]
 
-        # select the appropriate coefficients
-        coeffs = params["gibbs_coefficients"][i][1]
+    def _Cp_1bar(self, temperature, params):
+        coeffs = self._sgte_coefficients(temperature, params)
         Cp = -(
             coeffs[2]
             + 2.0 * coeffs[3] / temperature / temperature
@@ -216,13 +195,7 @@ class BroshCalphad(eos.EquationOfState):
         return Cp
 
     def _S_1bar(self, temperature, params):
-        # first, identify which of the piecewise segments we're in
-        i = np.argmax(
-            [T > temperature for T in list(zip(*params["gibbs_coefficients"]))[0]]
-        )
-
-        # select the appropriate coefficients
-        coeffs = params["gibbs_coefficients"][i][1]
+        coeffs = self._sgte_coefficients(temperature, params)
         S = -(
             coeffs[1]
             + coeffs[2] * (1.0 + np.log(temperature))
@@ -240,13 +213,7 @@ class BroshCalphad(eos.EquationOfState):
         return S
 
     def _gibbs_1bar(self, temperature, params):
-        # first, identify which of the piecewise segments we're in
-        i = np.argmax(
-            [T > temperature for T in list(zip(*params["gibbs_coefficients"]))[0]]
-        )
-
-        # select the appropriate coefficients
-        coeffs = params["gibbs_coefficients"][i][1]
+        coeffs = self._sgte_coefficients(temperature, params)
         gibbs = (
             coeffs[0]
             + coeffs[1] * temperature
@@ -300,28 +267,6 @@ class BroshCalphad(eos.EquationOfState):
             )
         )  # eq. A9, CHECKED
 
-    def _dGamma_dXT2(self, n, an, Xn):
-        total = 0.0
-        for k in range(0, n + 1):
-            coeff = binom(n, k) * (an - 1.0) ** (n - k)
-            if k != 3:
-                term = (3.0 - k) * Xn ** (2.0 - k) * k / (k - 3.0)
-            else:
-                term = -3.0 / Xn
-            total += coeff * term
-        return 3.0 * an ** (1.0 - n) / float(n) * total
-
-    def _d2Gamma_dXT2_2(self, n, an, Xn):
-        total = 0.0
-        for k in range(0, n + 1):
-            coeff = binom(n, k) * (an - 1.0) ** (n - k)
-            if k != 3:
-                term = (2.0 - k) * (3.0 - k) * Xn ** (1.0 - k) * k / (k - 3.0)
-            else:
-                term = 3.0 / (Xn**2)
-            total += coeff * term
-        return 3.0 * an ** (1.0 - n) / float(n) * total
-
     def _theta(self, pressure, params):
         # Theta (for quasiharmonic term)
         ab2 = 1.0 / (3.0 * params["b"][0] - 1.0)
@@ -337,58 +282,24 @@ class BroshCalphad(eos.EquationOfState):
             * (self._Gamma(2, ab2, XT2) - self._Gamma(2, ab2, 1.0))
         )
 
+    def _dlogtheta_dP(self, pressure, params):
+        # Appendix B: d(log(theta))/dP = gamma_0 * (X_2^T)^3 / K_0.
+        a = 1.0 / (3.0 * params["b"][0] - 1.0)
+        K = params["K_0"] / (1.0 + params["delta"][0])
+        X = 1.0 / (1.0 - a + a * np.sqrt(1.0 + 2.0 * pressure / (3.0 * a * K)))
+        return params["grueneisen_0"] / params["K_0"] * X**3
+
     def _dtheta_dP(self, pressure, params):
-        ab2 = 1.0 / (3.0 * params["b"][0] - 1.0)
-        K0b = params["K_0"] / (1.0 + params["delta"][0])
-        A = 2.0 / (3.0 * ab2 * K0b)
-        y = np.sqrt(1.0 + A * pressure)
-        XT2 = 1.0 / (1.0 - ab2 + ab2 * y)
-
-        dG_dXT2 = self._dGamma_dXT2(2, ab2, XT2)
-
-        # dXT2/dy
-        dXT2_dy = -ab2 / (1.0 - ab2 + ab2 * y) ** 2
-
-        # dy/dP
-        dy_dP = 0.5 * A / np.sqrt(1.0 + A * pressure)
-
-        # Prefactor
-        B = params["grueneisen_0"] / (1.0 + params["delta"][0])
-
-        # Theta
-        theta_val = self._theta(pressure, params)
-
-        return theta_val * B * dG_dXT2 * dXT2_dy * dy_dP
+        return self._theta(pressure, params) * self._dlogtheta_dP(pressure, params)
 
     def _d2theta_dP2(self, pressure, params):
-        ab2 = 1.0 / (3.0 * params["b"][0] - 1.0)
-        K0b = params["K_0"] / (1.0 + params["delta"][0])
-        A = 2.0 / (3.0 * ab2 * K0b)
-        y = np.sqrt(1.0 + A * pressure)
-        dy_dP = 0.5 * A / np.sqrt(1.0 + A * pressure)
-        d2y_dP2 = -0.25 * A * A / (1.0 + A * pressure) ** (3.0 / 2.0)
-
-        XT2 = 1.0 / (1.0 - ab2 + ab2 * y)
-        D = 1.0 - ab2 + ab2 * y
-        dXT2_dy = -ab2 / (D**2)
-        d2XT2_dy2 = 2.0 * ab2 * ab2 / (D**3)
-
-        XT2_prime = dXT2_dy * dy_dP
-        XT2_double_prime = d2XT2_dy2 * (dy_dP**2) + dXT2_dy * d2y_dP2
-
-        # Gamma derivatives
-        dGamma_dXT2 = self._dGamma_dXT2(2, ab2, XT2)
-        d2Gamma_dXT2_2 = self._d2Gamma_dXT2_2(2, ab2, XT2)
-
-        B = params["grueneisen_0"] / (1.0 + params["delta"][0])
-        theta_val = self._theta(pressure, params)
-        dtheta_dP = self._dtheta_dP(pressure, params)
-
-        return (
-            theta_val
-            * B
-            * (d2Gamma_dXT2_2 * XT2_prime**2 + dGamma_dXT2 * XT2_double_prime)
-            + dtheta_dP * B * dGamma_dXT2 * XT2_prime
+        a = 1.0 / (3.0 * params["b"][0] - 1.0)
+        K = params["K_0"] / (1.0 + params["delta"][0])
+        y = np.sqrt(1.0 + 2.0 * pressure / (3.0 * a * K))
+        X = 1.0 / (1.0 - a + a * y)
+        dlogtheta_dP = params["grueneisen_0"] / params["K_0"] * X**3
+        return self._theta(pressure, params) * (
+            dlogtheta_dP**2 - dlogtheta_dP * X / (K * y)
         )
 
     def _interpolating_function(self, pressure, params):
@@ -409,34 +320,51 @@ class BroshCalphad(eos.EquationOfState):
             * np.exp((1.0 - f) / params["b"][1])
         )
 
+    def _dI_dP(self, pressure, params):
+        b = params["b"][1]
+        delta = params["delta"][1]
+        f = np.sqrt(1.0 + 2.0 * b * (1.0 + delta) * pressure / params["K_0"])
+        return -(1.0 + delta) / (params["K_0"] * (1.0 + b)) * np.exp((1.0 - f) / b)
+
     def _gibbs_qh(self, temperature, theta, n):
+        if temperature == 0.0:
+            return 0.0
         return (
             3.0
             * n
             * gas_constant
             * temperature
-            * np.log(1.0 - np.exp(-theta / temperature))
+            * np.log(-np.expm1(-theta / temperature))
         )  # eq. 5
 
     def _S_qh(self, temperature, theta, n):
+        if temperature == 0.0:
+            return 0.0
         nu = theta / temperature
+        denominator = -np.expm1(-nu)
         return (
             3.0
             * n
             * gas_constant
-            * (nu / (np.exp(nu) - 1.0) - np.log(1.0 - np.exp(-nu)))
+            * (nu * np.exp(-nu) / denominator - np.log(denominator))
         )
+
+    def _Cp_qh(self, temperature, theta, n):
+        if temperature == 0.0:
+            return 0.0
+        nu = theta / temperature
+        return 3.0 * n * gas_constant * nu**2 * np.exp(-nu) / np.expm1(-nu) ** 2
 
     def _C_T(self, temperature, params):
         # C, which is the (G_qh(t,p0) - G_sgte(t,p0)) term
-        G_SGTE = self._gibbs_1bar(temperature, params)
-        G_qh0 = self._gibbs_qh(temperature, params["theta_0"], params["n"])
         if temperature < params["T_0"]:
             C_T = (
                 temperature * temperature / (2.0 * params["T_0"]) * params["delta_Cpr"]
             )
 
         else:
+            G_SGTE = self._gibbs_1bar(temperature, params)
+            G_qh0 = self._gibbs_qh(temperature, params["theta_0"], params["n"])
             C_T = (
                 (G_qh0 - G_SGTE)
                 + params["delta_Gr"]
@@ -445,6 +373,16 @@ class BroshCalphad(eos.EquationOfState):
             )
 
         return C_T
+
+    def _dC_dT(self, temperature, params):
+        if temperature < params["T_0"]:
+            return temperature / params["T_0"] * params["delta_Cpr"]
+        return (
+            self._S_1bar(temperature, params)
+            - self._S_qh(temperature, params["theta_0"], params["n"])
+            - params["delta_Sr"]
+            + params["delta_Cpr"]
+        )
 
     def gibbs_energy(self, pressure, temperature, volume, params):
         """
@@ -467,67 +405,49 @@ class BroshCalphad(eos.EquationOfState):
             )
         )
 
-        # G_SGTE
-        G_SGTE = self._gibbs_1bar(temperature, params)
-
-        # G_qh
         theta = self._theta(pressure, params)
         G_qh = self._gibbs_qh(temperature, theta, params["n"])
-        G_qh0 = self._gibbs_qh(temperature, params["theta_0"], params["n"])
-
         C_T = self._C_T(temperature, params)
         I_P = self._interpolating_function(pressure, params)
-        return G_SGTE + G_c + G_qh - G_qh0 + C_T * (1.0 - I_P)
+
+        # Eq. 4 with Appendix C's continuation.
+        reference = (
+            params["delta_Gr"]
+            + params["T_0"] * params["delta_Sr"]
+            - params["T_0"] / 2.0 * params["delta_Cpr"]
+            + temperature * (params["delta_Cpr"] - params["delta_Sr"])
+        )
+        return G_c + G_qh - C_T * I_P + reference
 
     def entropy(self, pressure, temperature, volume, params):
-        """
-        Returns the molar entropy of the mineral. :math:`[J/K/mol]`
-        """
-
-        S_SGTE = self._S_1bar(temperature, params)
-
-        # S_qh
+        """Returns the molar entropy :math:`[J/K/mol]`."""
         theta = self._theta(pressure, params)
-        S_qh = self._S_qh(temperature, theta, params["n"])
-        S_qh0 = self._S_qh(temperature, params["theta_0"], params["n"])
-
-        # dCdT, which is the (S_qh(t,p0) - S_sgte(t,p0)) term
-        if temperature < params["T_0"]:
-            dC_TdT = temperature / params["T_0"] * params["delta_Cpr"]
-
-        else:
-            dC_TdT = -(S_qh0 - S_SGTE) - params["delta_Sr"] + params["delta_Cpr"]
-
-        I_P = self._interpolating_function(pressure, params)
-        return S_SGTE + S_qh - S_qh0 - dC_TdT * (1.0 - I_P)
+        return (
+            self._S_qh(temperature, theta, params["n"])
+            + self._dC_dT(temperature, params)
+            * self._interpolating_function(pressure, params)
+            + params["delta_Sr"]
+            - params["delta_Cpr"]
+        )
 
     def molar_heat_capacity_p(self, pressure, temperature, volume, params):
-        """
-        Returns the molar isobaric heat capacity :math:`[J/K/mol]`.
-        For now, this is calculated by numerical differentiation.
-        """
-        dT = 0.1
-        if temperature < dT / 2.0:
-            return 0.0
+        """Returns the molar isobaric heat capacity :math:`[J/K/mol]`."""
+        Cp_qh = self._Cp_qh(temperature, self._theta(pressure, params), params["n"])
+        if temperature < params["T_0"]:
+            correction = temperature / params["T_0"] * params["delta_Cpr"]
         else:
-            dS = self.entropy(
-                pressure, temperature + dT / 2.0, volume, params
-            ) - self.entropy(pressure, temperature - dT / 2.0, volume, params)
-            return temperature * dS / dT
+            correction = self._Cp_1bar(temperature, params) - self._Cp_qh(
+                temperature, params["theta_0"], params["n"]
+            )
+        return Cp_qh + correction * self._interpolating_function(pressure, params)
 
     def thermal_expansivity(self, pressure, temperature, volume, params):
-        """
-        Returns the volumetric thermal expansivity :math:`[1/K]`.
-        For now, this is calculated by numerical differentiation.
-        """
-        dT = 0.1
-        if temperature < dT / 2.0:
-            return 0.0
-        else:
-            dV = self.volume(pressure, temperature + dT / 2.0, params) - self.volume(
-                pressure, temperature - dT / 2.0, params
-            )
-            return dV / dT / volume
+        """Returns the volumetric thermal expansivity :math:`[1/K]`."""
+        Cp_qh = self._Cp_qh(temperature, self._theta(pressure, params), params["n"])
+        return (
+            Cp_qh * self._dlogtheta_dP(pressure, params)
+            - self._dC_dT(temperature, params) * self._dI_dP(pressure, params)
+        ) / volume
 
     def _grueneisen_parameter(self, pressure, temperature, volume, params):
         """
@@ -671,18 +591,9 @@ class BroshCalphad(eos.EquationOfState):
             params["c"] = self.calculate_transformed_parameters(params)
 
         # Calculate reference values for gibbs free energy and heat capacity
-        nur = params["theta_0"] / params["T_0"]
         G_qhr = self._gibbs_qh(params["T_0"], params["theta_0"], params["n"])
         S_qhr = self._S_qh(params["T_0"], params["theta_0"], params["n"])
-        Cp_qhr = (
-            3.0
-            * params["n"]
-            * gas_constant
-            * nur
-            * nur
-            * np.exp(nur)
-            / np.power(np.exp(nur) - 1.0, 2.0)
-        )
+        Cp_qhr = self._Cp_qh(params["T_0"], params["theta_0"], params["n"])
 
         G_SGTEr = self._gibbs_1bar(params["T_0"], params)
         S_SGTEr = self._S_1bar(params["T_0"], params)
