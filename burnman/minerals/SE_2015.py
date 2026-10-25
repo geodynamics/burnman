@@ -1,6 +1,6 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2021 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2026 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
@@ -8,12 +8,23 @@
 Saxena and Eriksson (2015)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Iron endmember minerals and melt taken from :cite:`SE2015`
-using the equation of state of :cite:`Brosh2007`.
+Iron phases based on :cite:`SE2015`, using the full cold-compression curve
+of :cite:`Brosh2007`.
 
-1 bar gibbs free energy coefficients are given in the following order:
-[[T_max, [const, T, T*ln(T), T^(-1), T^(-2), T^(-3), T^(-9),
-T^2, T^3, T^4, T^7, T^(1/2), ln(T)]]
+HCP uses b_1=2.49614 from Perple_X's ``SE15ver.dat`` (FeHCP, ``b6``);
+Table 1 of :cite:`SE2015` gives 5.5. The hcp-liquid melting temperature
+is 6453.79 K at 363.85 GPa.
+
+FCC uses a Neel temperature of 67 K and a moment of 0.7 Bohr magnetons,
+obtained by dividing Table 1's -201 and -2.1 by the CALPHAD FCC
+antiferromagnetic factor of -3
+(https://pycalphad.org/docs/latest/_modules/pycalphad/model.html#Model.magnetic_energy).
+
+Each ``gibbs_coefficients`` segment is ``[T_max, coefficients]``. The
+coefficients for the 1 bar Gibbs energy (J/mol) multiply, in order::
+
+    [1, T, T*ln(T), T**(-1), T**(-2), T**(-3), T**(-9),
+     T**2, T**3, T**4, T**7, sqrt(T), ln(T)]
 """
 
 from ..classes.mineral import Mineral
@@ -195,8 +206,8 @@ class fcc_iron(Mineral):
                 "magnetic_chs",
                 {
                     "structural_parameter": 0.28,
-                    "curie_temperature": [201.0, 0.0],
-                    "magnetic_moment": [2.1, 0.0],
+                    "curie_temperature": [67.0, 0.0],
+                    "magnetic_moment": [0.7, 0.0],
                 },
             ]
         ]
@@ -280,7 +291,7 @@ class hcp_iron(Mineral):
             "theta_0": 250.0,  # b3
             "grueneisen_0": 2.85,  # b1
             "delta": [6.0, 10.0],  # b5, b7
-            "b": [0.7, 2.49614],  # b4, b6
+            "b": [0.7, 2.49614],  # Table 1 prints b_1=5.5; see module notes.
         }
         Mineral.__init__(self)
 
