@@ -606,38 +606,49 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     :rtype: 2D numpy.array
     """
 
-    # Check array dimensions
-    n_dimensions = len(model.data[0])
-    if len(x_array[0]) != n_dimensions:
-        raise Exception(
-            "Dimensions of each point must be the same as the "
-            "total number of dimensions"
-        )
+    x_array = np.asarray(x_array, dtype=float)
+    if x_array.ndim != 2 or x_array.shape[1] != model.data.shape[1]:
+        raise ValueError("Query dimensions must match the model data.")
+    if not 0.0 < confidence_interval < 1.0 or model.dof <= 0:
+        raise ValueError("Require 0 < confidence_interval < 1 and positive dof.")
+    if len(x_array) == 0:
+        return np.empty((4, 0))
 
-    param_values = model.get_params()
-    x_m_0s = np.empty_like(x_array)
-    f_m_0s = np.empty_like(x_array[:, 0])
-    for i, x in enumerate(x_array):
-        x_m_0s[i] = model.function(x, flag)
-        f_m_0s[i] = f(x)
-
+    param_values = np.array(model.get_params(), dtype=float, copy=True)
+    f_m_0s = np.empty(len(x_array))
     diag_delta = np.diag(model.delta_params)
     dxdbeta = np.empty([len(param_values), len(x_array)])
 
-    for i, value in enumerate(param_values):
-        model.set_params(param_values + diag_delta[i])
+    try:
+        for i, x in enumerate(x_array):
+            f_m_0s[i] = f(model.function(x, flag))
 
-        for j, x_m_0 in enumerate(x_m_0s):
-            x_m_1 = model.function(x_m_0, flag)
-            dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j]) / diag_delta[i][i]
+        for i, value in enumerate(param_values):
+            model.set_params(param_values + diag_delta[i])
+            step = model.get_params()[i] - value
+            if step == 0.0:  # Try the other side at a parameter bound.
+                model.set_params(param_values - diag_delta[i])
+                step = model.get_params()[i] - value
+            if step == 0.0:
+                if model.pcov[i, i] != 0.0:
+                    raise ValueError(
+                        "Cannot perturb a parameter with nonzero covariance."
+                    )
+                dxdbeta[i] = 0.0
+                continue
 
-    model.set_params(param_values)  # reset params
+            for j, x in enumerate(x_array):
+                x_m_1 = model.function(x, flag)
+                dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j]) / step
+    finally:
+        model.set_params(param_values)
+    model.function(x_array[-1], flag)
 
     variance = np.empty(len(x_array))
     for i, Gprime in enumerate(dxdbeta.T):
         variance[i] = Gprime.T.dot(model.pcov).dot(Gprime)
 
-    critical_value = t.isf(0.5 * (confidence_interval + 1.0), model.dof)
+    critical_value = t.ppf(0.5 * (confidence_interval + 1.0), model.dof)
 
     confidence_half_widths = critical_value * np.sqrt(variance)
     prediction_half_widths = critical_value * np.sqrt(variance + model.noise_variance)

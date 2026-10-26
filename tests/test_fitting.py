@@ -554,8 +554,8 @@ class test_fitting(BurnManTest):
             model=fitted_eos,
             x_array=VTP,
             confidence_interval=0.95,
-            f=attribute_function(fo, "V"),
-            flag="V",
+            f=attribute_function(fo, "P", using_volume=True),
+            flag="P",
         )
         self.assertEqual(len(cp_bands[0]), len(VTP))
         self.assertEqual(len(cp_bands), 4)
@@ -712,6 +712,8 @@ class test_fitting(BurnManTest):
                 [-1.0 * fitted_eos.popt[2], 2.0 * fitted_eos.popt[2]],
             ]
         )
+        # Excess volume may be negative; keep lower and upper bounds ordered.
+        bounds.sort(axis=1)
 
         fitted_eos = fit_XPTp_data(
             solution=solution,
