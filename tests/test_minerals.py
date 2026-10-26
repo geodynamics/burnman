@@ -93,5 +93,21 @@ class SLB2022LandauVolumes(BurnManTest):
                 self.assertGreater(phase.shear_wave_velocity, 0.0)
 
 
+class VolumeStateModifiers(BurnManTest):
+    def test_volume_state_does_not_add_modifier_volume_twice(self):
+        mineral = minerals.SLB_2011.forsterite()
+        mineral.property_modifiers = [
+            ["linear", {"delta_V": 2.0e-7, "delta_S": 0.5, "delta_E": 100.0}]
+        ]
+        mineral.set_state(3.0e9, 700.0)
+        volume = mineral.molar_volume
+        gibbs, helmholtz = mineral.molar_gibbs, mineral.molar_helmholtz
+        mineral.set_state_with_volume(volume, 700.0)
+        self.assertAlmostEqual(mineral.molar_volume / volume, 1.0, places=12)
+        self.assertAlmostEqual(mineral.pressure / 3.0e9, 1.0, places=10)
+        self.assertAlmostEqual(mineral.molar_gibbs / gibbs, 1.0, places=12)
+        self.assertAlmostEqual(mineral.molar_helmholtz / helmholtz, 1.0, places=12)
+
+
 if __name__ == "__main__":
     unittest.main()
