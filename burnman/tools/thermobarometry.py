@@ -3,7 +3,7 @@ import numpy as np
 import sympy as sp
 
 from scipy.linalg import sqrtm, block_diag
-from scipy.optimize import minimize
+from scipy.optimize import LinearConstraint, minimize
 
 from ..classes.solution import Solution
 from ..classes.combinedmineral import CombinedMineral
@@ -338,7 +338,8 @@ def estimate_conditions(
         setting the attribute `free_compositional_vectors` on the relevant
         solution phases, where each row of the array corresponds to a
         free compositional vector, and the columns correspond to the
-        amounts of endmembers of that phase in each vector.
+        amounts of endmembers of that phase in each vector. Site occupancies
+        are constrained to be nonnegative; endmember amounts may be signed.
     :type assemblage: Assemblage
 
     :param dataset_covariances: The covariance data describing the
@@ -418,10 +419,15 @@ def estimate_conditions(
 
     # Count the number of free compositional vectors across all phases
     n_free_vectors = 0
+    occupancy_baseline = []
+    occupancy_blocks = []
     for phase in assemblage.phases:
         if hasattr(phase, "free_compositional_vectors"):
             n_free_vectors += phase.free_compositional_vectors.shape[0]
             phase.baseline_composition = phase.molar_fractions.copy()
+            occs = phase.solution_model.endmember_occupancies
+            occupancy_baseline.extend(phase.baseline_composition.dot(occs))
+            occupancy_blocks.append(occs.T.dot(phase.free_compositional_vectors.T))
 
     # Check if P and/or T are fixed
     P_fixed = np.isclose(pressure_bounds[0], pressure_bounds[1])
@@ -476,15 +482,36 @@ def estimate_conditions(
     ]
     options = {"maxiter": max_it}
 
-    # Solve first with Nelder-Mead if there are free compositional vectors
-    # Nelder-Mead is more robust for problems where the feasible region
-    # may be complex due to compositional degrees of freedom
+    # Site occupancies are b + A @ x, including zero columns for P and T.
+    constraints = []
     if n_free_vectors > 0:
-        res = minimize(chisqr, x0, method="Nelder-Mead", bounds=bounds, options=options)
+        b = np.array(occupancy_baseline)
+        A = np.hstack((np.zeros((len(b), 2)), block_diag(*occupancy_blocks)))
+        constraints = [LinearConstraint(A, -b, np.inf)]
+
+        # Nelder-Mead cannot enforce linear constraints itself.
+        def feasible_chisqr(args):
+            if np.any(A.dot(args) + b < -1.0e-10):
+                return np.inf
+            return chisqr(args)
+
+        res = minimize(
+            feasible_chisqr, x0, method="Nelder-Mead", bounds=bounds, options=options
+        )
         x0 = res.x
 
-    # Solve with SLSQP, which returns the Jacobian needed for uncertainty estimation
-    res = minimize(chisqr, x0, method="SLSQP", bounds=bounds, options=options)
+    # SLSQP enforces the linear constraints; keep chisqr available for its
+    # finite-difference evaluations just outside a composition boundary.
+    res = minimize(
+        chisqr,
+        x0,
+        method="SLSQP",
+        bounds=bounds,
+        constraints=constraints,
+        options=options,
+    )
+    if n_free_vectors > 0 and not np.all(A.dot(res.x) + b >= -1.0e-10):
+        raise ValueError("Optimization returned infeasible site occupancies.")
 
     # Rescale solution and Jacobian back to SI units (Pa for pressure)
     res.x[0] *= P_scaling

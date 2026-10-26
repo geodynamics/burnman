@@ -1,7 +1,9 @@
 import unittest
+from unittest.mock import patch
 from util import BurnManTest
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import OptimizeResult
 
 import burnman
 from burnman import Composite
@@ -20,6 +22,7 @@ from burnman.utils.math import _pad_ndarray_inverse_mirror
 from burnman.utils.math import is_positive_definite
 
 from burnman.minerals import HP_2011_ds62, mp50MnNCKFMASHTO
+from burnman.tools import thermobarometry
 from burnman.tools.thermobarometry import estimate_conditions
 from burnman.tools.thermobarometry import get_reaction_matrix
 from burnman.tools.thermobarometry import assemblage_affinity_misfit
@@ -472,23 +475,68 @@ class test_tools(BurnManTest):
             )
 
     def test_estimate_conditions_free_compositional_vector(self):
-        assemblage = setup_assemblage()
-        theta = np.array([0.5e9, 500.0])
-        dataset_covariances = HP_2011_ds62.cov()
+        for scale in (0.0, 1.0):
+            with self.subTest(scale=scale):
+                assemblage = setup_assemblage(scale=scale)
+                theta = np.array([0.5e9, 500.0])
+                dataset_covariances = HP_2011_ds62.cov()
 
-        # set free compositional vectors for each phase
-        # corresponding to isochemical reactions
-        for phase in assemblage.phases:
-            r = Composite([phase]).reaction_basis
-            if r.shape[0] > 0:
-                phase.free_compositional_vectors = Composite([phase]).reaction_basis
+                # Free isochemical reactions in biotite and ilmenite.
+                for phase in assemblage.phases:
+                    r = Composite([phase]).reaction_basis
+                    if r.shape[0] > 0:
+                        phase.free_compositional_vectors = r
 
-        res = estimate_conditions(
-            assemblage, dataset_covariances, guessed_conditions=theta
-        )
-        self.assertTrue(res.success)
-        self.assertEqual(res.n_reactions, 18)
-        self.assertEqual(res.n_params, 4)
+                res = estimate_conditions(
+                    assemblage, dataset_covariances, guessed_conditions=theta
+                )
+                self.assertTrue(res.success, res.message)
+                self.assertEqual(res.n_reactions, 18)
+                self.assertEqual(res.n_params, 4)
+                for phase in assemblage.phases[:-1]:
+                    self.assertGreaterEqual(min(phase.site_occupancies), -1.0e-10)
+                self.assertLess(min(assemblage.phases[1].molar_fractions), 0.0)
+
+    def test_estimate_conditions_rejects_infeasible_warmup(self):
+        assemblage = setup_assemblage(scale=0.0)
+        biotite = assemblage.phases[1]
+        biotite.free_compositional_vectors = Composite([biotite]).reaction_basis
+        original_minimize = thermobarometry.minimize
+
+        def check_minimize(fun, x0, method, **kwargs):
+            if method == "Nelder-Mead":
+                compositions = [
+                    phase.molar_fractions.copy() for phase in assemblage.phases[:-1]
+                ]
+                trial = np.array(x0)
+                trial[2] = 1.0  # A negative Mgmthree_A occupancy in biotite.
+                self.assertEqual(fun(trial), np.inf)
+                for phase, composition in zip(assemblage.phases[:-1], compositions):
+                    self.assertArraysAlmostEqual(phase.molar_fractions, composition)
+            return original_minimize(fun, x0, method=method, **kwargs)
+
+        with patch.object(thermobarometry, "minimize", side_effect=check_minimize):
+            result = estimate_conditions(
+                assemblage, HP_2011_ds62.cov(), guessed_conditions=[0.5e9, 500.0]
+            )
+        self.assertTrue(result.success, result.message)
+
+    def test_estimate_conditions_rejects_infeasible_optimum(self):
+        assemblage = setup_assemblage(scale=0.0)
+        biotite = assemblage.phases[1]
+        biotite.free_compositional_vectors = Composite([biotite]).reaction_basis
+        compositions = [
+            phase.molar_fractions.copy() for phase in assemblage.phases[:-1]
+        ]
+        # Simulate a solver claiming success at an unphysical composition.
+        result = OptimizeResult(x=np.array([500.0, 500.0, 1.0]), success=True)
+        with patch.object(thermobarometry, "minimize", return_value=result):
+            with self.assertRaisesRegex(ValueError, "infeasible site occupancies"):
+                estimate_conditions(
+                    assemblage, HP_2011_ds62.cov(), guessed_conditions=[0.5e9, 500.0]
+                )
+        for phase, composition in zip(assemblage.phases[:-1], compositions):
+            self.assertArraysAlmostEqual(phase.molar_fractions, composition)
 
     def test_estimate_conditions_with_condition_priors(self):
         assemblage = setup_assemblage()
