@@ -16,7 +16,10 @@ from burnman.optimize.nonlinear_fitting import (
     find_mle,
 )
 from burnman.utils.misc import attribute_function, pretty_string_values
-from burnman.optimize.composition_fitting import fit_composition_to_solution
+from burnman.optimize.composition_fitting import (
+    DummyCompositionSolution,
+    fit_composition_to_solution,
+)
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -785,6 +788,77 @@ class test_fitting(BurnManTest):
         f = [0.004, 0.328, 0.619, 0.048, 0.000]
         f2 = np.round(gt.molar_fractions, 3)
         self.assertArraysAlmostEqual(f, f2)
+
+    def test_composition_conversion_coefficients(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        conversions = {
+            "twice_Mg": {"Mg": 2.0, "Fe_A": 0.0},
+            "half_Fe": {"Fe_A": 0.5},
+        }
+        for normalize in (False, True):
+            with self.subTest(normalize=normalize):
+                converted = fit_composition_to_solution(
+                    solution,
+                    ["twice_Mg", "half_Fe"],
+                    [1.2, 0.7],
+                    np.eye(2),
+                    conversions,
+                    normalize=normalize,
+                )
+                direct = fit_composition_to_solution(
+                    solution,
+                    ["Mg", "Fe_A"],
+                    [0.6, 1.4],
+                    np.diag([0.25, 4.0]),
+                    normalize=normalize,
+                )
+                expected = [0.3, 0.7] if normalize else [0.6, 1.4]
+                self.assertArraysAlmostEqual(converted[0], expected)
+                self.assertArraysAlmostEqual(converted[0], direct[0])
+                self.assertArraysAlmostEqual(
+                    converted[1].flatten(), direct[1].flatten()
+                )
+                self.assertFloatEqual(converted[2], direct[2])
+
+    def test_composition_conversion_equal_site_amounts(self):
+        solution = DummyCompositionSolution(
+            ["MgFeSiO4", "MgFeSiO4"], ["[Mg][Fe]SiO4", "[Fe][Mg]SiO4"]
+        )
+        amounts, covariance, residual = fit_composition_to_solution(
+            solution,
+            ["Mg_A", "Mg_B", "Mg_equal"],
+            [0.8, 0.2, 0.0],
+            np.eye(3),
+            {"Mg_equal": {"Mg_A": 1.0, "Mg_B": -1.0}},
+        )
+        self.assertArraysAlmostEqual(amounts, [0.5, 0.5])
+        self.assertArraysAlmostEqual(
+            covariance.flatten(), np.array([1.0, -1.0, -1.0, 1.0]) / 6.0
+        )
+        self.assertFloatEqual(residual, 0.18)
+
+    def test_composition_conversion_uses_earlier_definition(self):
+        solution = DummyCompositionSolution(
+            ["MgFeSiO4", "MgFeSiO4"], ["[Mg][Fe]SiO4", "[Fe][Mg]SiO4"]
+        )
+        conversions = {
+            "twice_Mg": {"Mg_A": 2.0},
+            "Mg_difference": {"twice_Mg": 1.5, "Mg_B": -0.25},
+        }
+        converted = fit_composition_to_solution(
+            solution, ["Mg_difference", "Fe_A"], [0.725, 0.7], np.eye(2), conversions
+        )
+        direct = fit_composition_to_solution(
+            solution,
+            ["Mg_difference", "Fe_A"],
+            [0.725, 0.7],
+            np.eye(2),
+            {"Mg_difference": {"Mg_A": 3.0, "Mg_B": -0.25}},
+        )
+        self.assertArraysAlmostEqual(converted[0], [0.3, 0.7])
+        self.assertArraysAlmostEqual(converted[0], direct[0])
+        self.assertArraysAlmostEqual(converted[1].flatten(), direct[1].flatten())
+        self.assertFloatEqual(converted[2], direct[2])
 
     def test_differential_evolution(self):
         """

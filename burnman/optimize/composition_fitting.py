@@ -78,7 +78,8 @@ def fit_composition_to_solution(
         into an arithmetic sum of element and site-species amounts. For example,
         {'Mg_equal': {'Mg_A': 1., 'Mg_B': -1.}}, coupled with Mg_equal = 0
         would impose a constraint that the amount of Mg would be equal on
-        the first and second site in the solution.
+        the first and second site in the solution. Definitions are processed
+        in dictionary order and may refer to previously defined variables.
     :type variable_conversions: dict of dict, or None
 
     :param normalize: Whether to normalize the molar fractions to sum to one.
@@ -123,10 +124,10 @@ def fit_composition_to_solution(
             assert new_var not in solution_variables
             solution_variables.append(new_var)
 
-            for var in conversion_dict.keys():
-                solution_matrix[:, n_sol_vars + i] += solution_matrix[
-                    :, solution_variables.index(var)
-                ]
+            for var, coefficient in conversion_dict.items():
+                solution_matrix[:, n_sol_vars + i] += (
+                    coefficient * solution_matrix[:, solution_variables.index(var)]
+                )
 
     # Now, construct A using the fitted variables
     A = np.zeros((n_vars, solution_matrix.shape[0]))
