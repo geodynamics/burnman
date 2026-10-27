@@ -97,7 +97,7 @@ def _build_endmember_covariance_matrix(assemblage, dataset_covariances):
                     b = endmember.mixture.molar_fractions
                     A.append([0] * len(cov["endmember_names"]))
                     for i, idx in enumerate(indices):
-                        A[-1][idx] = b[i]
+                        A[-1][idx] += b[i]
                 else:
                     A.append([0] * len(cov["endmember_names"]))
                     A[-1][cov["endmember_names"].index(endmember.name)] = 1.0

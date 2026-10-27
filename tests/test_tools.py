@@ -7,6 +7,7 @@ from scipy.optimize import OptimizeResult
 
 import burnman
 from burnman import Composite
+from burnman.classes.solutionmodel import IdealSolution
 from burnman.eos.slb import SLBDomainError
 from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.chemistry import equilibrium_pressure
@@ -397,6 +398,35 @@ class test_tools(BurnManTest):
         self.assertTrue(len(contour_sets) == 11)
         self.assertTrue(len(ticks) == 11)
         self.assertTrue(len(lines) == 11)
+
+    def test_endmember_covariances_with_repeated_raw_endmembers(self):
+        covariance = {
+            "endmember_names": [HP_2011_ds62.fo().name, HP_2011_ds62.fa().name],
+            "covariance_matrix": np.array([[10000.0, 2000.0], [2000.0, 40000.0]]),
+        }
+        expected = np.array(
+            [
+                [10000.0, 2000.0, 10000.0],
+                [2000.0, 40000.0, 2000.0],
+                [10000.0, 2000.0, 10000.0],
+            ]
+        )
+        for amounts in ([0.5, 0.5], [1.5, -0.5]):
+            with self.subTest(amounts=amounts):
+                made_fo = burnman.CombinedMineral(
+                    [HP_2011_ds62.fo(), HP_2011_ds62.fo()], amounts
+                )
+                solution = burnman.Solution(
+                    solution_model=IdealSolution(
+                        [[made_fo, "[Mg]2SiO4"], [HP_2011_ds62.fa(), "[Fe]2SiO4"]]
+                    ),
+                    molar_fractions=[0.5, 0.5],
+                )
+                assemblage = Composite([solution, HP_2011_ds62.fo()], [0.5, 0.5])
+                actual = thermobarometry._build_endmember_covariance_matrix(
+                    assemblage, covariance
+                )
+                self.assertArraysAlmostEqual(actual.ravel(), expected.ravel())
 
     def test_estimate_conditions(self):
         assemblage = setup_assemblage()
