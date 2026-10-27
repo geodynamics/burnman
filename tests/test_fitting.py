@@ -6,7 +6,7 @@ from numpy import random
 import matplotlib.pyplot as plt
 
 import burnman
-from burnman.optimize.eos_fitting import fit_XPTp_data
+from burnman.optimize.eos_fitting import SolutionFit, fit_XPTp_data
 from burnman.optimize.linear_fitting import weighted_constrained_least_squares
 from burnman.optimize.nonlinear_fitting import (
     NonLinearModel,
@@ -732,6 +732,38 @@ class test_fitting(BurnManTest):
 
         with self.assertRaises(Exception):
             _ = burnman.eos_fitting.fit_VTP_data(fo, params, VTP, verbose=False)
+
+    def test_solution_fit_array_parameter_round_trip(self):
+        for bounded in (False, True):
+            with self.subTest(bounded=bounded):
+                solution = burnman.minerals.JH_2015.garnet()
+                fit_params = [["Cp", 0], ["V_0", 1], ["Cp", 1], ["E", 0, 1]]
+                values = np.array(
+                    [10.0, 20.0, 30.0, 40.0, 4.5e-5, 50.0, 60.0, 70.0, 80.0, 2000.0]
+                )
+                expected = values.copy()
+                bounds = None
+                if bounded:
+                    bounds = np.tile([-np.inf, np.inf], (len(values), 1))
+                    bounds[2, 1] = 25.0
+                    bounds[8, 1] = 75.0
+                    expected[2] = 25.0
+                    expected[8] = 75.0
+
+                n_coordinates = solution.n_endmembers + 3
+                model = SolutionFit(
+                    solution=solution,
+                    data=np.empty((0, n_coordinates)),
+                    data_covariances=np.empty((0, n_coordinates, n_coordinates)),
+                    flags=[],
+                    fit_params=fit_params,
+                    mle_tolerances=np.empty(0),
+                    bounds=bounds,
+                )
+                model.set_params(values)
+                self.assertArraysAlmostEqual(
+                    model.get_params(), expected, tol=0.0, tol_zero=0.0
+                )
 
     def test_bounded_solution_fitting(self):
         solution = burnman.minerals.SLB_2011.mg_fe_olivine()
