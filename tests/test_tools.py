@@ -661,6 +661,61 @@ class test_tools(BurnManTest):
         for phase, composition in zip(assemblage.phases[:-1], compositions):
             self.assertArraysAlmostEqual(phase.molar_fractions, composition)
 
+    def test_estimate_conditions_automatic_scaling(self):
+        reference = None
+        for guess in ([12.0e9, 1000.0], [14.0e9, 1400.0], [16.0e9, 1800.0]):
+            with self.subTest(guess=guess):
+                ol = burnman.minerals.SLB_2024.olivine()
+                wad = burnman.minerals.SLB_2024.wadsleyite()
+                ol.set_composition([0.9, 0.1])
+                wad.set_composition([0.82, 0.18])
+                ol.compositional_covariances = np.eye(2) * 1.0e-10
+                wad.compositional_covariances = np.eye(2) * 1.0e-4
+                assemblage = Composite([ol, wad], [0.5, 0.5])
+                assemblage.state_priors = np.array([13.0e9, 1400.0])
+                assemblage.state_inverse_covariances = np.diag([1.0e-18, 1.0e-4])
+                data = {
+                    "endmember_names": [*ol.endmember_names, *wad.endmember_names],
+                    "covariance_matrix": np.eye(4) * 70.0**2,
+                }
+                result = estimate_conditions(
+                    assemblage,
+                    data,
+                    include_state_misfit=True,
+                    guessed_conditions=guess,
+                )
+                self.assertTrue(result.success, result.message)
+                self.assertFloatEqual(result.fun, 0.9517, tol=1.0e-5)
+                self.assertArraysAlmostEqual(
+                    result.x / [1.0e9, 1.0], [12.3656, 1380.6], tol=1.0e-4
+                )
+                if reference is not None:
+                    error = np.linalg.solve(
+                        np.linalg.cholesky(reference.xcov), result.x - reference.x
+                    )
+                    self.assertLess(np.linalg.norm(error), 0.002)
+                reference = result
+
+    def test_estimate_conditions_covariance_preserves_pressure_information(self):
+        assemblage = setup_assemblage()
+        assemblage.state_priors = np.array([0.4e9, 873.0])
+        assemblage.state_inverse_covariances = np.diag([1.0e-18, 1.0])
+        result = estimate_conditions(
+            assemblage,
+            HP_2011_ds62.cov(),
+            include_state_misfit=True,
+            guessed_conditions=assemblage.state_priors,
+        )
+        self.assertTrue(result.success, result.message)
+        # An independent inversion in GPa/K must give the same SI covariance.
+        units = np.diag([1.0e9, 1.0])
+        jacobian = result.dadx @ units
+        information = jacobian.T @ np.linalg.solve(result.acov, jacobian)
+        information += units @ assemblage.state_inverse_covariances @ units
+        expected = units @ np.linalg.inv(information) @ units
+        self.assertGreater(result.var[0], 1.0e6)
+        self.assertArraysAlmostEqual(result.xcov.ravel(), expected.ravel())
+
     def test_estimate_conditions_with_condition_priors(self):
         assemblage = setup_assemblage()
         theta = np.array([0.4e9, 873.0])

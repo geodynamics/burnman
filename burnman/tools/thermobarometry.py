@@ -328,7 +328,6 @@ def estimate_conditions(
     guessed_conditions=[1.0e9, 1000.0],
     pressure_bounds=[1.0e5, 400.0e9],
     temperature_bounds=[300.0, 4000.0],
-    P_scaling=1.0e6,
     small_fraction_tol=0.0,
     max_it=100,
 ):
@@ -336,6 +335,8 @@ def estimate_conditions(
     Perform a least-squares inversion to find the optimal pressure and
     temperature for a given mineral assemblage.
     Algorithm modified from :cite:`Powell1994`.
+    Pressure and temperature scales are determined automatically from their
+    weighted affinity sensitivities at the initial guess and any state priors.
 
     :param assemblage: The mineral assemblage for which to perform the
         inversion. Each solution phase in the assemblage must have its
@@ -373,9 +374,6 @@ def estimate_conditions(
 
     :param temperature_bounds: Bounds for temperature (K) during optimization.
     :type temperature_bounds: list of two floats
-
-    :param P_scaling: Scaling factor for pressure to improve numerical stability.
-    :type P_scaling: float
 
     :param small_fraction_tol: If > 0.0, reduces the number of endmembers in
         solution phases by transforming to a smaller set of independent
@@ -467,7 +465,7 @@ def estimate_conditions(
 
     # Define the chi-squared function to minimize
     def chisqr(args):
-        assemblage_set_state_from_params(assemblage, [args[0] * P_scaling, *args[1:]])
+        assemblage_set_state_from_params(assemblage, args * scales)
         # Compute the misfit. We do not include the state uncertainties
         # in the affinity misfit because we are optimizing over P and T directly
         # i.e., we are finding the misfit assuming that P and T are known exactly
@@ -481,15 +479,22 @@ def estimate_conditions(
             chisqr += assemblage_state_misfit(assemblage)
         return chisqr
 
-    # Set up initial guess, bounds, and options for the optimizer
-    x0 = list(guessed_conditions)
-    x0[0] /= P_scaling
-    x0.extend([0.0] * n_free_vectors)
-    bounds = [
-        (pressure_bounds[0] / P_scaling, pressure_bounds[1] / P_scaling),
-        (temperature_bounds[0], temperature_bounds[1]),
-        *[(None, None)] * n_free_vectors,
-    ]
+    # Diagonal preconditioning gives P and T unit weighted sensitivity.
+    bounds = np.array([pressure_bounds, temperature_bounds], dtype=float)
+    assemblage.set_state(*np.clip(guessed_conditions, bounds[:, 0], bounds[:, 1]))
+    acov = assemblage_affinity_covariance_matrix(assemblage, R, dataset_covariances)
+    dadx = R @ np.column_stack(
+        [assemblage.endmember_partial_volumes, -assemblage.endmember_partial_entropies]
+    )
+    weighted = np.linalg.solve(np.linalg.cholesky(acov), dadx)
+    curvature = np.sum(weighted**2, axis=0)
+    if include_state_misfit:
+        curvature += np.diag(assemblage.state_inverse_covariances)
+    scales = np.ones(2 + n_free_vectors)
+    scales[:2] = 1.0 / np.sqrt(np.where(curvature > 0.0, curvature, 1.0))
+    x0 = np.r_[guessed_conditions, np.zeros(n_free_vectors)] / scales
+    bounds = [tuple(b / s) for b, s in zip(bounds, scales)]
+    bounds += [(None, None)] * n_free_vectors
     options = {"maxiter": max_it}
 
     # Site occupancies are b + A @ x, including zero columns for P and T.
@@ -523,9 +528,9 @@ def estimate_conditions(
     if n_free_vectors > 0 and not np.all(A.dot(res.x) + b >= -1.0e-10):
         raise ValueError("Optimization returned infeasible site occupancies.")
 
-    # Rescale solution and Jacobian back to SI units (Pa for pressure)
-    res.x[0] *= P_scaling
-    res.jac[0] /= P_scaling
+    # Restore SI units for the solution and objective gradient.
+    res.x *= scales
+    res.jac /= scales
 
     # Post-process results
     # First we reset the assemblage to the optimal P and T
@@ -537,7 +542,7 @@ def estimate_conditions(
     dmudP = assemblage.endmember_partial_volumes
     dmudT = -assemblage.endmember_partial_entropies
     res.dadx = R.dot(np.array([dmudP, dmudT]).T)
-    information = res.dadx.T.dot(np.linalg.pinv(res.acov)).dot(res.dadx) + (
+    information = res.dadx.T.dot(np.linalg.solve(res.acov, res.dadx)) + (
         assemblage.state_inverse_covariances if include_state_misfit else 0
     )
     # Invert only the free P/T block to obtain conditional uncertainty.
@@ -545,7 +550,11 @@ def estimate_conditions(
     res.xcov = np.zeros((2, 2))
     if free.size:
         free_block = np.ix_(free, free)
-        res.xcov[free_block] = np.linalg.pinv(information[free_block])
+        covariance_scaling = np.outer(scales[free], scales[free])
+        res.xcov[free_block] = (
+            np.linalg.pinv(information[free_block] * covariance_scaling)
+            * covariance_scaling
+        )
     res.var = np.sqrt(np.diag(res.xcov))
     with np.errstate(divide="ignore", invalid="ignore"):
         res.xcorr = res.xcov / np.outer(res.var, res.var)
