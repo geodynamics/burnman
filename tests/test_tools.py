@@ -1,4 +1,9 @@
+import io
+import runpy
 import unittest
+from contextlib import redirect_stdout
+from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from util import BurnManTest
 import numpy as np
@@ -475,6 +480,16 @@ class test_tools(BurnManTest):
         )
         self.assertTrue(res.success)
         self.assertEqual(res.x[0], 1.0e9)
+        self.assertArraysAlmostEqual(res.xcov[0], [0.0, 0.0])
+        self.assertArraysAlmostEqual(res.xcov[:, 0], [0.0, 0.0])
+        self.assertFloatEqual(res.var[0], 0.0)
+        dadt = res.dadx[:, 1]
+        self.assertFloatEqual(
+            res.xcov[1, 1], 1.0 / dadt.dot(np.linalg.solve(res.acov, dadt))
+        )
+        self.assertTrue(np.all(np.isnan(res.xcorr[0])))
+        self.assertTrue(np.all(np.isnan(res.xcorr[:, 0])))
+        self.assertFloatEqual(res.xcorr[1, 1], 1.0)
 
     def test_estimate_conditions_fixed_T(self):
         assemblage = setup_assemblage()
@@ -488,6 +503,84 @@ class test_tools(BurnManTest):
         )
         self.assertTrue(res.success)
         self.assertEqual(res.x[1], 500.0)
+        self.assertArraysAlmostEqual(res.xcov[1], [0.0, 0.0])
+        self.assertArraysAlmostEqual(res.xcov[:, 1], [0.0, 0.0])
+        self.assertFloatEqual(res.var[1], 0.0)
+        dadp = res.dadx[:, 0]
+        self.assertFloatEqual(
+            res.xcov[0, 0], 1.0 / dadp.dot(np.linalg.solve(res.acov, dadp))
+        )
+        self.assertTrue(np.all(np.isnan(res.xcorr[1])))
+        self.assertTrue(np.all(np.isnan(res.xcorr[:, 1])))
+        self.assertFloatEqual(res.xcorr[0, 0], 1.0)
+
+    def test_estimate_conditions_fixed_state_with_correlated_priors(self):
+        # In MPa/K, the prior covariance is [[10000, 4000], [4000, 2500]].
+        # Its conditional variances are 3600 MPa^2 and 900 K^2.
+        for fixed_index, bounds in enumerate(
+            (
+                {"pressure_bounds": [0.4e9, 0.4e9]},
+                {"temperature_bounds": [873.0, 873.0]},
+            )
+        ):
+            with self.subTest(fixed_index=fixed_index):
+                assemblage = setup_assemblage()
+                assemblage.state_priors = np.array([0.4e9, 873.0])
+                assemblage.state_inverse_covariances = np.array(
+                    [
+                        [1.0e-12 / 3600.0, -1.0e-6 / 2250.0],
+                        [-1.0e-6 / 2250.0, 1.0 / 900.0],
+                    ]
+                )
+                res = estimate_conditions(
+                    assemblage,
+                    HP_2011_ds62.cov(),
+                    include_state_misfit=True,
+                    guessed_conditions=assemblage.state_priors,
+                    **bounds,
+                )
+                self.assertTrue(res.success, res.message)
+                free_index = 1 - fixed_index
+                derivative = res.dadx[:, free_index]
+                prior_variance = [3600.0e12, 900.0][free_index]
+                expected = 1.0 / (
+                    derivative.dot(np.linalg.solve(res.acov, derivative))
+                    + 1.0 / prior_variance
+                )
+                self.assertFloatEqual(res.xcov[free_index, free_index], expected)
+                self.assertArraysAlmostEqual(res.xcov[fixed_index], [0.0, 0.0])
+                self.assertArraysAlmostEqual(res.xcov[:, fixed_index], [0.0, 0.0])
+
+    def test_estimate_conditions_fixed_P_and_T_with_free_composition(self):
+        assemblage = setup_assemblage(scale=0.0)
+        biotite = assemblage.phases[1]
+        biotite.free_compositional_vectors = Composite([biotite]).reaction_basis
+        res = estimate_conditions(
+            assemblage,
+            HP_2011_ds62.cov(),
+            guessed_conditions=[0.4e9, 873.0],
+            pressure_bounds=[0.4e9, 0.4e9],
+            temperature_bounds=[873.0, 873.0],
+        )
+        self.assertTrue(res.success, res.message)
+        self.assertEqual(res.n_params, 1)
+        self.assertEqual(res.xcov.shape, (2, 2))
+        self.assertArraysAlmostEqual(res.xcov.ravel(), [0.0] * 4)
+        self.assertArraysAlmostEqual(res.var, [0.0, 0.0])
+        self.assertTrue(np.all(np.isnan(res.xcorr)))
+
+    def test_estimate_conditions_narrow_bounds_do_not_fix_state(self):
+        res = estimate_conditions(
+            setup_assemblage(),
+            HP_2011_ds62.cov(),
+            guessed_conditions=[0.4e9, 873.0],
+            pressure_bounds=[0.4e9 - 1000.0, 0.4e9 + 1000.0],
+            temperature_bounds=[873.0 - 0.001, 873.0 + 0.001],
+        )
+        self.assertTrue(res.success, res.message)
+        self.assertEqual(res.n_params, 2)
+        self.assertGreater(res.var[0], 0.0)
+        self.assertGreater(res.var[1], 0.0)
 
     def test_estimate_conditions_fail_fixed_P_and_T(self):
         assemblage = setup_assemblage()
@@ -594,6 +687,73 @@ class test_tools(BurnManTest):
         self.assertTrue(res_without_priors.success)
         self.assertEqual(res_without_priors.n_reactions, 18)
         self.assertTrue(res_without_priors.x[0] < res_with_priors.x[0])
+
+    def test_assemblage_affinity_misfit_preserves_small_variances(self):
+        for covariance, affinities, expected in (
+            (np.diag([1.0e20, 1.0]), [1.0e10, 1.0], 2.0),
+            (np.array([[4.0, 1.0], [1.0, 9.0]]), [7.0, -7.0], 21.0),
+        ):
+            with self.subTest(covariance=covariance):
+                assemblage = SimpleNamespace(
+                    endmember_partial_gibbs=np.array(affinities)
+                )
+                with patch.object(
+                    thermobarometry,
+                    "assemblage_affinity_covariance_matrix",
+                    return_value=covariance,
+                ):
+                    misfit = assemblage_affinity_misfit(assemblage, np.eye(2))
+                self.assertFloatEqual(misfit, expected)
+
+    def test_assemblage_affinity_misfit_rejects_invalid_covariance(self):
+        assemblage = SimpleNamespace(endmember_partial_gibbs=np.array([0.0, 1.0]))
+        for covariance in (np.diag([1.0, -1.0]), np.diag([1.0, 0.0])):
+            with self.subTest(covariance=covariance):
+                with patch.object(
+                    thermobarometry,
+                    "assemblage_affinity_covariance_matrix",
+                    return_value=covariance,
+                ):
+                    misfit = assemblage_affinity_misfit(assemblage, np.eye(2))
+                self.assertEqual(misfit, np.inf)
+
+    def test_example_optimal_thermobarometry_order_curves(self):
+        figures_before = set(plt.get_fignums())
+        try:
+            with np.printoptions(), patch("matplotlib.pyplot.show"), redirect_stdout(
+                io.StringIO()
+            ):
+                namespace = runpy.run_path(
+                    str(
+                        Path(__file__).resolve().parents[1]
+                        / "examples"
+                        / "example_optimal_thermobarometry.py"
+                    ),
+                    run_name="__main__",
+                )
+            result = namespace["res"]
+            self.assertTrue(result.success, result.message)
+            self.assertGreater(result.reduced_chisqr, 0.25)
+            self.assertLess(result.reduced_chisqr, 0.35)
+            self.assertGreater(result.var[0], 20.0e6)
+            self.assertLess(result.var[0], 60.0e6)
+            self.assertGreater(result.var[1], 5.0)
+            self.assertLess(result.var[1], 20.0)
+            curves = namespace["ax"].lines
+            self.assertEqual(len(curves), 2)
+            for curve in curves:
+                misfits = np.asarray(curve.get_ydata())
+                self.assertEqual(len(misfits), 51)
+                self.assertTrue(np.all(np.isfinite(misfits)))
+                self.assertTrue(np.all(misfits >= 0.0))
+                self.assertLess(max(misfits), 1.0)
+                self.assertFloatEqual(misfits[25], result.reduced_chisqr)
+            biotite_misfits = curves[0].get_ydata()
+            self.assertLess(biotite_misfits[25], biotite_misfits[0])
+            self.assertLess(biotite_misfits[25], biotite_misfits[-1])
+        finally:
+            for figure in set(plt.get_fignums()) - figures_before:
+                plt.close(figure)
 
     def test_assemblage_affinity_misfit(self):
         sill = HP_2011_ds62.sill()

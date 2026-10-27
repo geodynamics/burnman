@@ -281,6 +281,7 @@ def assemblage_affinity_misfit(
     :type include_state_uncertainties: bool
 
     :return: Chi-squared misfit value.
+        Returns infinity if the affinity covariance is not positive definite.
     :rtype: float
     """
     R = reaction_matrix
@@ -288,7 +289,13 @@ def assemblage_affinity_misfit(
         assemblage, R, dataset_covariances, include_state_uncertainties
     )
     a = R.dot(assemblage.endmember_partial_gibbs)
-    return a.T.dot(np.linalg.pinv(cov_a)).dot(a)
+    try:
+        factor = np.linalg.cholesky(cov_a)
+    except np.linalg.LinAlgError:
+        # An invalid covariance must not look like a perfect fit at a site boundary.
+        return np.inf
+    weighted_affinities = np.linalg.solve(factor, a)
+    return weighted_affinities.dot(weighted_affinities)
 
 
 def assemblage_state_misfit(assemblage):
@@ -395,6 +402,8 @@ def estimate_conditions(
         the reduced chi-squared value (reduced_chisqr,
         given by chi-squared divided by the number of degrees of freedom),
         and the fit quality (fit, given by the square root of the reduced chi-squared value).
+        State variables fixed by equal bounds have zero variance and covariance;
+        correlations involving a fixed variable are undefined (NaN).
     :rtype: OptimizeResult
     """
 
@@ -430,9 +439,9 @@ def estimate_conditions(
             occupancy_baseline.extend(phase.baseline_composition.dot(occs))
             occupancy_blocks.append(occs.T.dot(phase.free_compositional_vectors.T))
 
-    # Check if P and/or T are fixed
-    P_fixed = np.isclose(pressure_bounds[0], pressure_bounds[1])
-    T_fixed = np.isclose(temperature_bounds[0], temperature_bounds[1])
+    # Equal bounds fix a state variable in the optimizer.
+    P_fixed = pressure_bounds[0] == pressure_bounds[1]
+    T_fixed = temperature_bounds[0] == temperature_bounds[1]
     if P_fixed and T_fixed and n_free_vectors == 0:
         raise Exception(
             "Both pressure and temperature cannot be fixed if there "
@@ -528,12 +537,18 @@ def estimate_conditions(
     dmudP = assemblage.endmember_partial_volumes
     dmudT = -assemblage.endmember_partial_entropies
     res.dadx = R.dot(np.array([dmudP, dmudT]).T)
-    res.xcov = np.linalg.pinv(
-        res.dadx.T.dot(np.linalg.pinv(res.acov)).dot(res.dadx)
-        + (assemblage.state_inverse_covariances if include_state_misfit else 0)
+    information = res.dadx.T.dot(np.linalg.pinv(res.acov)).dot(res.dadx) + (
+        assemblage.state_inverse_covariances if include_state_misfit else 0
     )
+    # Invert only the free P/T block to obtain conditional uncertainty.
+    free = np.flatnonzero([not P_fixed, not T_fixed])
+    res.xcov = np.zeros((2, 2))
+    if free.size:
+        free_block = np.ix_(free, free)
+        res.xcov[free_block] = np.linalg.pinv(information[free_block])
     res.var = np.sqrt(np.diag(res.xcov))
-    res.xcorr = res.xcov / np.outer(res.var, res.var)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        res.xcorr = res.xcov / np.outer(res.var, res.var)
 
     res.affinities = R.dot(assemblage.endmember_partial_gibbs)
     res.weighted_affinities = np.linalg.pinv(sqrtm(res.acov)).dot(res.affinities)
