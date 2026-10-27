@@ -1,5 +1,9 @@
 import os
+import io
+import runpy
 import unittest
+from contextlib import redirect_stdout
+from unittest.mock import patch
 from util import BurnManTest
 import numpy as np
 from numpy import random
@@ -906,6 +910,60 @@ class test_fitting(BurnManTest):
         fig, ax = burnman.nonlinear_fitting.corner_plot(
             fitted_eos.popt, fitted_eos.pcov
         )
+
+    def test_phase_fitting_example_combines_repeated_analyses(self):
+        for covariance in (-0.005, 0.005):
+            with self.subTest(covariance=covariance):
+                counts = []
+
+                def fit_phases(compositions, bulk):
+                    n = compositions.shape[1]
+                    counts.append(n)
+                    amounts = np.arange(1.0, n + 1.0)
+                    amounts /= amounts.sum()
+                    pcov = np.full((n, n), covariance)
+                    np.fill_diagonal(pcov, 0.04)
+                    return amounts, pcov, 0.0
+
+                previous_directory = os.getcwd()
+                random_state = np.random.get_state()
+                figure = plt.figure()
+                try:
+                    os.chdir(os.path.join(path, "..", "examples"))
+                    with patch(
+                        "burnman.optimize.composition_fitting."
+                        "fit_phase_proportions_to_bulk_composition",
+                        side_effect=fit_phases,
+                    ), patch("matplotlib.pyplot.show"), redirect_stdout(io.StringIO()):
+                        result = runpy.run_path(
+                            "example_fit_composition.py", run_name="__main__"
+                        )
+                finally:
+                    os.chdir(previous_directory)
+                    np.random.set_state(random_state)
+                    plt.close(figure)
+
+                amounts = result["weight_proportions"]
+                uncertainties = result["weight_proportion_uncertainties"]
+                cpx = result["phases"].index("clinopyroxene")
+                for sample, n_analyses, expected in (
+                    ("BF-55", 4, 0.5),
+                    ("BF-32", 6, 1.0 / 3.0),
+                ):
+                    i = result["samples"].index(sample)
+                    self.assertEqual(counts[i], n_analyses)
+                    self.assertFloatEqual(amounts[i, cpx], expected)
+                    self.assertFloatEqual(
+                        uncertainties[i, cpx] ** 2, 0.04 + 0.04 + 2.0 * covariance
+                    )
+
+                i = result["samples"].index("BF-55")
+                olivine = result["phases"].index("olivine")
+                self.assertFloatEqual(amounts[i, olivine], 0.1)
+                self.assertFloatEqual(uncertainties[i, olivine], 0.2)
+                opx = result["phases"].index("orthopyroxene")
+                self.assertTrue(np.isnan(amounts[i, opx]))
+                self.assertTrue(np.isnan(uncertainties[i, opx]))
 
     def test_fit_composition_to_solution(self):
         gt = burnman.minerals.JH_2015.garnet()
