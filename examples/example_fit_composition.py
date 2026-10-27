@@ -101,11 +101,8 @@ if __name__ == "__main__":
     # Print the optimized parameters and principal uncertainties
     print("Best-fit molar fractions:")
     for i in range(len(popt)):
-        print(
-            f"{gt.endmember_names[i]}: "
-            f"{gt.molar_fractions[i]:.3f} +/- "
-            f"{np.sqrt(pcov[i][i]):.3f}"
-        )
+        fraction = f"{gt.molar_fractions[i]:.3f}".replace("-0.000", "0.000")
+        print(f"{gt.endmember_names[i]}: {fraction} +/- {np.sqrt(pcov[i][i]):.3f}")
 
     # If you don't have a full solution model prepared,
     # you can instead use the helper class
