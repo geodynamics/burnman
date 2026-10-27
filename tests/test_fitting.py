@@ -989,6 +989,58 @@ class test_fitting(BurnManTest):
         f2 = np.round(gt.molar_fractions, 3)
         self.assertArraysAlmostEqual(f, f2)
 
+    def test_composition_repeated_observations_preserve_zero_constraints(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        for duplicate in ("Mg", "Mg_A"):
+            for zero_first in (False, True):
+                for normalize in (False, True):
+                    with self.subTest(
+                        duplicate=duplicate, zero_first=zero_first, normalize=normalize
+                    ):
+                        values = [0.0, 1.0, 2.0] if zero_first else [1.0, 0.0, 2.0]
+                        amounts, _, residual = fit_composition_to_solution(
+                            solution,
+                            ["Mg", duplicate, "Fe"],
+                            values,
+                            None,
+                            normalize=normalize,
+                        )
+                        # Allow the solver's numerical feasibility tolerance.
+                        self.assertArraysAlmostEqual(
+                            amounts, [0.0, 1.0 if normalize else 2.0], tol_zero=1.0e-8
+                        )
+                        # The conflicting positive Mg observation still contributes
+                        # to the objective, even though Mg must be exactly absent.
+                        self.assertFloatEqual(residual, 0.5 if normalize else 1.0)
+
+    def test_composition_zero_constraints_ignore_empty_conversion_rows(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        amounts, _, residual = fit_composition_to_solution(
+            solution,
+            ["Mg", "no_species", "Mg_A", "Mg", "Fe"],
+            [1.0, 0.0, 0.0, 0.0, 2.0],
+            None,
+            {"no_species": {"Mg": 0.0}},
+            normalize=False,
+        )
+        self.assertArraysAlmostEqual(amounts, [0.0, 2.0], tol_zero=1.0e-8)
+        self.assertFloatEqual(residual, 1.0)
+
+    def test_composition_repeated_observation_zero_tolerance(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        for small, expected_mg in ((1.0e-11, 0.0), (1.0e-9, (1.0 + 1.0e-9) / 2.0)):
+            with self.subTest(observation=small):
+                amounts, _, _ = fit_composition_to_solution(
+                    solution,
+                    ["Mg", "Mg", "Fe"],
+                    [1.0, small, 2.0],
+                    None,
+                    normalize=False,
+                )
+                self.assertArraysAlmostEqual(
+                    amounts, [expected_mg, 2.0], tol_zero=1.0e-8
+                )
+
     def test_composition_conversion_coefficients(self):
         solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
         conversions = {

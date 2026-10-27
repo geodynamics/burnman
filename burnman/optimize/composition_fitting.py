@@ -69,6 +69,8 @@ def fit_composition_to_solution(
 
     :param variable_values: Numerical values of the fitted variables.
         These should be given as amounts; they do not need to be normalized.
+        Values with magnitude below 1e-10 impose equality constraints to zero,
+        even when other observations of the same quantity are nonzero.
     :type variable_values: numpy.array
 
     :param variable_covariances: Covariance matrix of the variables.
@@ -140,15 +142,9 @@ def fit_composition_to_solution(
     # Define the constraints
     # Ensure that element abundances / site occupancies
     # are exactly equal to zero if the user specifies that
-    # they are equal to zero.
-    S, S_index = np.unique(A, axis=0, return_index=True)
-    S = np.array(
-        [
-            s
-            for i, s in enumerate(S)
-            if np.abs(b[S_index[i]]) < 1.0e-10 and any(np.abs(s) > 1.0e-10)
-        ]
-    )
+    # they are equal to zero. Select zeros before deduplicating rows.
+    S = np.unique(A[np.abs(b) < 1.0e-10], axis=0)
+    S = S[np.any(np.abs(S) > 1.0e-10, axis=1)]
     equality_constraints = [S, np.zeros(len(S))]
 
     # Ensure all site occupancies are non-negative
