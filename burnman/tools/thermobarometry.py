@@ -382,9 +382,10 @@ def estimate_conditions(
     :return: Result object from the optimization containing the optimal
         conditions (x, which includes P, T, and any free compositional vectors)
         and other properties of the solution. These include
-        the covariance matrix of the estimated parameters (xcov),
-        the standard deviations of the estimated parameters (var),
-        the correlation matrix (xcorr),
+        the 2-by-2 covariance matrix of pressure and temperature (xcov),
+        their two standard deviations (var),
+        their 2-by-2 correlation matrix (xcorr),
+        with compositional uncertainties propagated through the affinity covariance,
         the affinities of the independent reactions at the optimal conditions (affinities),
         the covariance matrix of the affinities (acov),
         the affinities weighted by the inverse square root of their covariance matrix (weighted_affinities),
@@ -392,7 +393,7 @@ def estimate_conditions(
         the number of independent reactions (n_reactions), the number of fitted parameters (n_params),
         the degrees of freedom (degrees_of_freedom), the chi-squared value (fun),
         the reduced chi-squared value (reduced_chisqr,
-        given by the reduced chi-squared divided by the number of degrees of freedom),
+        given by chi-squared divided by the number of degrees of freedom),
         and the fit quality (fit, given by the square root of the reduced chi-squared value).
     :rtype: OptimizeResult
     """
@@ -521,7 +522,7 @@ def estimate_conditions(
     # First we reset the assemblage to the optimal P and T
     assemblage_set_state_from_params(assemblage, res.x)
 
-    # Compute the covariance matrix of the estimated parameters
+    # Compute the covariance matrix of pressure and temperature
     # and other statistics
     res.acov = assemblage_affinity_covariance_matrix(assemblage, R, dataset_covariances)
     dmudP = assemblage.endmember_partial_volumes
