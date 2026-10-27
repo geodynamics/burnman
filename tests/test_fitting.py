@@ -1,12 +1,16 @@
 import os
+import io
+import runpy
 import unittest
+from contextlib import redirect_stdout
+from unittest.mock import patch
 from util import BurnManTest
 import numpy as np
 from numpy import random
 import matplotlib.pyplot as plt
 
 import burnman
-from burnman.optimize.eos_fitting import fit_XPTp_data
+from burnman.optimize.eos_fitting import SolutionFit, fit_XPTp_data
 from burnman.optimize.linear_fitting import weighted_constrained_least_squares
 from burnman.optimize.nonlinear_fitting import (
     NonLinearModel,
@@ -16,12 +20,125 @@ from burnman.optimize.nonlinear_fitting import (
     find_mle,
 )
 from burnman.utils.misc import attribute_function, pretty_string_values
-from burnman.optimize.composition_fitting import fit_composition_to_solution
+from burnman.optimize.composition_fitting import (
+    DummyCompositionSolution,
+    fit_composition_to_solution,
+)
 
 path = os.path.dirname(os.path.abspath(__file__))
 
 
+class JacobianLineModel(NonLinearModel):
+    def __init__(self, in_place=True):
+        self.in_place = in_place
+        self.params = np.array([2.0, -1.0])
+        self.bounds = np.array([[-np.inf, np.inf], [-np.inf, np.inf]])
+        self.delta_params = np.array([1.0e-5, 1.0e-5])
+        x = np.array([-1.0, 0.0, 2.0])
+        self.data = np.column_stack((x, 2.0 * x - 1.0 + [0.1, -0.2, 0.3]))
+        self.data_covariances = np.array([np.diag([0.0, 0.25**2])] * len(x))
+        self.mle_tolerances = np.full(len(x), 1.0e-12)
+        self.flags = [None] * len(x)
+
+    def get_params(self):
+        return self.params
+
+    def set_params(self, values):
+        values = np.clip(values, self.bounds[:, 0], self.bounds[:, 1])
+        if self.in_place:
+            self.params[:] = values
+        else:
+            self.params = values.copy()
+
+    def function(self, x, flag=None):
+        return np.array([x[0], self.params[0] * x[0] + self.params[1]])
+
+    def normal(self, x, flag=None):
+        normal = np.array([-self.params[0], 1.0])
+        return normal / np.linalg.norm(normal)
+
+
 class test_fitting(BurnManTest):
+    def test_jacobian_in_place_setter(self):
+        model = JacobianLineModel()
+        baseline = model.get_params().copy()
+        calculate_jacobian(model)
+        expected = np.column_stack((model.data[:, 0], np.ones(len(model.data)))) / 0.25
+        self.assertArraysAlmostEqual(
+            model.jacobian.flatten(), expected.flatten(), tol=1.0e-7, tol_zero=1.0e-8
+        )
+        self.assertArraysAlmostEqual(
+            model.get_params(), baseline, tol=0.0, tol_zero=0.0
+        )
+
+    def test_jacobian_uses_actual_parameter_steps(self):
+        for lower, upper in ((-np.inf, 0.0), (0.0, np.inf), (-0.25, 0.5)):
+            for sign in (-1.0, 1.0):
+                with self.subTest(lower=lower, upper=upper, sign=sign):
+                    model = JacobianLineModel(in_place=False)
+                    baseline = model.get_params().copy()
+                    model.bounds[0] = baseline[0] + np.array([lower, upper]) * 1.0e-5
+                    model.delta_params[0] *= sign
+                    calculate_jacobian(model)
+                    expected = (
+                        np.column_stack((model.data[:, 0], np.ones(len(model.data))))
+                        / 0.25
+                    )
+                    self.assertArraysAlmostEqual(
+                        model.jacobian.flatten(),
+                        expected.flatten(),
+                        tol=1.0e-7,
+                        tol_zero=1.0e-8,
+                    )
+                    self.assertArraysAlmostEqual(
+                        model.get_params(), baseline, tol=0.0, tol_zero=0.0
+                    )
+
+    def test_jacobian_restores_parameters_after_failure(self):
+        for direction in (-1.0, 1.0):
+            with self.subTest(failing_trial=direction):
+                model = JacobianLineModel()
+                baseline = model.get_params().copy()
+                original_function = model.function
+
+                def function(x, flag=None):
+                    if direction * (model.get_params()[0] - baseline[0]) > 0.0:
+                        raise RuntimeError("trial evaluation failed")
+                    return original_function(x, flag)
+
+                model.function = function
+                with self.assertRaisesRegex(RuntimeError, "trial evaluation failed"):
+                    calculate_jacobian(model)
+                self.assertArraysAlmostEqual(
+                    model.get_params(), baseline, tol=0.0, tol_zero=0.0
+                )
+
+    def test_jacobian_rejects_fixed_parameter(self):
+        model = JacobianLineModel()
+        baseline = model.get_params().copy()
+        model.bounds[0] = baseline[0]
+        with self.assertRaisesRegex(ValueError, "Cannot perturb parameter 0"):
+            calculate_jacobian(model)
+        self.assertArraysAlmostEqual(
+            model.get_params(), baseline, tol=0.0, tol_zero=0.0
+        )
+
+    def test_in_place_fit_covariance(self):
+        model = JacobianLineModel()
+        design = np.column_stack((model.data[:, 0], np.ones(len(model.data))))
+        expected = np.linalg.solve(design.T @ design, design.T @ model.data[:, 1])
+        residuals = model.data[:, 1] - design @ expected
+        covariance = (
+            np.linalg.inv(design.T @ design)
+            * (residuals @ residuals)
+            / (len(model.data) - len(model.get_params()))
+        )
+        nonlinear_least_squares_fit(model, param_tolerance=1.0e-9)
+        self.assertArraysAlmostEqual(model.popt, expected, tol=1.0e-7)
+        self.assertArraysAlmostEqual(
+            model.pcov.flatten(), covariance.flatten(), tol=1.0e-7
+        )
+
     def test_linear_fit(self):
         # Test from Neri et al. (Meas. Sci. Technol. 1 (1990) 1007-1010.)
         i, x, Wx, y, Wy = np.loadtxt(
@@ -554,8 +671,8 @@ class test_fitting(BurnManTest):
             model=fitted_eos,
             x_array=VTP,
             confidence_interval=0.95,
-            f=attribute_function(fo, "V"),
-            flag="V",
+            f=attribute_function(fo, "P", using_volume=True),
+            flag="P",
         )
         self.assertEqual(len(cp_bands[0]), len(VTP))
         self.assertEqual(len(cp_bands), 4)
@@ -619,6 +736,38 @@ class test_fitting(BurnManTest):
 
         with self.assertRaises(Exception):
             _ = burnman.eos_fitting.fit_VTP_data(fo, params, VTP, verbose=False)
+
+    def test_solution_fit_array_parameter_round_trip(self):
+        for bounded in (False, True):
+            with self.subTest(bounded=bounded):
+                solution = burnman.minerals.JH_2015.garnet()
+                fit_params = [["Cp", 0], ["V_0", 1], ["Cp", 1], ["E", 0, 1]]
+                values = np.array(
+                    [10.0, 20.0, 30.0, 40.0, 4.5e-5, 50.0, 60.0, 70.0, 80.0, 2000.0]
+                )
+                expected = values.copy()
+                bounds = None
+                if bounded:
+                    bounds = np.tile([-np.inf, np.inf], (len(values), 1))
+                    bounds[2, 1] = 25.0
+                    bounds[8, 1] = 75.0
+                    expected[2] = 25.0
+                    expected[8] = 75.0
+
+                n_coordinates = solution.n_endmembers + 3
+                model = SolutionFit(
+                    solution=solution,
+                    data=np.empty((0, n_coordinates)),
+                    data_covariances=np.empty((0, n_coordinates, n_coordinates)),
+                    flags=[],
+                    fit_params=fit_params,
+                    mle_tolerances=np.empty(0),
+                    bounds=bounds,
+                )
+                model.set_params(values)
+                self.assertArraysAlmostEqual(
+                    model.get_params(), expected, tol=0.0, tol_zero=0.0
+                )
 
     def test_bounded_solution_fitting(self):
         solution = burnman.minerals.SLB_2011.mg_fe_olivine()
@@ -712,6 +861,8 @@ class test_fitting(BurnManTest):
                 [-1.0 * fitted_eos.popt[2], 2.0 * fitted_eos.popt[2]],
             ]
         )
+        # Excess volume may be negative; keep lower and upper bounds ordered.
+        bounds.sort(axis=1)
 
         fitted_eos = fit_XPTp_data(
             solution=solution,
@@ -760,6 +911,60 @@ class test_fitting(BurnManTest):
             fitted_eos.popt, fitted_eos.pcov
         )
 
+    def test_phase_fitting_example_combines_repeated_analyses(self):
+        for covariance in (-0.005, 0.005):
+            with self.subTest(covariance=covariance):
+                counts = []
+
+                def fit_phases(compositions, bulk):
+                    n = compositions.shape[1]
+                    counts.append(n)
+                    amounts = np.arange(1.0, n + 1.0)
+                    amounts /= amounts.sum()
+                    pcov = np.full((n, n), covariance)
+                    np.fill_diagonal(pcov, 0.04)
+                    return amounts, pcov, 0.0
+
+                previous_directory = os.getcwd()
+                random_state = np.random.get_state()
+                figure = plt.figure()
+                try:
+                    os.chdir(os.path.join(path, "..", "examples"))
+                    with patch(
+                        "burnman.optimize.composition_fitting."
+                        "fit_phase_proportions_to_bulk_composition",
+                        side_effect=fit_phases,
+                    ), patch("matplotlib.pyplot.show"), redirect_stdout(io.StringIO()):
+                        result = runpy.run_path(
+                            "example_fit_composition.py", run_name="__main__"
+                        )
+                finally:
+                    os.chdir(previous_directory)
+                    np.random.set_state(random_state)
+                    plt.close(figure)
+
+                amounts = result["weight_proportions"]
+                uncertainties = result["weight_proportion_uncertainties"]
+                cpx = result["phases"].index("clinopyroxene")
+                for sample, n_analyses, expected in (
+                    ("BF-55", 4, 0.5),
+                    ("BF-32", 6, 1.0 / 3.0),
+                ):
+                    i = result["samples"].index(sample)
+                    self.assertEqual(counts[i], n_analyses)
+                    self.assertFloatEqual(amounts[i, cpx], expected)
+                    self.assertFloatEqual(
+                        uncertainties[i, cpx] ** 2, 0.04 + 0.04 + 2.0 * covariance
+                    )
+
+                i = result["samples"].index("BF-55")
+                olivine = result["phases"].index("olivine")
+                self.assertFloatEqual(amounts[i, olivine], 0.1)
+                self.assertFloatEqual(uncertainties[i, olivine], 0.2)
+                opx = result["phases"].index("orthopyroxene")
+                self.assertTrue(np.isnan(amounts[i, opx]))
+                self.assertTrue(np.isnan(uncertainties[i, opx]))
+
     def test_fit_composition_to_solution(self):
         gt = burnman.minerals.JH_2015.garnet()
         fitted_species = ["Fe", "Ca", "Mg", "Cr", "Al", "Si", "Fe3+"]
@@ -783,6 +988,129 @@ class test_fitting(BurnManTest):
         f = [0.004, 0.328, 0.619, 0.048, 0.000]
         f2 = np.round(gt.molar_fractions, 3)
         self.assertArraysAlmostEqual(f, f2)
+
+    def test_composition_repeated_observations_preserve_zero_constraints(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        for duplicate in ("Mg", "Mg_A"):
+            for zero_first in (False, True):
+                for normalize in (False, True):
+                    with self.subTest(
+                        duplicate=duplicate, zero_first=zero_first, normalize=normalize
+                    ):
+                        values = [0.0, 1.0, 2.0] if zero_first else [1.0, 0.0, 2.0]
+                        amounts, _, residual = fit_composition_to_solution(
+                            solution,
+                            ["Mg", duplicate, "Fe"],
+                            values,
+                            None,
+                            normalize=normalize,
+                        )
+                        # Allow the solver's numerical feasibility tolerance.
+                        self.assertArraysAlmostEqual(
+                            amounts, [0.0, 1.0 if normalize else 2.0], tol_zero=1.0e-8
+                        )
+                        # The conflicting positive Mg observation still contributes
+                        # to the objective, even though Mg must be exactly absent.
+                        self.assertFloatEqual(residual, 0.5 if normalize else 1.0)
+
+    def test_composition_zero_constraints_ignore_empty_conversion_rows(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        amounts, _, residual = fit_composition_to_solution(
+            solution,
+            ["Mg", "no_species", "Mg_A", "Mg", "Fe"],
+            [1.0, 0.0, 0.0, 0.0, 2.0],
+            None,
+            {"no_species": {"Mg": 0.0}},
+            normalize=False,
+        )
+        self.assertArraysAlmostEqual(amounts, [0.0, 2.0], tol_zero=1.0e-8)
+        self.assertFloatEqual(residual, 1.0)
+
+    def test_composition_repeated_observation_zero_tolerance(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        for small, expected_mg in ((1.0e-11, 0.0), (1.0e-9, (1.0 + 1.0e-9) / 2.0)):
+            with self.subTest(observation=small):
+                amounts, _, _ = fit_composition_to_solution(
+                    solution,
+                    ["Mg", "Mg", "Fe"],
+                    [1.0, small, 2.0],
+                    None,
+                    normalize=False,
+                )
+                self.assertArraysAlmostEqual(
+                    amounts, [expected_mg, 2.0], tol_zero=1.0e-8
+                )
+
+    def test_composition_conversion_coefficients(self):
+        solution = DummyCompositionSolution(["MgO", "FeO"], ["[Mg]O", "[Fe]O"])
+        conversions = {
+            "twice_Mg": {"Mg": 2.0, "Fe_A": 0.0},
+            "half_Fe": {"Fe_A": 0.5},
+        }
+        for normalize in (False, True):
+            with self.subTest(normalize=normalize):
+                converted = fit_composition_to_solution(
+                    solution,
+                    ["twice_Mg", "half_Fe"],
+                    [1.2, 0.7],
+                    np.eye(2),
+                    conversions,
+                    normalize=normalize,
+                )
+                direct = fit_composition_to_solution(
+                    solution,
+                    ["Mg", "Fe_A"],
+                    [0.6, 1.4],
+                    np.diag([0.25, 4.0]),
+                    normalize=normalize,
+                )
+                expected = [0.3, 0.7] if normalize else [0.6, 1.4]
+                self.assertArraysAlmostEqual(converted[0], expected)
+                self.assertArraysAlmostEqual(converted[0], direct[0])
+                self.assertArraysAlmostEqual(
+                    converted[1].flatten(), direct[1].flatten()
+                )
+                self.assertFloatEqual(converted[2], direct[2])
+
+    def test_composition_conversion_equal_site_amounts(self):
+        solution = DummyCompositionSolution(
+            ["MgFeSiO4", "MgFeSiO4"], ["[Mg][Fe]SiO4", "[Fe][Mg]SiO4"]
+        )
+        amounts, covariance, residual = fit_composition_to_solution(
+            solution,
+            ["Mg_A", "Mg_B", "Mg_equal"],
+            [0.8, 0.2, 0.0],
+            np.eye(3),
+            {"Mg_equal": {"Mg_A": 1.0, "Mg_B": -1.0}},
+        )
+        self.assertArraysAlmostEqual(amounts, [0.5, 0.5])
+        self.assertArraysAlmostEqual(
+            covariance.flatten(), np.array([1.0, -1.0, -1.0, 1.0]) / 6.0
+        )
+        self.assertFloatEqual(residual, 0.18)
+
+    def test_composition_conversion_uses_earlier_definition(self):
+        solution = DummyCompositionSolution(
+            ["MgFeSiO4", "MgFeSiO4"], ["[Mg][Fe]SiO4", "[Fe][Mg]SiO4"]
+        )
+        conversions = {
+            "twice_Mg": {"Mg_A": 2.0},
+            "Mg_difference": {"twice_Mg": 1.5, "Mg_B": -0.25},
+        }
+        converted = fit_composition_to_solution(
+            solution, ["Mg_difference", "Fe_A"], [0.725, 0.7], np.eye(2), conversions
+        )
+        direct = fit_composition_to_solution(
+            solution,
+            ["Mg_difference", "Fe_A"],
+            [0.725, 0.7],
+            np.eye(2),
+            {"Mg_difference": {"Mg_A": 3.0, "Mg_B": -0.25}},
+        )
+        self.assertArraysAlmostEqual(converted[0], [0.3, 0.7])
+        self.assertArraysAlmostEqual(converted[0], direct[0])
+        self.assertArraysAlmostEqual(converted[1].flatten(), direct[1].flatten())
+        self.assertFloatEqual(converted[2], direct[2])
 
     def test_differential_evolution(self):
         """

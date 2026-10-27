@@ -693,7 +693,7 @@ class SolutionFit(NonLinearModel):
                 else:
                     n_values = len(self.m.endmembers[imbr][0].params[key])
                     for j in range(n_values):
-                        self.m.endmembers[imbr][0].params[key][j] = value
+                        self.m.endmembers[imbr][0].params[key][j] = param_values[i]
                         i += 1
             elif len(param) == 3:
                 key, imbr, jmbr = param

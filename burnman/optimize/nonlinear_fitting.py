@@ -182,7 +182,8 @@ def find_mle(model):
 def calculate_jacobian(model):
     """
     Compute the Jacobian matrix of weighted residuals with respect
-    to model parameters using central finite differences.
+    to model parameters using central finite differences, accounting for
+    actual trial displacements if parameter bounds clip the steps.
 
     :param model: Model object.
     :type model: FittableModel
@@ -193,20 +194,27 @@ def calculate_jacobian(model):
     n_params = len(model.get_params())
     model.jacobian = np.empty((n_data, n_params))
     diag_delta = np.diag(model.delta_params)
-    param_values = model.get_params()
+    param_values = np.copy(model.get_params())
 
     # Get d (weighted residual) / d parameter by numerical differences
-    for i in range(n_params):
-        model.set_params(param_values - diag_delta[i])
-        _, res_0, _ = find_mle(model)
+    try:
+        for i in range(n_params):
+            model.set_params(param_values - diag_delta[i])
+            p0 = model.get_params()[i]
+            _, res_0, _ = find_mle(model)
 
-        model.set_params(param_values + diag_delta[i])
-        _, res_1, _ = find_mle(model)
+            model.set_params(param_values + diag_delta[i])
+            p1 = model.get_params()[i]
+            if p1 == p0:
+                raise ValueError(
+                    f"Cannot perturb parameter {i}: both trial values are identical."
+                )
+            _, res_1, _ = find_mle(model)
 
-        model.jacobian[:, i] = (res_1 - res_0) / (2.0 * diag_delta[i][i])
+            model.jacobian[:, i] = (res_1 - res_0) / (p1 - p0)
 
-    # Reset parameter values
-    model.set_params(param_values)
+    finally:
+        model.set_params(param_values)
 
 
 def nonlinear_least_squares_fit(
@@ -578,10 +586,25 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     where df(x)/dB is the vector of partial derivatives of f(x)
     with respect to B.
 
+    The fitted quantity (response variable) is the last coordinate of model.data.
+    Its noise variance is estimated from residuals whose observation flags match
+    ``flag``, evaluated at the observed independent coordinates. The squared
+    residuals are summed and divided by the number of matching observations
+    minus the number of fitted parameters. This retains a pooled-scatter
+    approximation for a new observation representative of those data.
+
+    This variance is converted to the squared units of f using the existing
+    parameter perturbations. Prediction bounds are NaN when changes in f are
+    not locally proportional to changes in the fitted quantity (relative
+    tolerance 1e-5), the fitted quantity does not change under any perturbation, or
+    there are insufficient matching observations. Confidence bounds remain
+    available for these derived quantities.
+
     :param model: As modified (for example) by the function
         :func:`burnman.nonlinear_least_squares_fit`.
-        Should contain the following functions: get_params, set_params, function, normal
-        And attributes: delta_params, pcov, dof, noise_variance
+        Should contain the functions get_params, set_params and function,
+        and attributes data, delta_params, pcov and dof. If flags are absent,
+        all observations are assumed to use the supplied flag.
     :type model: object
 
     :param x_array: Coordinates at which to evaluate the bounds.
@@ -606,41 +629,86 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     :rtype: 2D numpy.array
     """
 
-    # Check array dimensions
-    n_dimensions = len(model.data[0])
-    if len(x_array[0]) != n_dimensions:
-        raise Exception(
-            "Dimensions of each point must be the same as the "
-            "total number of dimensions"
-        )
+    x_array = np.asarray(x_array, dtype=float)
+    if x_array.ndim != 2 or x_array.shape[1] != model.data.shape[1]:
+        raise ValueError("Query dimensions must match the model data.")
+    if not 0.0 < confidence_interval < 1.0 or model.dof <= 0:
+        raise ValueError("Require 0 < confidence_interval < 1 and positive dof.")
+    if len(x_array) == 0:
+        return np.empty((4, 0))
 
-    param_values = model.get_params()
-    x_m_0s = np.empty_like(x_array)
-    f_m_0s = np.empty_like(x_array[:, 0])
-    for i, x in enumerate(x_array):
-        x_m_0s[i] = model.function(x, flag)
-        f_m_0s[i] = f(x)
-
+    param_values = np.array(model.get_params(), dtype=float, copy=True)
+    f_m_0s = np.empty(len(x_array))
+    fitted_quantity_0s = np.empty(len(x_array))
     diag_delta = np.diag(model.delta_params)
     dxdbeta = np.empty([len(param_values), len(x_array)])
+    fitted_quantity_changes = np.zeros_like(dxdbeta)
+    parameter_steps = np.zeros(len(param_values))
 
-    for i, value in enumerate(param_values):
-        model.set_params(param_values + diag_delta[i])
+    try:
+        flags = getattr(model, "flags", [flag] * len(model.data))
+        residuals = np.array(
+            [
+                model.function(x, observed_flag)[-1] - x[-1]
+                for x, observed_flag in zip(model.data, flags)
+                if observed_flag == flag
+            ]
+        )
+        noise_dof = model.dof - (len(model.data) - len(residuals))
+        fitted_quantity_noise_variance = (
+            residuals.dot(residuals) / noise_dof if noise_dof > 0 else np.nan
+        )
 
-        for j, x_m_0 in enumerate(x_m_0s):
-            x_m_1 = model.function(x_m_0, flag)
-            dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j]) / diag_delta[i][i]
+        for i, x in enumerate(x_array):
+            x_m_0 = model.function(x, flag)
+            fitted_quantity_0s[i] = x_m_0[-1]
+            f_m_0s[i] = f(x_m_0)
 
-    model.set_params(param_values)  # reset params
+        for i, value in enumerate(param_values):
+            model.set_params(param_values + diag_delta[i])
+            step = model.get_params()[i] - value
+            if step == 0.0:  # Try the other side at a parameter bound.
+                model.set_params(param_values - diag_delta[i])
+                step = model.get_params()[i] - value
+            if step == 0.0:
+                if model.pcov[i, i] != 0.0:
+                    raise ValueError(
+                        "Cannot perturb a parameter with nonzero covariance."
+                    )
+                dxdbeta[i] = 0.0
+                continue
+
+            parameter_steps[i] = step
+            for j, x in enumerate(x_array):
+                x_m_1 = model.function(x, flag)
+                fitted_quantity_changes[i, j] = x_m_1[-1] - fitted_quantity_0s[j]
+                dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j]) / step
+    finally:
+        model.set_params(param_values)
+    model.function(x_array[-1], flag)
 
     variance = np.empty(len(x_array))
+    prediction_noise_variance = np.full(len(x_array), np.nan)
     for i, Gprime in enumerate(dxdbeta.T):
         variance[i] = Gprime.T.dot(model.pcov).dot(Gprime)
+        # Use actual changes, rather than derivatives in differently scaled
+        # parameter units, to identify a local transformation of the fitted quantity.
+        dy = fitted_quantity_changes[:, i]
+        df = Gprime * parameter_steps
+        dy_squared = dy.dot(dy)
+        if dy_squared > 0.0:
+            conversion = dy.dot(df) / dy_squared
+            if np.linalg.norm(df - conversion * dy) <= 1.0e-5 * np.linalg.norm(df):
+                prediction_noise_variance[i] = (
+                    conversion**2 * fitted_quantity_noise_variance
+                )
 
-    critical_value = t.isf(0.5 * (confidence_interval + 1.0), model.dof)
+    critical_value = t.ppf(0.5 * (confidence_interval + 1.0), model.dof)
 
     confidence_half_widths = critical_value * np.sqrt(variance)
-    prediction_half_widths = critical_value * np.sqrt(variance + model.noise_variance)
+    prediction_half_widths = critical_value * np.sqrt(
+        variance + prediction_noise_variance
+    )
 
     confidence_bound_0 = f_m_0s - confidence_half_widths
     confidence_bound_1 = f_m_0s + confidence_half_widths

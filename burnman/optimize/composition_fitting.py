@@ -69,6 +69,8 @@ def fit_composition_to_solution(
 
     :param variable_values: Numerical values of the fitted variables.
         These should be given as amounts; they do not need to be normalized.
+        Values with magnitude below 1e-10 impose equality constraints to zero,
+        even when other observations of the same quantity are nonzero.
     :type variable_values: numpy.array
 
     :param variable_covariances: Covariance matrix of the variables.
@@ -78,7 +80,8 @@ def fit_composition_to_solution(
         into an arithmetic sum of element and site-species amounts. For example,
         {'Mg_equal': {'Mg_A': 1., 'Mg_B': -1.}}, coupled with Mg_equal = 0
         would impose a constraint that the amount of Mg would be equal on
-        the first and second site in the solution.
+        the first and second site in the solution. Definitions are processed
+        in dictionary order and may refer to previously defined variables.
     :type variable_conversions: dict of dict, or None
 
     :param normalize: Whether to normalize the molar fractions to sum to one.
@@ -123,10 +126,10 @@ def fit_composition_to_solution(
             assert new_var not in solution_variables
             solution_variables.append(new_var)
 
-            for var in conversion_dict.keys():
-                solution_matrix[:, n_sol_vars + i] += solution_matrix[
-                    :, solution_variables.index(var)
-                ]
+            for var, coefficient in conversion_dict.items():
+                solution_matrix[:, n_sol_vars + i] += (
+                    coefficient * solution_matrix[:, solution_variables.index(var)]
+                )
 
     # Now, construct A using the fitted variables
     A = np.zeros((n_vars, solution_matrix.shape[0]))
@@ -139,15 +142,9 @@ def fit_composition_to_solution(
     # Define the constraints
     # Ensure that element abundances / site occupancies
     # are exactly equal to zero if the user specifies that
-    # they are equal to zero.
-    S, S_index = np.unique(A, axis=0, return_index=True)
-    S = np.array(
-        [
-            s
-            for i, s in enumerate(S)
-            if np.abs(b[S_index[i]]) < 1.0e-10 and any(np.abs(s) > 1.0e-10)
-        ]
-    )
+    # they are equal to zero. Select zeros before deduplicating rows.
+    S = np.unique(A[np.abs(b) < 1.0e-10], axis=0)
+    S = S[np.any(np.abs(S) > 1.0e-10, axis=1)]
     equality_constraints = [S, np.zeros(len(S))]
 
     # Ensure all site occupancies are non-negative
