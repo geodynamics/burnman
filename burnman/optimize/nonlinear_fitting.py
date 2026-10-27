@@ -182,7 +182,8 @@ def find_mle(model):
 def calculate_jacobian(model):
     """
     Compute the Jacobian matrix of weighted residuals with respect
-    to model parameters using central finite differences.
+    to model parameters using central finite differences, accounting for
+    actual trial displacements if parameter bounds clip the steps.
 
     :param model: Model object.
     :type model: FittableModel
@@ -193,20 +194,27 @@ def calculate_jacobian(model):
     n_params = len(model.get_params())
     model.jacobian = np.empty((n_data, n_params))
     diag_delta = np.diag(model.delta_params)
-    param_values = model.get_params()
+    param_values = np.copy(model.get_params())
 
     # Get d (weighted residual) / d parameter by numerical differences
-    for i in range(n_params):
-        model.set_params(param_values - diag_delta[i])
-        _, res_0, _ = find_mle(model)
+    try:
+        for i in range(n_params):
+            model.set_params(param_values - diag_delta[i])
+            p0 = model.get_params()[i]
+            _, res_0, _ = find_mle(model)
 
-        model.set_params(param_values + diag_delta[i])
-        _, res_1, _ = find_mle(model)
+            model.set_params(param_values + diag_delta[i])
+            p1 = model.get_params()[i]
+            if p1 == p0:
+                raise ValueError(
+                    f"Cannot perturb parameter {i}: both trial values are identical."
+                )
+            _, res_1, _ = find_mle(model)
 
-        model.jacobian[:, i] = (res_1 - res_0) / (2.0 * diag_delta[i][i])
+            model.jacobian[:, i] = (res_1 - res_0) / (p1 - p0)
 
-    # Reset parameter values
-    model.set_params(param_values)
+    finally:
+        model.set_params(param_values)
 
 
 def nonlinear_least_squares_fit(

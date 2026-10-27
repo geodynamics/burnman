@@ -24,7 +24,117 @@ from burnman.optimize.composition_fitting import (
 path = os.path.dirname(os.path.abspath(__file__))
 
 
+class JacobianLineModel(NonLinearModel):
+    def __init__(self, in_place=True):
+        self.in_place = in_place
+        self.params = np.array([2.0, -1.0])
+        self.bounds = np.array([[-np.inf, np.inf], [-np.inf, np.inf]])
+        self.delta_params = np.array([1.0e-5, 1.0e-5])
+        x = np.array([-1.0, 0.0, 2.0])
+        self.data = np.column_stack((x, 2.0 * x - 1.0 + [0.1, -0.2, 0.3]))
+        self.data_covariances = np.array([np.diag([0.0, 0.25**2])] * len(x))
+        self.mle_tolerances = np.full(len(x), 1.0e-12)
+        self.flags = [None] * len(x)
+
+    def get_params(self):
+        return self.params
+
+    def set_params(self, values):
+        values = np.clip(values, self.bounds[:, 0], self.bounds[:, 1])
+        if self.in_place:
+            self.params[:] = values
+        else:
+            self.params = values.copy()
+
+    def function(self, x, flag=None):
+        return np.array([x[0], self.params[0] * x[0] + self.params[1]])
+
+    def normal(self, x, flag=None):
+        normal = np.array([-self.params[0], 1.0])
+        return normal / np.linalg.norm(normal)
+
+
 class test_fitting(BurnManTest):
+    def test_jacobian_in_place_setter(self):
+        model = JacobianLineModel()
+        baseline = model.get_params().copy()
+        calculate_jacobian(model)
+        expected = np.column_stack((model.data[:, 0], np.ones(len(model.data)))) / 0.25
+        self.assertArraysAlmostEqual(
+            model.jacobian.flatten(), expected.flatten(), tol=1.0e-7, tol_zero=1.0e-8
+        )
+        self.assertArraysAlmostEqual(
+            model.get_params(), baseline, tol=0.0, tol_zero=0.0
+        )
+
+    def test_jacobian_uses_actual_parameter_steps(self):
+        for lower, upper in ((-np.inf, 0.0), (0.0, np.inf), (-0.25, 0.5)):
+            for sign in (-1.0, 1.0):
+                with self.subTest(lower=lower, upper=upper, sign=sign):
+                    model = JacobianLineModel(in_place=False)
+                    baseline = model.get_params().copy()
+                    model.bounds[0] = baseline[0] + np.array([lower, upper]) * 1.0e-5
+                    model.delta_params[0] *= sign
+                    calculate_jacobian(model)
+                    expected = (
+                        np.column_stack((model.data[:, 0], np.ones(len(model.data))))
+                        / 0.25
+                    )
+                    self.assertArraysAlmostEqual(
+                        model.jacobian.flatten(),
+                        expected.flatten(),
+                        tol=1.0e-7,
+                        tol_zero=1.0e-8,
+                    )
+                    self.assertArraysAlmostEqual(
+                        model.get_params(), baseline, tol=0.0, tol_zero=0.0
+                    )
+
+    def test_jacobian_restores_parameters_after_failure(self):
+        for direction in (-1.0, 1.0):
+            with self.subTest(failing_trial=direction):
+                model = JacobianLineModel()
+                baseline = model.get_params().copy()
+                original_function = model.function
+
+                def function(x, flag=None):
+                    if direction * (model.get_params()[0] - baseline[0]) > 0.0:
+                        raise RuntimeError("trial evaluation failed")
+                    return original_function(x, flag)
+
+                model.function = function
+                with self.assertRaisesRegex(RuntimeError, "trial evaluation failed"):
+                    calculate_jacobian(model)
+                self.assertArraysAlmostEqual(
+                    model.get_params(), baseline, tol=0.0, tol_zero=0.0
+                )
+
+    def test_jacobian_rejects_fixed_parameter(self):
+        model = JacobianLineModel()
+        baseline = model.get_params().copy()
+        model.bounds[0] = baseline[0]
+        with self.assertRaisesRegex(ValueError, "Cannot perturb parameter 0"):
+            calculate_jacobian(model)
+        self.assertArraysAlmostEqual(
+            model.get_params(), baseline, tol=0.0, tol_zero=0.0
+        )
+
+    def test_in_place_fit_covariance(self):
+        model = JacobianLineModel()
+        design = np.column_stack((model.data[:, 0], np.ones(len(model.data))))
+        expected = np.linalg.solve(design.T @ design, design.T @ model.data[:, 1])
+        residuals = model.data[:, 1] - design @ expected
+        covariance = (
+            np.linalg.inv(design.T @ design)
+            * (residuals @ residuals)
+            / (len(model.data) - len(model.get_params()))
+        )
+        nonlinear_least_squares_fit(model, param_tolerance=1.0e-9)
+        self.assertArraysAlmostEqual(model.popt, expected, tol=1.0e-7)
+        self.assertArraysAlmostEqual(
+            model.pcov.flatten(), covariance.flatten(), tol=1.0e-7
+        )
+
     def test_linear_fit(self):
         # Test from Neri et al. (Meas. Sci. Technol. 1 (1990) 1007-1010.)
         i, x, Wx, y, Wy = np.loadtxt(
