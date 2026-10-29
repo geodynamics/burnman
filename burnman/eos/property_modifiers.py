@@ -963,7 +963,9 @@ modifier_names["debye"] = "Debye model excess (Helmholtz)"
 modifier_names["debye_delta"] = "Debye model excess (internal energy)"
 modifier_names["einstein"] = "Einstein model excess (Helmholtz)"
 modifier_names["einstein_delta"] = "Einstein model excess (internal energy)"
-modifier_names["volume_ww"] = "Exponential volume correction (Wu and Wentzcovitch, 2008)"
+modifier_names["volume_ww"] = (
+    "Exponential volume correction (Wu and Wentzcovitch, 2008)"
+)
 
 modifier_functions = OrderedDict()
 modifier_functions["landau"] = landau_excesses
