@@ -10,7 +10,6 @@ from scipy.optimize import fsolve
 import burnman
 from burnman.tools.eos import check_eos_consistency
 
-
 liq = burnman.minerals.other.liquid_iron()
 check_eos_consistency(
     liq, P=10.0e9, T=7000.0, tol=1.0e-3, verbose=True, including_shear_properties=False

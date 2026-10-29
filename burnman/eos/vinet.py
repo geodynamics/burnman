@@ -64,6 +64,30 @@ class Vinet(eos.IsothermalEquationOfState):
     and :cite:`vinet1987`. This equation of state actually
     predates Vinet by 55 years :cite:`Rydberg1932`,
     and was investigated further by :cite:`Stacey1981`.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus.
+          - Dimensionless
+
     """
 
     def volume(self, pressure, temperature, params):

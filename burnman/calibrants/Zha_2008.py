@@ -3,16 +3,14 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
-from burnman.eos.mie_grueneisen_debye import MGDBase
-from burnman.classes.calibrant import Calibrant
-import numpy as np
-
-
 """
 Zha_2008
 ^^^^^^^^
 """
+
+from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
+from burnman.eos.mie_grueneisen_debye import MGDBase
+from burnman.classes.calibrant import Calibrant
 
 
 class Pt(Calibrant):

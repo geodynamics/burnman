@@ -5,27 +5,10 @@
 
 
 """
-Mineral database
-
-  - :mod:`~burnman.minerals.SLB_2005`
-  - :mod:`~burnman.minerals.SLB_2011_ZSB_2013`
-  - :mod:`~burnman.minerals.SLB_2011`
-  - :mod:`~burnman.minerals.SLB_2022`
-  - :mod:`~burnman.minerals.SLB_2024`
-  - :mod:`~burnman.minerals.DKS_2013_liquids`
-  - :mod:`~burnman.minerals.DKS_2013_solids`
-  - :mod:`~burnman.minerals.RS_2014_liquids`
-  - :mod:`~burnman.minerals.Murakami_etal_2012`
-  - :mod:`~burnman.minerals.Murakami_2013`
-  - :mod:`~burnman.minerals.Matas_etal_2007`
-  - :mod:`~burnman.minerals.HP_2011_ds62`
-  - :mod:`~burnman.minerals.HP_2011_fluids`
-  - :mod:`~burnman.minerals.HHPH_2013`
-  - :mod:`~burnman.minerals.HGP_2018_ds633`
-  - :mod:`~burnman.minerals.SE_2015`
-  - :mod:`~burnman.minerals.other`
+This package contains thermodynamic models from a variety of published sources:
 """
 
+__lazy_modules__ = ["burnman.minerals"]
 
 # Stixrude and Lithgow-Bertelloni
 from . import SLB_2024
@@ -49,9 +32,13 @@ from . import Matas_etal_2007
 # Holland, Powell and coworkers
 from . import HP_2011_ds62
 from . import HP_2011_fluids
+from . import HPx_ds636
+from . import Pitzer_Sterner_1994
 from . import HHPH_2013
 from . import JH_2015
 from . import HGP_2018_ds633
+from . import ig51W24
+from . import ig51G25
 from . import ig50NCKFMASHTOCr
 from . import ig50NCKFMASTOCr
 from . import mb50NCKFMASHTO

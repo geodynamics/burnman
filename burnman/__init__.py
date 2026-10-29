@@ -107,7 +107,9 @@ Dependencies
 First, make sure you have a sufficiently recent version of python installed
 on your machine (see above for the latest requirements).
 To check your version of python, type the following in a terminal:
+
     python --version
+
 If your version is not recent enough, visit https://www.python.org/ to
 find out how to install a newer version.
 
@@ -218,11 +220,41 @@ Acknowledgement and Support
 
 """
 
+__lazy_modules__ = [
+    "burnman",
+    "burnman.constants",
+    "burnman.classes.material",
+    "burnman.classes.perplex",
+    "burnman.classes.mineral",
+    "burnman.classes.combinedmineral",
+    "burnman.classes.solution",
+    "burnman.classes.solutionmodel",
+    "burnman.classes.elasticsolutionmodel",
+    "burnman.classes.elasticsolution",
+    "burnman.classes.composite",
+    "burnman.classes.relaxedcomposite",
+    "burnman.classes.calibrant",
+    "burnman.classes.anisotropy",
+    "burnman.classes.anisotropicmineral",
+    "burnman.classes.anisotropicsolution",
+    "burnman.classes.mineral_helpers",
+    "burnman.classes.composition",
+    "burnman.classes.layer",
+    "burnman.classes.planet",
+    "burnman.classes.polytope",
+    "burnman.classes",
+    "burnman.tools.equilibration",
+    "burnman.tools.partitioning",
+    "burnman.optimize",
+]
+
 import importlib.metadata
+
+# Physical constants
+from . import constants
 
 # Low level utility functions
 from . import utils
-from .utils import geotherm
 
 # Classes and associated functions for representing rocks and minerals:
 from .classes.material import Material, material_property
@@ -230,6 +262,7 @@ from .classes.perplex import PerplexMaterial
 from .classes.mineral import Mineral
 from .classes.combinedmineral import CombinedMineral
 from .classes.solution import Solution, SolidSolution, RelaxedSolution
+from .classes.solutionmodel import SolutionModel
 from .classes.elasticsolutionmodel import ElasticSolutionModel
 from .classes.elasticsolution import ElasticSolution, ElasticSolidSolution
 from .classes.composite import Composite
@@ -240,6 +273,7 @@ from .classes.anisotropicmineral import AnisotropicMineral
 from .classes.anisotropicmineral import cell_parameters_to_vectors
 from .classes.anisotropicmineral import cell_vectors_to_parameters
 from .classes.anisotropicsolution import AnisotropicSolution, RelaxedAnisotropicSolution
+from .classes.hyperelastic import HyperelasticMineral
 from .classes.mineral_helpers import HelperLowHighPressureRockTransition
 from .classes.mineral_helpers import HelperSpinTransition
 from .classes.mineral_helpers import HelperRockSwitcher
@@ -250,6 +284,7 @@ from .classes.layer import Layer, BoundaryLayerPerturbation
 from .classes.planet import Planet
 from .classes.polytope import MaterialPolytope
 from .classes import seismic
+from .classes import geotherm
 from .classes import averaging_schemes
 
 # Mineral library

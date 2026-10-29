@@ -19,10 +19,10 @@ an elastic stiffness tensor into elastic properties.
 * anisotropic functions
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from burnman.classes import anisotropy
-
 
 if __name__ == "__main__":
     try:

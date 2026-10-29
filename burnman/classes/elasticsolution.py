@@ -111,8 +111,10 @@ class ElasticSolution(Mineral):
         self.reset()
         self.molar_fractions = np.array(molar_fractions)
 
-        if self.temperature is not None:
+        try:  # set the volume if pressure and temperature are already set
             _ = self.molar_volume
+        except AttributeError:
+            pass
 
     def set_method(self, method):
         for i in range(self.n_endmembers):
@@ -552,9 +554,7 @@ class ElasticSolution(Mineral):
         Returns excess molar enthalpy [J/mol].
         Property specific to solutions.
         """
-        return self.solution_model.excess_enthalpy(
-            self.molar_volume, self.temperature, self.molar_fractions
-        )
+        return NotImplementedError
 
     @material_property
     def molar_enthalpy(self):
@@ -562,15 +562,7 @@ class ElasticSolution(Mineral):
         Returns molar enthalpy of the solution [J/mol].
         Aliased with self.H.
         """
-        return (
-            sum(
-                [
-                    self.solution_model.endmembers[i][0].H * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)
-                ]
-            )
-            + self.excess_enthalpy
-        )
+        return self.molar_gibbs + self.temperature * self.molar_entropy
 
     @material_property
     def isothermal_bulk_modulus_reuss(self):

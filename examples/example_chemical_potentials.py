@@ -17,6 +17,7 @@ properties from an assemblage.
 * How to compute fugacities and relative fugacities.
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -25,7 +26,6 @@ from burnman import Composite
 import burnman.constants as constants
 from burnman.tools import chemistry
 import burnman.minerals as minerals
-
 
 if __name__ == "__main__":
     """

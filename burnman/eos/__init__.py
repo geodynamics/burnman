@@ -7,10 +7,9 @@
 """
 Equation of State
 -----------------
-
-
 """
 
+__lazy_modules__ = ["burnman.eos"]
 
 from .equation_of_state import EquationOfState, IsothermalEquationOfState
 from .murnaghan import Murnaghan
@@ -23,6 +22,7 @@ from .hp import HP_TMT
 from .hp import HP_TMTL
 from .hp import HP98
 from .cork import CORK
+from .pitzer_sterner import PitzerSterner
 from .vinet import Vinet
 from .morse_potential import Morse
 from .reciprocal_kprime import RKprime

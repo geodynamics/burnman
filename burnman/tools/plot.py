@@ -249,6 +249,7 @@ def plot_projected_elastic_properties(
     n_divs=100,
     n_rots=181,
     plot_vectors=True,
+    ranges=None,
 ):
     """
     :param mineral: Mineral object on which calculations should be done
@@ -287,6 +288,15 @@ def plot_projected_elastic_properties(
     :param plot_vectors: Whether or not to plot vectors
         for $V_S$ and Poisson axial directions
     :type plot_vectors: bool
+
+    :param ranges: Optional list of (min, max) tuples for each plot type.
+        If not provided, the min and max of the data will be used.
+    :type ranges: list of (float, float) tuples, optional
+
+    :return: Contour sets, ticks and line segments for each plot type.
+    :rtype: (list of matplotlib.contour.QuadContourSet,
+             list of list of float,
+             list of numpy.ndarray)
     """
 
     assert len(plot_types) == len(axes)
@@ -367,19 +377,23 @@ def plot_projected_elastic_properties(
 
         axes[i].set_title(title)
 
-        vmin = np.min(values)
-        vmax = np.max(values)
-        vmin2 = np.min(values)
-        vmax2 = np.max(values)
+        if ranges is not None:
+            vmin, vmax = ranges[i]
+            vmin2, vmax2 = ranges[i]
+        else:
+            vmin = np.min(values)
+            vmax = np.max(values)
+            vmin2 = np.min(values)
+            vmax2 = np.max(values)
 
-        if (title == "V$_{S1}$ (km/s)" or title == "V$_{S2}$ (km/s)") and both_vs:
-            vmin = vsmin
-            vmax = vsmax
-        if (
-            title == "Minimum Poisson ratio" or title == "Maximum Poisson ratio"
-        ) and both_poisson:
-            vmin = poissonmin
-            vmax = poissonmax
+            if (title == "V$_{S1}$ (km/s)" or title == "V$_{S2}$ (km/s)") and both_vs:
+                vmin = vsmin
+                vmax = vsmax
+            if (
+                title == "Minimum Poisson ratio" or title == "Maximum Poisson ratio"
+            ) and both_poisson:
+                vmin = poissonmin
+                vmax = poissonmax
 
         spacing = np.power(10.0, np.floor(np.log10(vmax2 - vmin2)))
         nt = int((vmax2 - vmin2 - vmax2 % spacing + vmin2 % spacing) / spacing)
@@ -395,9 +409,10 @@ def plot_projected_elastic_properties(
         nt = int((tmax - tmin) / spacing + 1)
 
         ticks.append(np.linspace(tmin, tmax, nt))
+        levels = np.linspace(vmin, vmax, n_divs)
         contour_sets.append(
             axes[i].contourf(
-                theta, r, values, n_divs, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax
+                theta, r, values, levels, cmap=plt.cm.jet_r, vmin=vmin, vmax=vmax
             )
         )
         lines.append(

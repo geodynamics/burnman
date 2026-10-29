@@ -11,7 +11,6 @@ Minerals from Stixrude & Lithgow-Bertelloni 2011, Zhang, Stixrude & Brodholt 201
 
 """
 
-
 from ..classes.mineral import Mineral
 
 

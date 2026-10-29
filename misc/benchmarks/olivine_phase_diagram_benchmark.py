@@ -1,113 +1,113 @@
 # Benchmarks for the chemical potential functions
 import burnman
+from burnman.minerals import SLB_2011
+from burnman import equilibrate
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from scipy import optimize
 
+# Initialize the minerals we will use in this example.
+ol = SLB_2011.mg_fe_olivine()
+wad = SLB_2011.mg_fe_wadsleyite()
+rw = SLB_2011.mg_fe_ringwoodite()
 
-# Equilibrium functions
-def eqm_P_xMgB(A, B):
-    def eqm(arg, T, xMgA):
-        P = arg[0]
-        xMgB = arg[1]
+# Set the starting guess compositions for each of the solutions
+ol.set_composition([0.90, 0.10])
+wad.set_composition([0.90, 0.10])
+rw.set_composition([0.80, 0.20])
 
-        A.set_composition([xMgA, 1.0 - xMgA])
-        A.set_state(P, T)
+T = 1673.15  # K
 
-        B.set_composition([xMgB, 1.0 - xMgB])
-        B.set_state(P, T)
+# First, we find the compositions of the three phases
+# at the univariant.
+composition = {"Fe": 0.2, "Mg": 1.8, "Si": 1.0, "O": 4.0}
+assemblage = burnman.Composite([ol, wad, rw], [1.0, 0.0, 0.0])
+equality_constraints = [
+    ("T", T),
+    ("phase_fraction", (ol, 0.0)),
+    ("phase_fraction", (rw, 0.0)),
+]
+free_compositional_vectors = [{"Mg": 1.0, "Fe": -1.0}]
 
-        diff_mu_Mg2SiO4 = A.partial_gibbs[0] - B.partial_gibbs[0]
-        diff_mu_Fe2SiO4 = A.partial_gibbs[1] - B.partial_gibbs[1]
-        return [diff_mu_Mg2SiO4, diff_mu_Fe2SiO4]
+sol, prm = equilibrate(
+    composition,
+    assemblage,
+    equality_constraints,
+    free_compositional_vectors,
+    verbose=False,
+)
 
-    return eqm
+if not sol.success:
+    raise Exception(
+        "Could not find solution for the univariant using " "provided starting guesses."
+    )
 
+# We interrogate the stored copy of the assemblage for the pressure and
+# the composition of all three phases
+P_univariant = sol.assemblage.pressure
+x_fa_univariant = sol.assemblage.phases[0].molar_fractions[1]
+x_fwd_univariant = sol.assemblage.phases[1].molar_fractions[1]
+x_frw_univariant = sol.assemblage.phases[2].molar_fractions[1]
 
-def eqm_P_xMgABC(A, B, C):
-    def eqm(arg, T):
-        P = arg[0]
-        xMgA = arg[1]
-        xMgB = arg[2]
-        xMgC = arg[3]
+print(
+    f"Univariant point at T={T} K: P={P_univariant/1.0e9:.2f} GPa, "
+    f"x_fa={x_fa_univariant:.3f}, x_fwd={x_fwd_univariant:.3f}, x_frw={x_frw_univariant:.3f}"
+)
 
-        A.set_composition([xMgA, 1.0 - xMgA])
-        A.set_state(P, T)
+# Now we solve for the stable sections of the three binary loops
+phase_loops = []
+i = 0
+for d in [
+    [ol, wad, np.linspace(x_fa_univariant, 0.001, 20)],
+    [ol, rw, np.linspace(x_fa_univariant, 0.999, 20)],
+    [wad, rw, np.linspace(x_fwd_univariant, 0.001, 20)],
+]:
+    m1, m2, x_fe_m1 = d
+    assemblage = burnman.Composite([m1, m2], [1.0, 0.0])
 
-        B.set_composition([xMgB, 1.0 - xMgB])
-        B.set_state(P, T)
+    # Reset the compositions of the two phases to have compositions
+    # close to those at the univariant point
+    m1.set_composition([1.0 - x_fwd_univariant, x_fwd_univariant])
+    m2.set_composition([1.0 - x_fwd_univariant, x_fwd_univariant])
 
-        C.set_composition([xMgC, 1.0 - xMgC])
-        C.set_state(P, T)
+    # Also set the pressure and temperature
+    assemblage.set_state(P_univariant, T)
 
-        diff_mu_Mg2SiO4_0 = A.partial_gibbs[0] - B.partial_gibbs[0]
-        diff_mu_Fe2SiO4_0 = A.partial_gibbs[1] - B.partial_gibbs[1]
-        diff_mu_Mg2SiO4_1 = A.partial_gibbs[0] - C.partial_gibbs[0]
-        diff_mu_Fe2SiO4_1 = A.partial_gibbs[1] - C.partial_gibbs[1]
+    # Here our equality constraints are temperature,
+    # the phase fraction of the second phase,
+    # and we loop over the composition of the first phase.
+    equality_constraints = [
+        ("T", T),
+        (
+            "phase_composition",
+            (m1, [["Mg_A", "Fe_A"], [0.0, 1.0], [1.0, 1.0], x_fe_m1]),
+        ),
+        ("phase_fraction", (m2, 0.0)),
+    ]
 
-        return [
-            diff_mu_Mg2SiO4_0,
-            diff_mu_Fe2SiO4_0,
-            diff_mu_Mg2SiO4_1,
-            diff_mu_Fe2SiO4_1,
+    sols, prm = equilibrate(
+        composition,
+        assemblage,
+        equality_constraints,
+        free_compositional_vectors,
+        verbose=False,
+    )
+
+    # Process the solutions
+    out = np.array(
+        [
+            [
+                sol.assemblage.pressure,
+                sol.assemblage.phases[0].molar_fractions[1],
+                sol.assemblage.phases[1].molar_fractions[1],
+            ]
+            for sol in sols
+            if sol.success
         ]
-
-    return eqm
-
-
-"""
-Initialise solid solutions
-"""
-ol = burnman.minerals.SLB_2011.mg_fe_olivine()
-wd = burnman.minerals.SLB_2011.mg_fe_wadsleyite()
-rw = burnman.minerals.SLB_2011.mg_fe_ringwoodite()
-
-"""
-Temperature of phase diagram
-"""
-T = 1673.0  # K
-
-"""
-Find invariant point
-"""
-invariant = optimize.fsolve(eqm_P_xMgABC(ol, wd, rw), [15.0e9, 0.2, 0.3, 0.4], args=(T))
-print(str(invariant[0] / 1.0e9) + " GPa")
-print(invariant[1:4])
-
-"""
-Initialise arrays
-"""
-XMgA_ol_wad = np.linspace(invariant[1], 0.9999, 21)
-XMgA_ol_rw = np.linspace(0.0001, invariant[1], 21)
-XMgA_wad_rw = np.linspace(invariant[2], 0.9999, 21)
-
-P_ol_wad = np.empty_like(XMgA_ol_wad)
-XMgB_ol_wad = np.empty_like(XMgA_ol_wad)
-
-P_ol_rw = np.empty_like(XMgA_ol_wad)
-XMgB_ol_rw = np.empty_like(XMgA_ol_wad)
-
-P_wad_rw = np.empty_like(XMgA_ol_wad)
-XMgB_wad_rw = np.empty_like(XMgA_ol_wad)
-
-"""
-Find transition pressures
-"""
-
-for idx, XMgA in enumerate(XMgA_ol_wad):
-    XMgB_guess = 1.0 - ((1.0 - XMgA_ol_wad[idx]) * 0.8)
-    P_ol_wad[idx], XMgB_ol_wad[idx] = optimize.fsolve(
-        eqm_P_xMgB(ol, wd), [5.0e9, XMgB_guess], args=(T, XMgA_ol_wad[idx])
     )
-    XMgB_guess = 1.0 - ((1.0 - XMgA_ol_rw[idx]) * 0.8)
-    P_ol_rw[idx], XMgB_ol_rw[idx] = optimize.fsolve(
-        eqm_P_xMgB(ol, rw), [5.0e9, XMgB_guess], args=(T, XMgA_ol_rw[idx])
-    )
-    XMgB_guess = 1.0 - ((1.0 - XMgA_wad_rw[idx]) * 0.8)
-    P_wad_rw[idx], XMgB_wad_rw[idx] = optimize.fsolve(
-        eqm_P_xMgB(wd, rw), [5.0e9, XMgB_guess], args=(T, XMgA_wad_rw[idx])
-    )
+
+    phase_loops.append(out)
 
 """
 Plot model
@@ -116,30 +116,18 @@ fig1 = mpimg.imread("../../burnman/data/input_figures/slb_fig10a.png")
 plt.imshow(fig1, extent=[0, 1, 0.0, 30.0], aspect="auto")
 
 plt.plot(
-    1.0 - np.array([invariant[1], invariant[2], invariant[3]]),
-    np.array([invariant[0], invariant[0], invariant[0]]) / 1.0e9,
+    [x_fa_univariant, x_frw_univariant],
+    [P_univariant / 1.0e9, P_univariant / 1.0e9],
     color="black",
     linewidth=2,
-    label="invariant",
+    label="univariant",
 )
 
-plt.plot(
-    1.0 - XMgA_ol_wad, P_ol_wad / 1.0e9, "r-", linewidth=2, label="wad-out (ol, wad)"
-)
-plt.plot(
-    1.0 - XMgB_ol_wad, P_ol_wad / 1.0e9, "g-", linewidth=2, label="ol-out (ol, wad)"
-)
-
-plt.plot(1.0 - XMgA_ol_rw, P_ol_rw / 1.0e9, "r-", linewidth=2, label="rw-out (ol, rw)")
-plt.plot(1.0 - XMgB_ol_rw, P_ol_rw / 1.0e9, "b-", linewidth=2, label="ol-out (ol, rw)")
-
-plt.plot(
-    1.0 - XMgA_wad_rw, P_wad_rw / 1.0e9, "g-", linewidth=2, label="rw-out (wad, rw)"
-)
-plt.plot(
-    1.0 - XMgB_wad_rw, P_wad_rw / 1.0e9, "b-", linewidth=2, label="wad-out (wad, rw)"
-)
-
+for loop in phase_loops:
+    pressures, x_fe_m1s, x_fe_m2s = loop.T
+    plt.plot(x_fe_m1s, pressures / 1.0e9, "red", linewidth=1)
+    plt.plot(x_fe_m2s, pressures / 1.0e9, "red", linewidth=1)
+    plt.fill_betweenx(pressures / 1.0e9, x_fe_m1s, x_fe_m2s, color="gray", alpha=0.2)
 
 plt.title("Mg2SiO4-Fe2SiO4 phase diagram")
 plt.xlabel("X_Fe")

@@ -4,7 +4,7 @@
 # GPL v2 or later.
 import numpy as np
 import copy
-from scipy.linalg import expm, logm
+from scipy.linalg import expm, expm_frechet, logm
 from scipy.optimize import minimize
 from .solution import Solution
 from .anisotropicmineral import (
@@ -24,7 +24,7 @@ from ..utils.misc import copy_documentation
 class AnisotropicSolution(Solution, AnisotropicMineral):
     """
     A class implementing the anisotropic solution model described
-    in :cite:`Myhill2024a`.
+    in :cite:`Myhill2024`.
     This class is derived from Solution and AnisotropicMineral,
     and inherits most of the methods from those classes.
 
@@ -178,8 +178,10 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         )
         # Calculate all other required properties
         Solution.set_composition(self, molar_fractions)
-        if self._scalar_solution.pressure is not None:
+        try:  # if pressure and temperature are already set, compute base properties
             self.compute_base_properties()
+        except AttributeError:
+            pass
 
     @cached_property
     def ones(self):
@@ -196,13 +198,14 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         with respect to molar proportions at constant
         volume and temperature under hydrostatic conditions.
         """
-        lnM0_ones = np.einsum("ij, k->kij", logm(self.cell_vectors_0.T), self.ones)
-        dp = 1.0e-5
-
-        dlnM0 = np.einsum("ijk->kij", self._logm_M0_mbr) * dp / 2.0
-        logmM0_0 = lnM0_ones - dlnM0
-        logmM0_1 = lnM0_ones + dlnM0
-        return np.einsum("kij->ijk", (expm(logmM0_1) - expm(logmM0_0)) / dp)
+        lnM0 = np.einsum("ijk,k->ij", self._logm_M0_mbr, self.molar_fractions)
+        return np.stack(
+            [
+                expm_frechet(lnM0, direction, compute_expm=False)
+                for direction in np.moveaxis(self._logm_M0_mbr, -1, 0)
+            ],
+            axis=-1,
+        )
 
     @material_property
     def _unrotated_dFdp_fixed_VT(self):
@@ -211,13 +214,13 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         with respect to molar proportions at constant
         volume and temperature under hydrostatic conditions.
         """
-        dp = 1.0e-5
-        PsiI_ones = np.einsum("ij, k->kij", self._PsiI, self.ones)
-        dPsiI = np.einsum("ijk->kij", self._PsiI_mbr + self._dPsiIdp_xs) * dp / 2.0
-        PsiI_0 = PsiI_ones - dPsiI
-        PsiI_1 = PsiI_ones + dPsiI
-
-        return np.einsum("kij->ijk", (expm(PsiI_1) - expm(PsiI_0)) / dp)
+        return np.stack(
+            [
+                expm_frechet(self._PsiI, direction, compute_expm=False)
+                for direction in np.moveaxis(self._PsiI_mbr + self._dPsiIdp_xs, -1, 0)
+            ],
+            axis=-1,
+        )
 
     @material_property
     def _unrotated_dMdn_fixed_VT(self):
@@ -252,10 +255,12 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
     def _dMdn_fixed_VT(self):
         """
         Gradient in cell tensor with respect to composition
-        at fixed volume and temperature under hydrostatic conditions.
+        at fixed volume and temperature under hydrostatic conditions,
+        expressed in the crystallographic frame held fixed at this state.
+        Only the spatial index rotates; columns label lattice vectors.
         """
         R = self.rotation_matrix
-        return np.einsum("mi, nj, ijk->mnk", R, R, self._unrotated_dMdn_fixed_VT)
+        return np.einsum("mi, ijk->mjk", R, self._unrotated_dMdn_fixed_VT)
 
     @material_property
     def depsdn_fixed_VT(self):
@@ -264,7 +269,7 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         at fixed volume and temperature under hydrostatic conditions.
         """
         invM = np.linalg.inv(self.cell_vectors.T)
-        Ln = np.einsum("ijm,kj->ikm", self._dMdn_fixed_VT, invM)
+        Ln = np.einsum("ijm,jk->ikm", self._dMdn_fixed_VT, invM)
         LnT = np.einsum("ikm->kim", Ln)
         return 0.5 * (Ln + LnT)
 
@@ -275,7 +280,7 @@ depsdeps = np.einsum("pm, qn->pqmn", np.eye(3), np.eye(3))
 class RelaxedAnisotropicSolution(AnisotropicSolution):
     """
     A class implementing the relaxed anisotropic solution
-    model described in :cite:`Myhill2024b`.
+    model described in :cite:`Myhill2025`.
     This class is derived from AnisotropicSolution,
     and inherits most of the methods from that class.
 
@@ -349,9 +354,12 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
         """
         self.unrelaxed.set_state(pressure, temperature)
 
-        if hasattr(self.unrelaxed, "molar_fractions") and relaxed:
-            self._relax_at_PTX()
-            AnisotropicSolution.set_state(self, pressure, temperature)
+        if relaxed:
+            try:  # relax the structure if composition has been set
+                self._relax_at_PTX()
+                AnisotropicSolution.set_state(self, pressure, temperature)
+            except AttributeError:
+                pass
 
     def set_composition(self, molar_fractions, q_initial=None, relaxed=True):
         """
@@ -383,11 +391,14 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
 
         self.unrelaxed.set_composition(n)
 
-        if self.unrelaxed.pressure is not None and relaxed:
-            AnisotropicSolution.set_composition(self, n)
-            self._relax_at_PTX()
-            self.unrelaxed._scalar_solution.set_composition(self.molar_fractions)
-            self.unrelaxed.set_composition(self.molar_fractions)
+        if relaxed:
+            try:  # relax the structure if state has been set
+                AnisotropicSolution.set_composition(self, n)
+                self._relax_at_PTX()
+                self.unrelaxed._scalar_solution.set_composition(self.molar_fractions)
+                self.unrelaxed.set_composition(self.molar_fractions)
+            except AttributeError:
+                pass
 
     def _relax_at_PTX(self):
         """

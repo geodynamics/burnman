@@ -21,12 +21,12 @@ the mineral and its thermodynamic potentials and derivatives
 
 Mineral objects are initialized with a dictionary containing all of the
 parameters required by the desired equation of state. BurnMan contains
-implementations of may equations of state (:doc:`eos`).
+implementations of may equations of state (:ref:`ref-eos`).
 
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Mineral`
 
 
@@ -37,6 +37,7 @@ implementations of may equations of state (:doc:`eos`).
 * How to output thermodynamic and thermoelastic properties
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -47,7 +48,6 @@ from burnman import CombinedMineral
 
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.utils.chemistry import formula_to_string
-
 
 if __name__ == "__main__":
     """

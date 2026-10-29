@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-
 # Quartz is a mineral with a Landau type order-disorder model
 qtz = minerals.HGP_2018_ds633.q()
 

@@ -1,68 +1,19 @@
+.. _ref-materials:
 
 Materials
 =========
 
-Burnman operates on materials (type :class:`~burnman.Material`)
-most prominently in the form of minerals
-(:class:`~burnman.Mineral`) and composites (:class:`~burnman.Composite`).
+A key feature of BurnMan is its modular treatment of materials.
+Materials are represented by classes that define their thermodynamic
+and seismic properties.
 
 
-Material Base Class
--------------------
+.. toctree::
+  :maxdepth: 1
 
-.. autoclass:: burnman.Material
-
-Perple_X Class
---------------
-
-.. autoclass:: burnman.PerplexMaterial
-
-Minerals
---------
-
-Endmembers
-^^^^^^^^^^
-
-.. autoclass:: burnman.Mineral
-
-Solutions
-^^^^^^^^^
-
-.. autoclass:: burnman.Solution
-
-.. autoclass:: burnman.SolidSolution
-  :no-inherited-members:
-
-.. autoclass:: burnman.ElasticSolution
-
-.. autoclass:: burnman.ElasticSolidSolution
-  :no-inherited-members:
-
-Mineral helpers
-^^^^^^^^^^^^^^^
-
-.. autoclass:: burnman.classes.mineral_helpers.HelperSpinTransition
-
-Anisotropic materials
-^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: burnman.AnisotropicMaterial
-
-.. autoclass:: burnman.AnisotropicMineral
-
-.. autofunction:: burnman.cell_parameters_to_vectors
-
-.. autofunction:: burnman.cell_vectors_to_parameters
-
-Composites
-----------
-
-.. autoclass:: burnman.Composite
-
-.. autoclass:: burnman.RelaxedComposite
-
-
-Calibrants
-----------
-
-.. autoclass:: burnman.Calibrant
+  materials_01_base_class
+  materials_02_mineral
+  materials_03_solution
+  materials_04_elastic_solution
+  materials_05_composite
+  materials_06_perplex

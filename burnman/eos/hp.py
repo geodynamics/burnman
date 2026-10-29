@@ -17,14 +17,80 @@ from . import einstein
 class HP_TMT(eos.EquationOfState):
     """
     Base class for the thermal equation of state based on
-    the generic modified Tait equation of state (class MT),
+    the isothermal modified Tait equation of state (class MT),
     as described in :cite:`HP2011`.
 
+    .. math::
+        \\mathcal{G}(P,T) &= \\mathcal{H}_{\\textrm{1 bar, T}} - T\\mathcal{S}_{\\textrm{1 bar, T}} + \\int_{\\textrm{1 bar}}^P V(P,T)~dP, \\\\
+        \\mathcal{H}_{\\textrm{1 bar, T}} &= \\Delta_f\\mathcal{H}_{\\textrm{1 bar, 298 K}} + \\int_{298}^T C_P~dT, \\\\
+        \\mathcal{S}_{\\textrm{1 bar, T}} &= \\mathcal{S}_{\\textrm{1 bar, 298 K}} + \\int_{298}^T \\frac{C_P}{T}~dT, \\\\
+        \\int_{\\textrm{1 bar}}^P V(P,T)~dP &= P V_0 \\left( 1 - a + \\left( a \\frac{(1-b P_{th})^{1-c} - (1 + b(P-P_{th}))^{1-c}}{b (c-1) P} \\right) \\right)
 
-    An instance "m" of a Mineral can be assigned this
-    equation of state with the command m.set_method('hp_tmt')
-    (or by initialising the class with the param
-    equation_of_state = 'hp_tmt'
+    The heat capacity at one bar is given by an empirical polynomial fit to
+    experimental data:
+
+    .. math::
+        C_p = a + bT + cT^{-2} + dT^{-0.5}
+
+    The thermal pressure is calculated using a Mie-Grüneisen-like function:
+
+    .. math::
+        P_{\\textrm{th}} &= \\frac{\\alpha_0 K_0 E_{\\textrm{th}} }{C_{V0}}, \\\\
+        E_{\\textrm{th}} &= 3 n R \\Theta \\left(0.5 + \\frac{1}{ \\exp(\\frac{\\Theta}{T}) - 1 }\\right), \\\\
+        C_{V} &= 3 n R \\frac{(\\frac{\\Theta}{T})^2\\exp(\\frac{\\Theta}{T})}{(\\exp(\\frac{\\Theta}{T})-1)^2}
+
+
+    :math:`\\Theta` is the Einstein temperature of the crystal in Kelvin,
+    approximated for a substance :math:`i` with :math:`n_i` atoms in the
+    unit formula and a molar entropy :math:`S_i` using the empirical formula:
+
+    .. math::
+        \\Theta_i=\\frac{10636}{S_i/n_i + 6.44}
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``P_0``
+          - Reference pressure.
+          - Pa
+        * - ``T_0``
+          - Reference temperature.
+          - K
+        * - ``H_0``
+          - Enthalpy at the reference state.
+          - J/mol
+        * - ``S_0``
+          - Entropy at the reference state.
+          - J/(mol K)
+        * - ``Cp``
+          - Heat capacity coefficients at the reference pressure (length 4 list).
+          - Various
+        * - ``V_0``
+          - Volume at the reference state.
+          - m^3/mol
+        * - ``K_0``
+          - Isothermal bulk modulus at the reference state.
+          - Pa
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus at the reference state.
+          - Dimensionless
+        * - ``Kdprime_0``
+          - Second pressure derivative of bulk modulus at the reference state.
+          - Dimensionless
+        * - ``a_0``
+          - Thermal expansivity at reference state.
+          - 1/K
+        * - ``T_einstein``
+          - Einstein temperature.
+          - K
+        * - ``n``
+          - Number of atoms in the unit formula.
+          - Dimensionless
+
     """
 
     def volume(self, pressure, temperature, params):
@@ -339,10 +405,46 @@ class HP_TMTL(eos.EquationOfState):
     described in :cite:`HP1998`, but with the Modified Tait as the static part,
     as described in :cite:`HP2011`.
 
-    An instance "m" of a Mineral can be assigned this
-    equation of state with the command m.set_method('hp_tmtL')
-    (or by initialising the class with the param
-    equation_of_state = 'hp_tmtL'
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``P_0``
+          - Reference pressure.
+          - Pa
+        * - ``T_0``
+          - Reference temperature.
+          - K
+        * - ``H_0``
+          - Enthalpy at the reference state.
+          - J/mol
+        * - ``S_0``
+          - Entropy at the reference state.
+          - J/(mol K)
+        * - ``Cp``
+          - Heat capacity coefficients at the reference pressure (length 4 list).
+          - Various
+        * - ``V_0``
+          - Volume at the reference state.
+          - m^3/mol
+        * - ``K_0``
+          - Isothermal bulk modulus at the reference state.
+          - Pa
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus at the reference state.
+          - Dimensionless
+        * - ``Kdprime_0``
+          - Second pressure derivative of bulk modulus at the reference state.
+          - Dimensionless
+        * - ``a_0``
+          - Thermal expansivity at reference state.
+          - 1/K
+        * - ``dKdT_0``
+          - Temperature derivative of bulk modulus at reference state.
+          - Pa/K
     """
 
     def _V_T_1bar(self, temperature, params):
@@ -555,10 +657,43 @@ class HP98(eos.EquationOfState):
     Base class for the thermal equation of state
     described in :cite:`HP1998`.
 
-    An instance "m" of a Mineral can be assigned this
-    equation of state with the command m.set_method('hp98')
-    (or by initialising the class with the param
-    equation_of_state = 'hp98'
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``P_0``
+          - Reference pressure.
+          - Pa
+        * - ``T_0``
+          - Reference temperature.
+          - K
+        * - ``H_0``
+          - Enthalpy at the reference state.
+          - J/mol
+        * - ``S_0``
+          - Entropy at the reference state.
+          - J/(mol K)
+        * - ``Cp``
+          - Heat capacity coefficients at the reference pressure (length 4 list).
+          - Various
+        * - ``V_0``
+          - Volume at the reference state.
+          - m^3/mol
+        * - ``K_0``
+          - Isothermal bulk modulus at the reference state.
+          - Pa
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus at the reference state.
+          - Dimensionless
+        * - ``a_0``
+          - Thermal expansivity at reference state.
+          - 1/K
+        * - ``dKdT_0``
+          - Temperature derivative of bulk modulus at reference state.
+          - Pa/K
     """
 
     def _V_T_1bar(self, temperature, params):

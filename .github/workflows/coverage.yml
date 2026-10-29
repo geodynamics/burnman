@@ -32,6 +32,7 @@ jobs:
 
     - name: Check coverage change
       run: |
+        set -o pipefail
         mkdir main
         cd main
         git clone https://github.com/geodynamics/burnman
@@ -39,27 +40,26 @@ jobs:
         git status
         python -m pip install -e .[dev]
         python -m pip uninstall -y numba
-        coverage run -m unittest discover ./tests
-        coverage report > main_coverage.tmp
+        coverage run --source=burnman -m unittest discover ./tests
+        coverage report | tee ../../main_coverage.tmp
         main_coverage=$(coverage report --precision=7 --format=total)
         cd ../..
         rm -fr main
         python -m pip install -q -e .[dev]
         python -m pip uninstall -y numba
-        coverage run -m unittest discover ./tests
-        coverage report > new_coverage.tmp
+        coverage run --source=burnman -m unittest discover ./tests
+        coverage report | tee new_coverage.tmp
         new_coverage=$(coverage report --precision=7 --format=total)
         echo "Main coverage: $main_coverage"
         echo "New coverage: $new_coverage"
         if (( $(echo "$new_coverage < $main_coverage" | bc -l) )); then
-          diff main_coverage.tmp new_coverage.tmp
+          diff -u main_coverage.tmp new_coverage.tmp || true
           echo "Coverage ($new_coverage %) decreased relative to main ($main_coverage %)"
           exit 1
         fi
 
     - name: Generate HTML coverage report
       run: |
-        coverage run -m unittest discover ./tests
         coverage html -d htmlcov
       
     - name: Upload HTML coverage report

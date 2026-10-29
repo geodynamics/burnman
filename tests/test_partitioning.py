@@ -17,7 +17,7 @@ class test(BurnManTest):
 
         pressure = 23.83e9  # Pa
         temperature = 2000.0  # K
-        (a, b) = burnman.calculate_nakajima_fp_pv_partition_coefficient(
+        a, b = burnman.calculate_nakajima_fp_pv_partition_coefficient(
             pressure, temperature, bulk_composition.molar_composition, 0.5
         )
         self.assertFloatEqual(a, 0.184533288)

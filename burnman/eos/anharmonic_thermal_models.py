@@ -21,7 +21,7 @@ except ImportError:
         return decorator
 
 
-def singleton(cls):
+def _singleton(cls):
     instances = {}
 
     def get_instance(*args, **kwargs):
@@ -197,7 +197,7 @@ def _d2helmholtzdt2_pade(t):
     ) / (xq[0] * xq[0] * xq[0])
 
 
-@singleton
+@_singleton
 class Pade(object):
     def nondimensional_helmholtz_energy(self, T, debye_T, params=None):
         """
@@ -309,7 +309,7 @@ class Pade(object):
         pass
 
 
-@singleton
+@_singleton
 class LogNormal(object):
     def _helmholtz(self, x, mu, sigma):
         u = np.log(x)

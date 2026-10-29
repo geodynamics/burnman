@@ -18,10 +18,10 @@ class MGDBase(eos.EquationOfState):
     """
     Base class for a generic finite-strain Mie-Grueneisen-Debye
     equation of state.  References for this can be found in many
-    places, such as Shim, Duffy and Kenichi (2002) and Jackson and Rigden
-    (1996).  Here we mostly follow the appendices of Matas et al (2007).
+    places, such as :cite:`Shim2002` and :cite:`Jackson1996`.
+    Here we mostly follow the appendices of :cite:`Matas2007`.
     Of particular note is the thermal correction to the shear modulus, which
-    was developed by Hama and Suito (1998).
+    was developed by :cite:`Hama1998`.
     """
 
     def _grueneisen_parameter(self, pressure, temperature, volume, params):
@@ -272,9 +272,79 @@ class MGDBase(eos.EquationOfState):
 
 class MGD3(MGDBase):
     """
-    MGD equation of state with third order finite strain expansion for the
-    shear modulus (this should be preferred, as it is more thermodynamically
-    consistent.
+    Mie-Grueneisen-Debye equation of state with third order finite strain
+    expansion for the shear modulus.
+
+    The Debye model for the Helmholtz free energy can be written as follows :cite:`Matas2007`
+
+    .. math::
+        \\mathcal{F} &= \\frac{9nRT}{V}\\frac{1}{x^3} \\int_{0}^{x} \\xi^2 \\ln (1-e^{-\\xi}) d\\xi, \\\\
+        x &= \\theta / T, \\\\
+        \\theta &= \\theta_0 \\exp \\left( \\frac{\\gamma_0-\\gamma}{q_0} \\right), \\\\
+        \\gamma &= \\gamma_0 \\left( \\frac{V}{V_0} \\right)^{q_0}
+
+    where :math:`\\theta` is the Debye temperature and :math:`\\gamma` is the Grüneisen parameter.
+
+    Using thermodynamic relations we can derive equations for the thermal pressure and bulk modulus
+
+    .. math::
+        P_{th}(V,T) &= - \\frac{\\partial \\mathcal{F(V, T)}}{\\partial V}, \\\\
+        &= \\frac{3 n \\gamma R T}{V} D(x), \\\\
+        K_{th}(V,T) &= -V \\frac{\\partial P(V, T)}{\\partial V}, \\\\
+        &= \\frac{3 n \\gamma R T}{V} \\gamma \\left[ (1-q_0 - 3 \\gamma) D(x) + 3\\gamma \\frac{x}{e^x - 1} \\right], \\\\
+        D(x) &= \\frac{3}{x^3} \\int_{0}^{x} \\frac{\\xi^3}{e^{\\xi} - 1} d\\xi
+
+    The thermal shear correction used in BurnMan was developed by :cite:`HS1998`
+
+    .. math::
+        G_{th}(V,T) = \\frac{3}{5} \\left[ K_{th} (V, T) - 2\\frac{3nRT}{V}\\gamma D(x) \\right]
+
+
+    The total pressure, bulk and shear moduli can be calculated from the following sums
+
+    .. math::
+        P(V, T) &= P_{\\textrm{ref}}(V, T_0) + P_{th}(V, T) - P_{th}(V, T_0), \\\\
+        K(V, T) &= K_{\\textrm{ref}}(V, T_0) + K_{th}(V, T) - K_{th}(V, T_0), \\\\
+        G(V, T) &= G_{\\textrm{ref}}(V, T_0) + G_{th}(V, T) - G_{th}(V, T_0)
+
+    This equation of state is substantially the same as that in :cite:`Stixrude2005`.
+    The primary differences are in the thermal correction to the shear modulus and
+    in the volume dependences of the Debye temperature and the Gruneisen parameter.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of the bulk modulus at reference pressure.
+          - Dimensionless
+        * - ``molar_mass``
+          - Molar mass of the mineral.
+          - :math:`\\text{kg/mol}`
+        * - ``n``
+          - Number of atoms per formula unit.
+          - Dimensionless
+        * - ``Debye_0``
+          - Debye temperature at reference state.
+          - :math:`\\text{K}`
+        * - ``grueneisen_0``
+          - Grüneisen parameter at reference state.
+          - Dimensionless
+        * - ``q_0``
+          - Volume dependence of the Grüneisen parameter.
+          - Dimensionless
     """
 
     def __init__(self):

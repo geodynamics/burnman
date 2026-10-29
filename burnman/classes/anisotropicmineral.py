@@ -3,7 +3,7 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 import numpy as np
-from scipy.linalg import expm
+from scipy.linalg import expm, expm_frechet
 from numpy.linalg import cond
 from .mineral import Mineral
 from .material import Material, material_property
@@ -11,6 +11,7 @@ from .anisotropy import AnisotropicMaterial
 from ..utils.misc import copy_documentation
 from ..utils.unitcell import cell_parameters_to_vectors
 from ..utils.unitcell import cell_vectors_to_parameters
+from ..utils.unitcell import rotation_to_crystallographic_frame
 from ..utils.anisotropy import (
     voigt_notation_to_compliance_tensor,
     voigt_notation_to_stiffness_tensor,
@@ -89,16 +90,11 @@ def deformation_gradient_alpha_and_compliance(
         and the unrotated isothermal compliance tensor in Voigt form (6x6).
     :rtype: Tuple of four objects of type numpy.array (2D)
     """
-    # Numerical derivatives with respect to f and T
-    df = 1.0e-7
-    F0 = expm(PsiI - dPsiIdf_T * df / 2.0)
-    F1 = expm(PsiI + dPsiIdf_T * df / 2.0)
-    dFdf_T = (F1 - F0) / df
-
-    dT = 0.1
-    F0 = expm(PsiI - dPsiIdT_f * dT / 2.0)
-    F1 = expm(PsiI + dPsiIdT_f * dT / 2.0)
-    dFdT_f = (F1 - F0) / dT
+    # Differentiate the matrix exponential using the Frechet derivative,
+    # which handles noncommuting PsiI and dPsiI and is
+    # more accurate than finite differences.
+    F, dFdf_T = expm_frechet(PsiI, dPsiIdf_T)
+    dFdT_f = expm_frechet(PsiI, dPsiIdT_f, compute_expm=False)
 
     # Convert to pressure and temperature derivatives
     dFdP_T = -beta_TR * dFdf_T
@@ -106,7 +102,6 @@ def deformation_gradient_alpha_and_compliance(
 
     # Calculate the unrotated isothermal compressibility
     # and unrotated thermal expansivity tensors
-    F = expm(PsiI)
     invF = np.linalg.inv(F)
     LP = np.einsum("ij,kj->ik", dFdP_T, invF)
     beta_T = -0.5 * (LP + LP.T)
@@ -339,7 +334,10 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         :returns: The deformation gradient tensor describing the deformation of the
             mineral from its undeformed state
-            (i.e. the state at the reference pressure and temperature).
+            (i.e. the state at the reference pressure and temperature)
+            to its current state.
+            Note that this does not include the rotation of the mineral back into
+            the crystal frame, which is described by the rotation_matrix property.
         :rtype: numpy.array (2D)
         """
         return self._unrotated_F
@@ -361,36 +359,21 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         )
 
     @material_property
-    def deformed_coordinate_frame(self):
+    def rotation_matrix(self):
         """
-        :returns: The orientations of the three spatial coordinate axes
-            after deformation of the mineral [m]. For orthotropic minerals,
-            this is equal to the identity matrix, as hydrostatic stresses only
-            induce rotations in monoclinic and triclinic crystals.
+        :returns: The rotation from the unrotated frame into the
+            crystallographic frame. Column vectors transform as ``R @ v``
+            and second-order tensors as ``R @ A @ R.T``. For orthotropic
+            minerals, this is the identity matrix.
         :rtype: numpy.array (2D)
         """
         if self.orthotropic:
             return np.eye(3)
         else:
-            c = self.frame_convention
-            M_T = self.unrotated_cell_vectors
-            Q = np.empty((3, 3))
-            Q[c[0]] = M_T[c[0]] / np.linalg.norm(M_T[c[0]])
-            Q[c[2]] = np.cross(M_T[c[0]], M_T[c[1]]) / np.linalg.norm(
-                np.cross(M_T[c[0]], M_T[c[1]])
+            R = rotation_to_crystallographic_frame(
+                self.unrotated_cell_vectors, self.frame_convention
             )
-            Q[c[1]] = np.cross(Q[c[2]], Q[c[0]])
-            return Q
-
-    @material_property
-    def rotation_matrix(self):
-        """
-        :returns: The matrix required to rotate the properties of the deformed
-            mineral into the deformed coordinate frame. For orthotropic
-            minerals, this is equal to the identity matrix.
-        :rtype: numpy.array (2D)
-        """
-        return self.deformed_coordinate_frame.T
+            return R
 
     @material_property
     def cell_vectors(self):
@@ -405,10 +388,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         if self.orthotropic:
             return self.unrotated_cell_vectors
         else:
-            vectors = np.einsum(
-                "ij, jk->ik", self.unrotated_cell_vectors, self.rotation_matrix
-            )
-            return vectors
+            return (self.rotation_matrix @ self.unrotated_cell_vectors.T).T
 
     @material_property
     def cell_parameters(self):
@@ -530,8 +510,6 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         return 1.0 / self.isothermal_bulk_modulus_reuss
 
-    beta_T = isothermal_compressibility_reuss
-
     @material_property
     def isothermal_compressibility_voigt(self):
         """
@@ -578,6 +556,15 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
             S = voigt_notation_to_compliance_tensor(self._unrotated_S_T_Voigt)
             S_rotated = np.einsum("mi, nj, ok, pl, ijkl->mnop", R, R, R, R, S)
             return contract_compliances(S_rotated)
+
+    @material_property
+    def _unrotated_isothermal_stiffness_tensor(self):
+        """
+        :returns: The isothermal stiffness tensor [Pa]
+            in Voigt form (:math:`\\mathbb{C}_{\\text{T} pq}`).
+        :rtype: numpy.array (2D)
+        """
+        return np.linalg.inv(self._unrotated_S_T_Voigt)
 
     @material_property
     def thermal_expansivity_tensor(self):

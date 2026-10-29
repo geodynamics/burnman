@@ -27,6 +27,7 @@ and how to assess goodness of fit.
 * Assessing goodness of fit.
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
@@ -37,7 +38,6 @@ from burnman.optimize.composition_fitting import DummyCompositionSolution
 from burnman.optimize.composition_fitting import (
     fit_phase_proportions_to_bulk_composition,
 )
-
 
 if __name__ == "__main__":
     """
@@ -101,11 +101,8 @@ if __name__ == "__main__":
     # Print the optimized parameters and principal uncertainties
     print("Best-fit molar fractions:")
     for i in range(len(popt)):
-        print(
-            f"{gt.endmember_names[i]}: "
-            f"{gt.molar_fractions[i]:.3f} +/- "
-            f"{np.sqrt(pcov[i][i]):.3f}"
-        )
+        fraction = f"{gt.molar_fractions[i]:.3f}".replace("-0.000", "0.000")
+        print(f"{gt.endmember_names[i]}: {fraction} +/- {np.sqrt(pcov[i][i]):.3f}")
 
     # If you don't have a full solution model prepared,
     # you can instead use the helper class
@@ -185,9 +182,7 @@ if __name__ == "__main__":
     # Get the run pressures of each experiment
     pressures = np.array([data["pressure"][indices[0]] for indices in sample_indices])
 
-    # Create empty arrays to store the weight proportions of each phase,
-    # and the principal uncertainties (we do not use the covariances here,
-    # although they are calculated)
+    # Store phase totals and their uncertainties; absent phases remain NaN.
     weight_proportions = np.zeros((len(samples), len(phases))) * np.nan
     weight_proportion_uncertainties = np.zeros((len(samples), len(phases))) * np.nan
 
@@ -199,14 +194,15 @@ if __name__ == "__main__":
             compositions[:, sample_indices[i]], bulk_composition
         )
 
-        # Fill the correct elements of the weight_proportions
-        # and weight_proportion_uncertainties arrays
-        sample_phases = [data["phase"][i] for i in sample_indices[i]]
-        for j, phase in enumerate(sample_phases):
-            weight_proportions[i, phases.index(phase)] = popt[j]
-            weight_proportion_uncertainties[i, phases.index(phase)] = np.sqrt(
-                pcov[j][j]
-            )
+        # Combine analyses of each phase, including their covariance.
+        sample_phases = data["phase"][sample_indices[i]]
+        for j, phase in enumerate(phases):
+            indices = np.flatnonzero(sample_phases == phase)
+            if len(indices):
+                weight_proportions[i, j] = popt[indices].sum()
+                weight_proportion_uncertainties[i, j] = np.sqrt(
+                    pcov[np.ix_(indices, indices)].sum()
+                )
 
     # Plot the data
     for i, phase in enumerate(phases):

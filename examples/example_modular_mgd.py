@@ -33,6 +33,7 @@ and a further two options if the user wants to account for anharmonic effects:
 * How to create a mineral object using the Modular Mie-Grüneisen-Debye equation of state.
 
 """
+
 # First, a couple of standard imports
 import numpy as np
 import matplotlib.pyplot as plt

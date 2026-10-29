@@ -99,6 +99,32 @@ class equilibration(BurnManTest):
         ]
         self.assertArraysAlmostEqual(Ps, Ps_ref)
 
+    def test_conservation_of_elements(self):
+        assemblage = make_ol_wad_assemblage()
+        ol = assemblage.phases[0]
+        wad = assemblage.phases[1]
+        assemblage.set_state(10.0e9, 1200.0)
+        equality_constraints = [
+            ("P", 10.0e9),
+            (
+                "phase_composition",
+                (ol, (["Mg_A", "Fe_A"], [0.0, 1.0], [1.0, 1.0], 0.45)),
+            ),
+        ]
+        composition = {"Mg": 1.0, "Fe": 1.0, "Si": 1.0, "O": 4.0}
+
+        sol, prm = equilibrate(composition, assemblage, equality_constraints)
+        for key in composition:
+            self.assertAlmostEqual(assemblage.formula[key], composition[key], places=5)
+        old_number_of_moles = assemblage.number_of_moles
+
+        # now double the composition and see that number of moles doubles
+        composition = {key: 2.0 * composition[key] for key in composition}
+        sol, prm = equilibrate(composition, assemblage, equality_constraints)
+        self.assertAlmostEqual(
+            assemblage.number_of_moles, 2.0 * old_number_of_moles, places=5
+        )
+
     def test_ol_wad_eqm(self):
         assemblage = make_ol_wad_assemblage()
         ol = assemblage.phases[0]
@@ -198,7 +224,7 @@ class equilibration(BurnManTest):
 
         P = assemblage.pressure
         T = assemblage.temperature
-        S = assemblage.molar_entropy * assemblage.n_moles
+        S = assemblage.entropy
 
         assemblage = make_ol_wad_assemblage()
         equality_constraints = [("P", P), ("S", S)]
@@ -220,7 +246,7 @@ class equilibration(BurnManTest):
 
         P = assemblage.pressure
         T = assemblage.temperature
-        V = assemblage.molar_volume * assemblage.n_moles
+        V = assemblage.molar_volume * assemblage.number_of_moles
 
         assemblage = make_ol_wad_assemblage()
         equality_constraints = [("P", P), ("V", V)]

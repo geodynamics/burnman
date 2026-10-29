@@ -25,6 +25,64 @@ class DKS_L(eos.EquationOfState):
     """
     Base class for the finite strain liquid equation of state detailed
     in :cite:`deKoker2013` (supplementary materials).
+
+    This equation of state includes contributions from ideal gas
+    (translational and electronic), electronic, and excess (bonding)
+    components to the thermodynamic properties.
+
+    The parameters required for this equation of state do not all
+    correspond to natural variables;
+    please refer to :cite:`deKoker2013` for details.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``T_0``
+          - Reference temperature.
+          - :math:`\\text{K}`
+        * - ``O_theta``
+          -
+          -
+        * - ``O_f``
+          -
+          -
+        * - ``m``
+          -
+          -
+        * - ``a``
+          -
+          -
+        * - ``zeta_0``
+          - Reference electronic strength parameter.
+          -
+        * - ``xi``
+          - Power law exponent for the volume dependence on zeta.
+          - Unitless
+        * - ``Tel_0``
+          - Reference temperature for electronic contributions.
+          - K
+        * - ``eta``
+          - Power law exponent for the volume dependence on the electronic temperature.
+          - Unitless
+        * - ``formula``
+          - Chemical formula of the substance.
+          - Dict[str, float]
+        * - ``el_V_0``
+          - Reference volume for electronic contributions.
+          - :math:`\\text{m}^3`
+        * - ``spin_a``
+          - Description of spin_a.
+          - Length 2 list describing spin_a.
+        * - ``spin_b``
+          - Length 4 list describing spin_b.
+          - Units of spin_b.
     """
 
     """

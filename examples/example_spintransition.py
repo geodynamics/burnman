@@ -26,12 +26,12 @@ defined minerals by comparing the current pressure to the transition pressure.
 
 * implementation of spin transition in (Mg,Fe)O at user defined pressure
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     # seismic model for comparison:
@@ -49,8 +49,9 @@ if __name__ == "__main__":
         ["pressure", "density", "v_p", "v_s", "v_phi"], depths
     )
 
-    # here we use the Brown & Shankland geotherm
-    temperature = burnman.geotherm.brown_shankland(depths)
+    # here we use the Brown & Shankland
+    geotherm = burnman.geotherm.BrownShankland()
+    temperature = geotherm.temperatures(depths)
 
     # We create one mineral that contains spin transitions
     rock = minerals.Murakami_etal_2012.fe_periclase()

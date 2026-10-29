@@ -1,3 +1,6 @@
+2021-11-02
+^^^^^^^^^^
+
 * Running the examples now requires BurnMan to be installed. This change is
   made to ensure that tester behaviour always matches installed behaviour,
   rather than local behaviour (the cause of the problem with the 1.0.0 release).

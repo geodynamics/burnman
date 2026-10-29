@@ -29,7 +29,6 @@ import burnman
 
 from burnman import AnisotropicMineral
 
-
 run_fitting = False
 
 per = burnman.minerals.SLB_2011.periclase()

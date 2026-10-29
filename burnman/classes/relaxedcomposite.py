@@ -23,6 +23,7 @@ class RelaxedComposite(Composite):
     pressure and temperature. Once equilibrated, the
     thermodynamic properties of the relaxed composite can be
     queried in the same way as for a standard Composite.
+
     One additional feature of this class is that properties
     related to the second derivatives of the Gibbs energy
     (e.g. compressibility, thermal expansivity, heat capacity)
@@ -32,6 +33,7 @@ class RelaxedComposite(Composite):
     the user can pass relaxation_vectors=composite.reaction_basis.
     More limited relaxation can be specified
     by passing a linear subset of the reaction basis vectors.
+
     For example, on short timescales,a composite of olivine and wadsleyite
     might be able to exchange Mg and Fe, even if no grain growth or
     reduction can occur. In this case, a single vector representing the
@@ -42,7 +44,44 @@ class RelaxedComposite(Composite):
     wadsleyite (mwd, fwd). This is a subset of the full reaction basis,
     which would be: [[1, 0, -1, 0], [0, 1, 0, -1]].
 
-    This class is available as ``burnman.RelaxedComposite``.
+    Example:
+
+    .. code-block:: python
+
+        from burnman import RelaxedComposite
+
+        # Create a standard Composite
+        # This is also where you would set the composition of
+        # the individual phases if desired.
+        unrelaxed_composite = Composite(...) # see Composite documentation
+
+        # Create a RelaxedComposite that reacts quickly relative to
+        # changes in pressure and temperature
+        composite = RelaxedComposite(
+            unrelaxed_composite,
+            relaxation_vectors=unrelaxed_composite.reaction_basis
+        )
+
+        # Set the state of the relaxed composite at 10 GPa and 1500 K
+        # This will equilibrate the composite at its current bulk
+        # composition.
+        composite.set_state(1.0e10, 1500.0)
+
+        # Now do the same but specifying a different bulk composition
+        bulk_composition = {'Mg': 0.8, 'Fe': 0.2, 'Si': 1.0, 'O': 4.0}
+        composite.set_state(1.0e10, 1500.0, bulk_composition=bulk_composition)
+
+        # Query thermodynamic properties as usual
+        K_T = composite.isothermal_bulk_modulus_reuss
+
+    :param composite: The unrelaxed Composite material.
+    :type composite: :class:`burnman.Composite`
+    :param relaxation_vectors: A list of isochemical relaxation
+        vectors. Each vector should be a list or array with length
+        equal to the number of endmembers in the composite. The number
+        of vectors determines the number of degrees of freedom
+        available for relaxation.
+    :type relaxation_vectors: list of lists or 2D array
     """
 
     def __init__(self, composite, relaxation_vectors):
@@ -79,6 +118,8 @@ class RelaxedComposite(Composite):
             name=composite.name,
         )
 
+        self.number_of_moles = composite.number_of_moles
+
     def set_state(self, pressure, temperature, bulk_composition=None):
         """
         Sets the state of the composite. Also relaxes the
@@ -97,27 +138,28 @@ class RelaxedComposite(Composite):
         :type bulk_composition: dict
         """
         if bulk_composition is None:
-            try:
-                bulk_composition = Counter(
-                    {
-                        el: count * self.unrelaxed.n_moles
-                        for el, count in self.unrelaxed.formula.items()
-                    }
-                )
-            except AttributeError:
-                bulk_composition = self.unrelaxed.formula
+            bulk_composition = self.unrelaxed.formula
 
         self.unrelaxed.set_state(pressure, temperature)
 
         sol, _ = equilibrate(
             bulk_composition, self.unrelaxed, [["P", pressure], ["T", temperature]]
         )
-        assert sol.success
+        assert sol.success, "Equilibration failed in RelaxedComposite.set_state()"
 
+        self.copy_state_from_unrelaxed()
+
+    def copy_state_from_unrelaxed(self):
+        """
+        Copies the state (P, T, molar_fractions) from the unrelaxed
+        composite to the relaxed composite. This can be useful
+        if the unrelaxed composite has been modified externally
+        and the relaxed composite needs to be updated to match.
+        """
         # Set the relaxed composite to the equilibrated state
-        Composite.set_state(self, pressure, temperature)
+        Composite.set_state(self, self.unrelaxed.pressure, self.unrelaxed.temperature)
         Composite.set_fractions(self, self.unrelaxed.molar_fractions)
-        self.n_moles = self.unrelaxed.n_moles
+        self.number_of_moles = self.unrelaxed.number_of_moles
 
     @material_property
     def _d2Gdqdq_fixed_PT(self):
@@ -126,7 +168,7 @@ class RelaxedComposite(Composite):
         calculated at constant pressure and temperature.
         """
         phases = self.unrelaxed.phases
-        molar_amounts = self.unrelaxed.molar_fractions * self.unrelaxed.n_moles
+        molar_amounts = self.unrelaxed.molar_fractions * self.unrelaxed.number_of_moles
         hessians = [
             (
                 phase.gibbs_hessian / molar_amounts[i]
@@ -176,9 +218,9 @@ class RelaxedComposite(Composite):
         """
         beta_TR = self.unrelaxed.isothermal_compressibility_reuss
         alpha = self.unrelaxed.thermal_expansivity
-        c_p = self.unrelaxed.molar_heat_capacity_p * self.n_moles
-        V = self.molar_volume * self.n_moles
-        T = self.temperature
+        c_p = self.unrelaxed.heat_capacity_p
+        V = self.unrelaxed.volume
+        T = self.unrelaxed.temperature
         return np.array([[-V * beta_TR, V * alpha], [V * alpha, -c_p / T]])
 
     @material_property
@@ -199,17 +241,17 @@ class RelaxedComposite(Composite):
     @material_property
     @copy_documentation(Composite.isothermal_compressibility_reuss)
     def isothermal_compressibility_reuss(self):
-        return -self._d2Gdzdz[0, 0] / self.V / self.n_moles
+        return -self._d2Gdzdz[0, 0] / self.volume
 
     @material_property
     @copy_documentation(Composite.thermal_expansivity)
     def thermal_expansivity(self):
-        return self._d2Gdzdz[0, 1] / self.V / self.n_moles
+        return self._d2Gdzdz[0, 1] / self.volume
 
     @material_property
     @copy_documentation(Composite.molar_heat_capacity_p)
     def molar_heat_capacity_p(self):
-        return -self._d2Gdzdz[1, 1] * self.T / self.n_moles
+        return -self._d2Gdzdz[1, 1] * self.T / self.number_of_moles
 
     @material_property
     @copy_documentation(Composite.isothermal_bulk_modulus_reuss)

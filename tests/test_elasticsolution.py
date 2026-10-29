@@ -345,14 +345,6 @@ class test_ElasticSolution(BurnManTest):
         m.set_state(P1, T1)  # return to new state
         self.assertFloatEqual(V, m.V)
 
-    def test_gt_Wh(self):
-        gt_ss = garnet_ss()
-        H_excess = gt_ss.solution_model.excess_enthalpy(
-            1.0e5, 1000.0, [0.5, 0.5]
-        )  # Hxs = Exs if Vxs=0
-        We = gt_ss.solution_model.We[0][1]
-        self.assertArraysAlmostEqual([We / 4.0], [H_excess])
-
     def test_order_disorder(self):
         opx = orthopyroxene()
         opx.set_composition(np.array([0.0, 1.0]))
@@ -468,6 +460,14 @@ class test_ElasticSolution(BurnManTest):
             dVdx2[i] = (V1 - V0) / df
 
         self.assertArraysAlmostEqual(dVdx, dVdx2)
+
+    def test_subregular_model_ternary_eos_consistency(self):
+        ss = two_site_ss_subregular_ternary()
+        f0 = np.array([0.25, 0.35, 0.4])
+        ss.set_composition(f0)
+        ss.set_state(1.0e9, 1000.0)
+
+        self.assertTrue(burnman.tools.eos.check_eos_consistency(ss))
 
     def test_subregular(self):
         ss0 = two_site_ss()

@@ -22,17 +22,19 @@ class AveragingScheme(object):
 
     def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
-        Average the bulk moduli :math:`K` for a composite. This defines the interface
-        for this method, and is not implemented in the base class.
+        Average the bulk moduli :math:`K` for a composite. This defines the
+        interface for this method, and is not implemented in the base class.
 
-        :param volumes: List of the volume of each phase in the composite
-            :math:`[m^3]`.
+        :param volumes: List of the volume of each phase
+            in the composite :math:`[m^3]`.
         :type volumes: list of floats
-        :param bulk_moduli : List of bulk moduli of each phase in the composite
-            :math:`[Pa]`.
+
+        :param bulk_moduli: List of bulk moduli of each phase
+            in the composite :math:`[Pa]`.
         :type bulk_moduli: list of floats
-        :param shear_moduli : List of shear moduli of each phase in the composite
-            :math:`[Pa]`.
+
+        :param shear_moduli: List of shear moduli of each phase
+            in the composite :math:`[Pa]`.
         :type shear_moduli: list of floats
 
         :returns: The average bulk modulus :math:`K`. :math:`[Pa]`

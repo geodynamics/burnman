@@ -53,10 +53,11 @@ with a series of boolean variables. In order of complexity:
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :func:`burnman.equilibrate`
 """
+
 from copy import copy
 import numpy as np
 import matplotlib.pyplot as plt
@@ -374,7 +375,7 @@ if __name__ == "__main__" and run_lower_mantle:
     equality_constraints = [("P", P0), ("T", T0)]
     sol, prm = equilibrate(composition, assemblage, equality_constraints)
 
-    S = np.array([assemblage.molar_entropy * assemblage.n_moles])
+    S = np.array([assemblage.entropy])
 
     # Now we calculate the assemblages and states at the post-perovskite-in and
     # bridgmanite-out boundaries at the desired entropy.

@@ -35,19 +35,69 @@ def check_pairs(phases, fractions):
             )
 
 
-# static composite of minerals/composites
 class Composite(Material):
     """
-    Base class for a composite material.
-    The static phases can be minerals or materials,
-    meaning composite can be nested arbitrarily.
+    The composite class in BurnMan is designed to calculate the properties of
+    multi-phase assemblages. Each phase within the composite is represented
+    by an instance of the Material class (typically a Mineral or Solution).
+    The composite class calculates the bulk properties of the assemblage
+    based on the properties and proportions of the individual phases.
 
-    The fractions of the phases can be input
-    as either 'molar' or 'mass' during instantiation,
-    and modified (or initialised) after this point by
-    using set_fractions.
+    All of the **thermodynamic** properties (Gibbs free energy, enthalpy,
+    entropy, volume, heat capacity etc.) are calculated by assuming that
+    any changes in pressure or temperature of the composite as a whole
+    are reflected equally in all of the individual phases, but that no
+    reactions occur either within or between phases. For a composite that
+    calculates properties assuming some or all reactions between phases,
+    can take place ion the timescales of changes in pressure and temperature,
+    see :ref:`ref-relaxed-composite`.
 
-    This class is available as ``burnman.Composite``.
+    The **elastic** properties (bulk and shear moduli, seismic velocities etc.)
+    of a composite material on short timescales are often not well-approximated
+    by assuming homogeneous changes in pressure and temperature. This is
+    because differential stresses can develop between phases due to their
+    differing elastic and thermal properties. To account for this, the
+    composite class allows the user to specify an averaging scheme for the
+    elastic moduli of the composite. The default averaging scheme is
+    Voigt-Reuss-Hill, which is appropriate for many applications.
+    Other :ref:`ref-averaging-schemes` are available.
+
+    Example:
+
+    .. code-block:: python
+
+        from burnman import Composite
+        from burnman.minerals import SLB2011
+
+        # Create a composite made of 70% olivine and 30% orthopyroxene
+        phases = [SLB2011.mg_fe_olivine(), SLB2011.orthopyroxene()]
+        fractions = [0.7, 0.3]  # molar fractions
+        composite = Composite(phases, fractions, fraction_type='molar', name='Mantle composite')
+
+        # Set the compositions of the solution phases
+        # Endmembers of olivine are forsterite and fayalite
+        # Endmembers of orthopyroxene are enstatite, ferrosilite, Mg-tschermaks and Orthodiopside
+        composite.phases[0].set_composition([0.9, 0.1])  # Fo90
+        composite.phases[1].set_composition([0.8, 0.2, 0.0, 0.0])  # En80
+
+        # Set the state of the composite (1 GPa, 1500 K)
+        composite.set_state(1e9, 1500)
+
+        # Change the fractions of the phases
+        composite.set_fractions([0.6, 0.4])
+
+        # Change the averaging scheme to Hashin-Shtrikman lower bound
+        composite.set_averaging_scheme("HashinShtrikmanLower")
+
+    :param phases: List of phases.
+    :type phases: list of :class:`burnman.Material`
+    :param fractions: molar or mass fraction for each phase.
+    :type fractions: list of floats
+    :param fraction_type: 'molar' or 'mass' (optional, 'molar' as standard)
+        specify whether molar or mass fractions are specified.
+    :type fraction_type: str
+    :param name: Name of the composite (optional).
+    :type name: str
     """
 
     def __init__(
@@ -214,7 +264,7 @@ class Composite(Material):
         """
         volumes = np.array(
             [
-                phase.molar_volume * molar_fraction
+                phase.volume * molar_fraction * self.number_of_moles
                 for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
             ]
         )
@@ -227,7 +277,7 @@ class Composite(Material):
         """
         masses = np.array(
             [
-                phase.molar_mass * molar_fraction
+                phase.mass * molar_fraction * self.number_of_moles
                 for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
             ]
         )
@@ -236,9 +286,10 @@ class Composite(Material):
     @material_property
     def formula(self):
         """
-        Returns molar chemical formula of the composite
+        Returns extensive chemical formula of the composite
         """
-        return sum_formulae([ph.formula for ph in self.phases], self.molar_fractions)
+        molar_amounts = self.molar_fractions * self.number_of_moles
+        return sum_formulae([ph.formula for ph in self.phases], molar_amounts)
 
     @material_property
     def molar_internal_energy(self):
@@ -282,14 +333,14 @@ class Composite(Material):
         Returns molar volume of the composite [m^3/mol]
         Aliased with self.V
         """
-        return np.sum(self.phase_volumes)
+        return np.sum(self.phase_volumes) / self.number_of_moles
 
     @material_property
     def molar_mass(self):
         """
         Returns molar mass of the composite [kg/mol]
         """
-        return sum(self.phase_masses)
+        return sum(self.phase_masses) / self.number_of_moles
 
     @material_property
     def density(self):
@@ -438,7 +489,7 @@ class Composite(Material):
         Returns the effective isotropic, isentropic bulk modulus of the composite [Pa]
         Aliased with self.K_eff
         """
-        V_frac = self.phase_volumes
+        V_frac = self.phase_volumes / sum(self.phase_volumes)
         K_ph = np.array([phase.isentropic_bulk_modulus_reuss for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
 
@@ -450,7 +501,7 @@ class Composite(Material):
         Returns the effective isotropic shear modulus of the mineral [Pa]
         Aliased with self.G_eff
         """
-        V_frac = self.phase_volumes
+        V_frac = self.phase_volumes / sum(self.phase_volumes)
         K_ph = np.array([phase.isentropic_bulk_modulus_reuss for phase in self.phases])
         G_ph = np.array([phase.shear_modulus for phase in self.phases])
 

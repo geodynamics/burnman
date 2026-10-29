@@ -1,3 +1,6 @@
+2022-01-28
+^^^^^^^^^^
+
 * BurnMan now has a Calibrant class. This class is a stripped-down
   version of a Material that is initialised with a params dictionary
   and a function to compute the pressure or volume at given conditions.

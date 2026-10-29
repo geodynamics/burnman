@@ -3,14 +3,14 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-import numpy as np
-from burnman.classes.calibrant import Calibrant
-from scipy.interpolate import RegularGridInterpolator
-
 """
 Tsuchiya_2003
 ^^^^^^^^^^^^^
 """
+
+import numpy as np
+from burnman.classes.calibrant import Calibrant
+from scipy.interpolate import RegularGridInterpolator
 
 
 class Au(Calibrant):

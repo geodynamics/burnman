@@ -12,6 +12,7 @@ L. Krischer, T. Megies, R. Barsch, M. Beyreuther, T. Lecocq, C. Caudron, J. Wass
 To find out more about the specific routines in this example see
     https://docs.obspy.org/packages/obspy.taup.html
 """
+
 import numpy as np  # Library used for general array
 import matplotlib.pyplot as plt  # Library used for plotting
 

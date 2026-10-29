@@ -16,7 +16,6 @@ import cProfile
 import scipy.stats as sp
 import matplotlib.mlab as mlab
 
-
 if __name__ == "__main__":
     seismic_model = burnman.seismic.PREM()
     number_of_points = (
@@ -185,7 +184,7 @@ if __name__ == "__main__":
                 )
 
             else:
-                (mu, sigma) = sp.norm.fit(np.array(trace))
+                mu, sigma = sp.norm.fit(np.array(trace))
                 print("mu, sigma: %e %e" % (mu, sigma))
                 n, bins, patches = plt.hist(
                     np.array(trace), 50, normed=1, facecolor="green", alpha=0.75

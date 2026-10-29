@@ -1,0 +1,23 @@
+Least squares equation of state fitting to unknown EoS
+
+Fit #1 (no bounds)
+Fitting failed, because the starting parameters were too far from the true values. This led to one or more of the EoS parameters leaving their valid range.
+
+Fit #2 (with priors)
+Optimized equation of state for stishovite:
+V_0: (1.4005 +/- 0.0001) x 1e-05
+K_0: (3.12 +/- 0.04) x 1e+11
+Kprime_0: (4.8 +/- 0.3) x 1e+00
+
+Fit #3 (with bounds)
+Optimized equation of state for stishovite:
+V_0: (1.40051 +/- 0.00008) x 1e-05
+K_0: (3.16 +/- 0.03) x 1e+11
+Kprime_0: (4.6 +/- 0.3) x 1e+00
+
+Fit #4 (with differential evolution)
+Optimized equation of state for stishovite:
+V_0: (1.40051 +/- 0.00008) x 1e-05
+K_0: (3.16 +/- 0.03) x 1e+11
+Kprime_0: (4.6 +/- 0.3) x 1e+00
+

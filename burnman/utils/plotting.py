@@ -30,9 +30,13 @@ def _get_seg_dist_sq(px, py, a, b):
     Compute the squared distance from point (px, py) to the line segment defined by points a and b.
 
     :param px: X-coordinate of the point.
+    :type px: float
     :param py: Y-coordinate of the point.
+    :type py: float
     :param a: First point of the segment as a tuple (x, y).
+    :type a: tuple of float
     :param b: Second point of the segment as a tuple (x, y).
+    :type b: tuple of float
     :return: Squared distance from point to segment.
     :rtype: float
     """
@@ -56,8 +60,11 @@ def _point_to_polygon_distance(x, y, polygon):
     Compute the signed distance from a point to the nearest polygon edge.
 
     :param x: X-coordinate of the point.
+    :type x: float
     :param y: Y-coordinate of the point.
+    :type y: float
     :param polygon: List of rings (each ring is a numpy array of shape (N, 2)).
+    :type polygon: list of numpy arrays
     :return: Signed distance; positive if inside, negative if outside.
     :rtype: float
     """
@@ -83,9 +90,13 @@ class Cell:
     Represents a square cell used during the polygon center search.
 
     :param x: X-coordinate of the cell center.
+    :type x: float
     :param y: Y-coordinate of the cell center.
+    :type y: float
     :param h: Half-size of the cell.
+    :type h: float
     :param polygon: The input polygon as a list of rings.
+    :type polygon: list of numpy arrays
     """
 
     def __init__(self, x, y, h, polygon):
@@ -102,7 +113,18 @@ class Cell:
 def closest_point_on_segment(p, a, b):
     """
     Return the closest point on segment ab to point p.
-    p, a, b: numpy arrays of shape (2,)
+
+    :param p: the target point
+    :type p: np.array of shape (2,)
+
+    :param a: the start point of the segment
+    :type a: np.array of shape (2,)
+
+    :param b: the end point of the segment
+    :type b: np.array of shape (2,)
+
+    :return: closest point on segment ab
+    :rtype: np.array of shape (2,)
     """
     ab = b - a
     ap = p - a
@@ -120,10 +142,15 @@ def closest_point_on_polygon(p, polygon):
     """
     Find the closest point on a polygon to point p.
 
-    :param p: np.array of shape (2,) - the target point
-    :param polygon: np.array of shape (N, 2) - the polygon vertices
-    (assumed closed or will be treated as closed)
-    :return: np.array of shape (2,) - closest point on polygon
+    :param p: the target point
+    :type p: np.array of shape (2,)
+
+    :param polygon: the polygon vertices
+        (assumed closed or will be treated as closed)
+    :type polygon: np.array of shape (N, 2)
+
+    :return: closest point on polygon
+    :rtype: np.array of shape (2,)
     """
     min_dist = np.inf
     closest_point = None
@@ -145,6 +172,7 @@ def _get_centroid_cell(polygon):
     Estimate the polygon's centroid as an initial guess.
 
     :param polygon: List of polygon rings.
+    :type polygon: list of numpy arrays
     :return: A Cell object located at the estimated centroid.
     :rtype: Cell
     """
@@ -173,9 +201,12 @@ def visual_center_of_polygon(polygon_rings, precision=1.0, with_distance=False):
     """
     Compute the pole of inaccessibility (visual center) of a polygon with the specified precision.
 
-    :param polygon_rings: A polygon represented as a list of rings. Each ring is a numpy array of shape (N, 2).
+    :param polygon_rings: A polygon represented as a list of rings.
+    :type polygon_rings: list of numpy arrays of shape (N, 2)
     :param precision: Desired precision. Stops when improvement is less than this value.
+    :type precision: float
     :param with_distance: If True, also return the distance to the closest edge.
+    :type with_distance: bool
     :return: The [x, y] coordinates of the center, and optionally the distance.
     :rtype: list or tuple
     """

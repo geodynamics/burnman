@@ -1,0 +1,26 @@
+Objective Cauchy-stress rates at 1000.0 K; initial pressure 5.0 GPa.
+
+Test: Rigid rotation of a prestretched crystal (maximum relative error):
+  Truesdell            <0.01 %
+  Green-Naghdi         <0.01 %
+  Zaremba-Jaumann      <0.01 %
+  No rotation          165.40 %
+
+Test: Increase shear to gamma = 1, rotate 90 degrees, and increase volume by 2.02 %.
+Evaluating the hyperelastic stress and tangent along the path...
+
+Maximum stress error (% of maximum EoS Frobenius norm):
+ Steps           Truesdell        Green-Naghdi     Zaremba-Jaumann
+     8               25.11                9.92               10.51
+    16               13.98                4.88                5.18
+    32                7.42                2.42                2.57
+    64                3.83                1.20                1.28
+
+Observed convergence orders from the final step halving:
+  Truesdell            0.95
+  Green-Naghdi         1.01
+  Zaremba-Jaumann      1.00
+Using B:D unchanged with 64 steps:
+  Truesdell            50.42 % error
+  Green-Naghdi         7.45 % error
+All consistent rates converge; the finite-step ranking is not universal.

@@ -3,14 +3,14 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.eos.vinet import Vinet
-from burnman.eos.mie_grueneisen_debye import MGDBase
-from burnman.classes.calibrant import Calibrant
-
 """
 Dewaele_2008
 ^^^^^^^^^^^^
 """
+
+from burnman.eos.vinet import Vinet
+from burnman.eos.mie_grueneisen_debye import MGDBase
+from burnman.classes.calibrant import Calibrant
 
 
 class Ni(Calibrant):

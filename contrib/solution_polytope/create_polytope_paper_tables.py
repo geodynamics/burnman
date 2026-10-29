@@ -52,7 +52,6 @@ from burnman.tools.solution import transform_solution_to_new_basis
 from burnman.tools.chemistry import site_occupancies_to_strings
 from burnman.minerals import JH_2015
 
-
 if __name__ == "__main__":
     """
     First, we show how to generate a polytope from a set of species charges

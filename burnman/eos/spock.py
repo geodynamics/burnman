@@ -5,11 +5,10 @@
 
 
 import scipy.optimize as opt
-from scipy.special import gamma, gammainc, exp1
 from . import equation_of_state as eos
+from ..utils.math import generalised_gammainc
 import warnings
 import numpy as np
-
 
 # Try to import the jit from numba.  If it is
 # not available, just go with the standard
@@ -25,39 +24,8 @@ except ImportError:
         return decorator
 
 
-def generalised_gammainc(a, x1, x2):
-    """
-    An implementation of the generalised incomplete gamma
-    function. Computed using the relationship with the regularised
-    lower incomplete gamma function (scipy.special.gammainc).
-    Uses the recurrence relation wherever a<0.
-
-    We could have used mpmath.gammainc(a, x1, x2) directly,
-    but it is significantly slower than this implementation.
-    """
-    n = int(-np.floor(a))
-    if n > 0:
-        a = a + n
-        u_gamma = (
-            exp1(x1) - exp1(x2)
-            if np.abs(a) < 1.0e-12
-            else (gammainc(a, x2) - gammainc(a, x1)) * gamma(a)
-        )
-
-        esubx1 = np.exp(-x1)
-        esubx2 = np.exp(-x2)
-        for _ in range(n):
-            a = a - 1.0
-            u_gamma = (
-                u_gamma + np.power(x2, a) * esubx2 - np.power(x1, a) * esubx1
-            ) / a
-        return u_gamma
-    else:
-        return (gammainc(a, x2) - gammainc(a, x1)) * gamma(a)
-
-
 @jit(nopython=True)
-def make_params(K_0, Kp_0, Kp_inf, Kdp_0):
+def _make_params(K_0, Kp_0, Kp_inf, Kdp_0):
     dKpdlnV_zero = -Kdp_0 * K_0
     c = Kp_inf
     a = dKpdlnV_zero / (Kp_0 - Kp_inf)
@@ -68,9 +36,43 @@ def make_params(K_0, Kp_0, Kp_inf, Kdp_0):
 class SPOCK(eos.IsothermalEquationOfState):
     """
     Class for the Scaled Power Of Compression K-prime equation of state.
-    This equation is derived from the assumption that K' = b*(V/V_0)^a.
+    This equation is derived from the assumption that
 
-    This equation of state has no temperature dependence.
+    .. math::
+        K' = b \\left( \\frac{V}{V_0} \\right)^a
+
+    This equation of state is described in :cite:`Myhill2025spock`,
+    but was originally derived by :cite:`Weppner2015`.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus at zero pressure.
+          - Dimensionless
+        * - ``Kdprime_0``
+          - Second pressure derivative of bulk modulus at zero pressure.
+          - :math:`\\text{Pa}^{-1}`
+        * - ``Kprime_inf``
+          - Infinite pressure limit of the pressure derivative of bulk modulus.
+          - Dimensionless
+
     """
 
     def isothermal_bulk_modulus_reuss(self, pressure, temperature, volume, params):
@@ -78,7 +80,7 @@ class SPOCK(eos.IsothermalEquationOfState):
         Returns isothermal bulk modulus :math:`K_T` :math:`[Pa]` as a function of pressure :math:`[Pa]`,
         temperature :math:`[K]` and volume :math:`[m^3]`.
         """
-        ai, bi, ci = make_params(
+        ai, bi, ci = _make_params(
             params["K_0"], params["Kprime_0"], params["Kprime_inf"], params["Kdprime_0"]
         )
 
@@ -100,7 +102,7 @@ class SPOCK(eos.IsothermalEquationOfState):
         """
         Returns pressure :math:`[Pa]` as a function of volume :math:`[m^3]`.
         """
-        ai, bi, ci = make_params(
+        ai, bi, ci = _make_params(
             params["K_0"], params["Kprime_0"], params["Kprime_inf"], params["Kdprime_0"]
         )
         lnVrel = np.log(volume / params["V_0"])
@@ -117,7 +119,7 @@ class SPOCK(eos.IsothermalEquationOfState):
         Internal function returning the Helmholtz energy
         :math:`\\mathcal{F}` of the mineral. :math:`[J/mol]`
         """
-        ai, bi, ci = make_params(
+        ai, bi, ci = _make_params(
             params["K_0"], params["Kprime_0"], params["Kprime_inf"], params["Kdprime_0"]
         )
         lnVrel = np.log(volume / params["V_0"])

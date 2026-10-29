@@ -21,9 +21,9 @@ need to be input for BurnMan to calculate :math:`V_P, V_\\Phi, V_S` and density 
 * how to create your own minerals
 
 """
+
 import numpy as np
 import burnman
-
 
 # A note about units: all the material parameters are expected to be in plain SI units.
 # This means that the elastic moduli should be in Pascals and NOT Gigapascals,
@@ -98,7 +98,8 @@ if __name__ == "__main__":
         ["pressure", "density", "v_p", "v_s", "v_phi"], depths
     )
 
-    temperature = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperature = geotherm.temperatures(depths)
     # The next line is not required here, because the method is set
     # automatically by defining 'equation_of_state' in mineral.params. This
     # shows an alternative way to set the method later, or reset the method to

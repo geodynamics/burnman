@@ -56,12 +56,14 @@ class TerminationCode(Enum):
     Enumeration of termination codes for the nonlinear solver.
     These are used to indicate the reason for solver termination.
     The codes are:
-      - SUCCESS (0): The solver successfully found a root.
-      - TOO_NONLINEAR (1): The function is too non-linear for lower lambda bound.
-      - CONSTRAINT_VIOLATION (2): The descent vector crosses the constraints.
-      - MAX_ITERATIONS (3): The solver reached the maximum number of iterations.
-      - SINGULAR_FAIL (4): The system was effectively singular and failed to converge.
-      - SINGULAR_SUCCESS (5): The solver found a root but the system is singular.
+
+        - SUCCESS (0): The solver successfully found a root.
+        - TOO_NONLINEAR (1): The function is too non-linear for lower lambda bound.
+        - CONSTRAINT_VIOLATION (2): The descent vector crosses the constraints.
+        - MAX_ITERATIONS (3): The solver reached the maximum number of iterations.
+        - SINGULAR_FAIL (4): The system was effectively singular and failed to converge.
+        - SINGULAR_SUCCESS (5): The solver found a root but the system is singular.
+
     """
 
     SUCCESS = 0
@@ -221,16 +223,19 @@ class DampedNewtonSolver:
 
     Successful termination of the solver requires meeting all of the following
     criteria:
-      - all(np.abs(dx (simplified Newton step)) < tol)
-      - all(np.abs(dx (full Newton step)) < sqrt(10*tol))
-      (to avoid pathological cases)
-      - lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step)
+
+        - all(np.abs(dx (simplified Newton step)) < tol)
+        - all(np.abs(dx (full Newton step)) < np.sqrt(10*tol))
+            (to avoid pathological cases)
+        - lambda = lambda_bounds(dx, x)[1] (lambda = 1 for a full Newton step)
 
     If these criteria are not satisfied, iterations continue until one of the
     following occurs:
-      - lambda is reduced to its minimum value (indicating a very nonlinear problem)
-      - successive iterations have descent vectors which violate the constraints
-      - the maximum number of iterations is reached
+
+        - lambda is reduced to its minimum value (indicating a very nonlinear problem)
+        - successive iterations have descent vectors which violate the constraints
+        - the maximum number of iterations is reached
+
     """
 
     def __init__(

@@ -221,7 +221,8 @@ if __name__ == "__main__":
     # geotherm.
     pressures = np.linspace(0.0e9, 135e9, 136)
     depths = seismic.PREM().depth(pressures)
-    temperatures = geotherm.stacey_oceanic(depths)
+    geotherm_SO = geotherm.StaceyOceanic()
+    temperatures = geotherm_SO.temperatures(depths)
     Vp_h, Vs_h, rho_h = fper_HS.evaluate(["v_p", "v_s", "rho"], pressures, temperatures)
     Vp_l, Vs_l, rho_l = fper_LS.evaluate(["v_p", "v_s", "rho"], pressures, temperatures)
     Vp_r, Vs_r, rho_r, mf_r = fper_relaxed.evaluate(

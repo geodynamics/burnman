@@ -1,3 +1,6 @@
+2022-06-25
+^^^^^^^^^^
+
 * New: BurnMan now has a function method for
   defining solution/elastic solution models.
   To use this method, the user should provide
