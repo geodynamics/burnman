@@ -9,6 +9,7 @@ example_grid
 
 This example shows how to evaluate seismic quantities on a :math:`P,T` grid.
 """
+
 # Here we import standard python modules that are required for
 # usage of BurnMan.  In particular, numpy is used for handling
 # numerical arrays and mathematical operations on them, and
@@ -21,7 +22,6 @@ from matplotlib import cm
 
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     rock = burnman.Composite(

@@ -19,12 +19,12 @@ teaches:
 - least squares fitting
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 import burnman
 import warnings
-
 
 if __name__ == "__main__":
     # 1) Fitting shear modulus and its derivative to shear wave velocity data

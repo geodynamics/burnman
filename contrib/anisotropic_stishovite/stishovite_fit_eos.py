@@ -166,9 +166,9 @@ def misfit_cell(args, scalar_args):
         dDebye_0,
         P_tr_GPa,
     ) = scalar_args
-    (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22) = args
+    a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22 = args
 
-    (a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, d44, d66) = np.zeros(12)
+    a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, d44, d66 = np.zeros(12)
 
     c44 = 1.0
     c66 = 1.0
@@ -294,8 +294,8 @@ def misfit_elastic(args, scalar_args, cell_args):
         dDebye_0,
         P_tr_GPa,
     ) = scalar_args
-    (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22) = cell_args
-    (a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, c44, c66, d44, d66) = args
+    a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22 = cell_args
+    a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, c44, c66, d44, d66 = args
 
     b22 = b11
     b55 = b44

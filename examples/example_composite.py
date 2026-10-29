@@ -14,7 +14,7 @@ class.
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Mineral`
 * :class:`burnman.Solution`
 * :class:`burnman.Composite`
@@ -40,7 +40,6 @@ import matplotlib.pyplot as plt
 import burnman
 from burnman import equilibrate
 from burnman import minerals
-
 
 if __name__ == "__main__":
     print("Part I: Making and interrogating composite materials")
@@ -137,7 +136,7 @@ if __name__ == "__main__":
 
     def delta_affinity_two_polymorphs(P, T, rock):
         rock.set_state(P, T)
-        return rock.reaction_affinities
+        return rock.reaction_affinities[0]
 
     T = 600.0
     print(f"Equilibrating the rock with brentq at {int(T)} K")

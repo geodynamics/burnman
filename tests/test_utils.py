@@ -7,6 +7,10 @@ from scipy.ndimage import gaussian_filter
 from sympy import Matrix, Rational
 import scipy.integrate as integrate
 
+from burnman.utils.anisotropy import expand_stresses
+from burnman.utils.anisotropy import contract_stresses
+from burnman.utils.anisotropy import expand_strains
+from burnman.utils.anisotropy import contract_strains
 from burnman.utils.chemistry import formula_to_string
 from burnman.utils.misc import extract_lines_between_markers
 from burnman.utils.misc import run_cli_program_with_input
@@ -320,6 +324,22 @@ class test_utils(BurnManTest):
             formula_sf, use_fractions=False, significant_figures=2
         )
         self.assertEqual(result_sf, "Mg1.12Fe0.5Si2O4")
+
+    def test_expand_contract_stresses(self):
+        stress_tensor = np.array([[1.0, 2.0, 3.0], [2.0, 4.0, 5.0], [3.0, 5.0, 6.0]])
+        voigt = contract_stresses(stress_tensor)
+        expanded = expand_stresses(voigt)
+
+        for i in range(3):
+            self.assertArraysAlmostEqual(expanded[i], stress_tensor[i])
+
+    def test_expand_contract_strains(self):
+        strain_tensor = np.array([[1.0, 2.0, 3.0], [2.0, 4.0, 5.0], [3.0, 5.0, 6.0]])
+        voigt = contract_strains(strain_tensor)
+        expanded = expand_strains(voigt)
+
+        for i in range(3):
+            self.assertArraysAlmostEqual(expanded[i], strain_tensor[i])
 
 
 if __name__ == "__main__":

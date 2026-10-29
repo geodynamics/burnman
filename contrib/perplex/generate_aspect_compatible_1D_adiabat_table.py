@@ -38,6 +38,7 @@ save these properties to an ASPECT-compatible file.
 * smoothing of thermodynamic properties
 * self consistent 1D geophysical profile generation
 """
+
 import numpy as np
 from scipy.optimize import fsolve, brentq
 from scipy.integrate import odeint
@@ -45,7 +46,6 @@ from scipy.interpolate import UnivariateSpline
 
 import burnman
 from burnman.utils.math import interp_smoothed_array_and_derivatives
-
 
 if __name__ == "__main__":
     # BEGIN USER INPUTS

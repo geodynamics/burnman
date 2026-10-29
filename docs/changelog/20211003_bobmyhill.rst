@@ -1,3 +1,6 @@
+2021-10-03
+^^^^^^^^^^
+
 * BurnMan now has a new anisotropic equation of state class,
   :class:`burnman.AnisotropicMineral`, which can be used to model materials of
   arbitrary symmetry under hydrostatic conditions.

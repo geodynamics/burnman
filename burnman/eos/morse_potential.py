@@ -13,7 +13,7 @@ import numpy as np
 def bulk_modulus(volume, params):
     """
     Compute the bulk modulus as per the Morse potential
-    equation of state.
+    equation of state :cite:`Morse1929`.
     Returns bulk modulus in the same units as
     the reference bulk modulus.
     Pressure must be in :math:`[Pa]`.
@@ -81,6 +81,30 @@ class Morse(eos.IsothermalEquationOfState):
     Class for the isothermal Morse Potential equation of state
     detailed in :cite:`Stacey1981`.
     This equation of state has no temperature dependence.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy.
+          - :math:`\\text{J/mol}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``V_0``
+          - Reference volume.
+          - :math:`\\text{m}^3`
+        * - ``K_0``
+          - Reference bulk modulus.
+          - :math:`\\text{Pa}`
+        * - ``Kprime_0``
+          - Pressure derivative of bulk modulus at zero pressure.
+          - Dimensionless
+
     """
 
     def volume(self, pressure, temperature, params):

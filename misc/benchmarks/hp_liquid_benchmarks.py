@@ -7,7 +7,6 @@ from burnman.tools.chemistry import equilibrium_temperature
 from burnman.tools.eos import check_eos_consistency
 from burnman.minerals import HGP_2018_ds633
 
-
 # Here, we test that burnman outputs the correct properties for
 # albite liquid from the Holland and Powell dataset (v. 6.33, 2018)
 ab = HGP_2018_ds633.ab()

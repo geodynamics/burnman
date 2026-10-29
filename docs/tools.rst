@@ -1,55 +1,6 @@
-Utilities
-=========
-
-BurnMan has a number of low-level utilities to help achieve common goals.
-Several of these have already been described in previous sections.
-
-
-Unit cell
----------
-
-.. automodule:: burnman.utils.unitcell
-
-
-
-Mathematical
-------------
-
-.. automodule:: burnman.utils.math
-
-
-Miscellaneous
--------------
-
-.. automodule:: burnman.utils.misc
-
+.. _ref-tools:
 
 Tools
 =====
 
-Burnman has a number of high-level tools to help achieve common goals.
-Several of these have already been described in previous sections.
-
-
-Optimal thermobarometry
------------------------
-
-.. automodule:: burnman.tools.thermobarometry
-
-
-Plotting
---------
-
-.. automodule:: burnman.tools.plot
-
-
-Output for seismology
----------------------
-
-.. automodule:: burnman.tools.output_seismo
-
-
-Equations of state
-------------------
-
-.. automodule:: burnman.tools.eos
+Please see the API documentation for BurnMan's tools: :ref:`ref-api-tools`

@@ -91,10 +91,23 @@ class EosConsistency(BurnManTest):
             True,
         )
 
+    def test_DKS_solid_power_law(self):
+        self.assertEqual(
+            check_eos_consistency(
+                burnman.minerals.DKS_2013_solids.periclase(),
+                10.0e9,
+                3000.0,
+                including_shear_properties=False,
+            ),
+            True,
+        )
+
     def test_DKS_solid(self):
         P = 10.0e9
         T = 3000.0
         params = burnman.minerals.DKS_2013_solids.periclase().params
+        # The finite-strain option allows shear properties to be calculated.
+        params["power_law_grueneisen"] = False
         params2 = burnman.minerals.SLB_2011.periclase().params
         for p in ["G_0", "Gprime_0", "eta_s_0"]:
             params[p] = params2[p]

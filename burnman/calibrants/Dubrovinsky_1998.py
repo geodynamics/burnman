@@ -3,14 +3,13 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.classes.calibrant import Calibrant
-import numpy as np
-
-
 """
 Dubrovinsky_1998
 ^^^^^^^^^^^^^^^^
 """
+
+from burnman.classes.calibrant import Calibrant
+import numpy as np
 
 
 class Al2O3_corundum(Calibrant):

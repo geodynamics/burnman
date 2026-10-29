@@ -1,3 +1,6 @@
+2022-06-24
+^^^^^^^^^^
+
 * New: BurnMan now has an ElasticSolution class
   that implements the elastic solution proposed in
   :cite:`Myhill2018`. This class defines excess

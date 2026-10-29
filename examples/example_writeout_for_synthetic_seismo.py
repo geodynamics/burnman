@@ -15,12 +15,12 @@ Nissen-Meyer et al. (2014), AxiSEM: broadband 3-D seismic wavefields in axisymme
 www.axisem.info
 
 """
+
 import numpy as np  # Library used for general array
 
 # Import BurnMan
 import burnman
 from burnman import minerals  # import mineral library seperately
-
 
 if __name__ == "__main__":
     # -Defining the rocks-

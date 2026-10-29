@@ -46,6 +46,7 @@ parameter may need to be adjusted relative to the model proposed by Wu and Wentz
 * How to create a mineral object using the Modular Mie-Grüneisen-Debye equation of state.
 
 """
+
 # First, a couple of standard imports
 import numpy as np
 import matplotlib.pyplot as plt

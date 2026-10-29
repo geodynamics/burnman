@@ -28,6 +28,7 @@ teaches:
 - averaging
 
 """
+
 import os
 import sys
 import numpy as np
@@ -86,7 +87,8 @@ if __name__ == "__main__":
         ["pressure", "density", "v_p", "v_s", "v_phi"], depths
     )
 
-    temperatures = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperatures = geotherm.temperatures(depths)
 
     print("Calculations are done for:")
     rock.debug_print()

@@ -3,15 +3,14 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.eos.vinet import Vinet
-from burnman.classes.calibrant import Calibrant
-import numpy as np
-
-
 """
 Dewaele_2012
 ^^^^^^^^^^^^
 """
+
+from burnman.eos.vinet import Vinet
+from burnman.classes.calibrant import Calibrant
+import numpy as np
 
 
 class KBr_B2(Calibrant):

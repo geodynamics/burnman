@@ -7,6 +7,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from scipy.stats import t, norm, genextreme
+from scipy.optimize import differential_evolution
 import copy
 
 from ..utils.math import unit_normalize
@@ -181,7 +182,8 @@ def find_mle(model):
 def calculate_jacobian(model):
     """
     Compute the Jacobian matrix of weighted residuals with respect
-    to model parameters using central finite differences.
+    to model parameters using central finite differences, accounting for
+    actual trial displacements if parameter bounds clip the steps.
 
     :param model: Model object.
     :type model: FittableModel
@@ -192,20 +194,27 @@ def calculate_jacobian(model):
     n_params = len(model.get_params())
     model.jacobian = np.empty((n_data, n_params))
     diag_delta = np.diag(model.delta_params)
-    param_values = model.get_params()
+    param_values = np.copy(model.get_params())
 
     # Get d (weighted residual) / d parameter by numerical differences
-    for i in range(n_params):
-        model.set_params(param_values - diag_delta[i])
-        _, res_0, _ = find_mle(model)
+    try:
+        for i in range(n_params):
+            model.set_params(param_values - diag_delta[i])
+            p0 = model.get_params()[i]
+            _, res_0, _ = find_mle(model)
 
-        model.set_params(param_values + diag_delta[i])
-        _, res_1, _ = find_mle(model)
+            model.set_params(param_values + diag_delta[i])
+            p1 = model.get_params()[i]
+            if p1 == p0:
+                raise ValueError(
+                    f"Cannot perturb parameter {i}: both trial values are identical."
+                )
+            _, res_1, _ = find_mle(model)
 
-        model.jacobian[:, i] = (res_1 - res_0) / (2.0 * diag_delta[i][i])
+            model.jacobian[:, i] = (res_1 - res_0) / (p1 - p0)
 
-    # Reset parameter values
-    model.set_params(param_values)
+    finally:
+        model.set_params(param_values)
 
 
 def nonlinear_least_squares_fit(
@@ -215,6 +224,8 @@ def nonlinear_least_squares_fit(
     max_lm_iterations=100,
     param_priors=None,
     param_prior_inv_cov_matrix=None,
+    first_run_differential_evolution=False,
+    differential_evolution_seed=42,
     verbose=False,
 ):
     """
@@ -228,7 +239,10 @@ def nonlinear_least_squares_fit(
     :param model: Model with fitting interface.
     :type model: FittableModel
 
-    :param lm_damping: Damping factor for Levenberg-Marquardt updates.
+    :param lm_damping: Initial damping factor for the Levenberg-Marquardt
+        updates. This is adapted automatically during fitting: increased
+        whenever a step fails to reduce the objective function, and
+        decreased whenever a step succeeds.
     :type lm_damping: float
 
     :param param_tolerance: Convergence tolerance based on fractional parameter change.
@@ -249,37 +263,40 @@ def nonlinear_least_squares_fit(
     :modifies: model — Sets optimized parameters, covariance matrix, weighted residuals, Jacobian, and noise estimates.
 
     .. note:: The object passed as model must have the following attributes:
-        * data [2D numpy.array] - Elements of x[i][j] contain the
+
+        - data [2D numpy.array] - Elements of x[i][j] contain the
             observed position of data point i.
-        * data_covariances [3D numpy.array] Elements of cov[i][j][k] contain
+        - data_covariances [3D numpy.array] Elements of cov[i][j][k] contain
             the covariance matrix of data point i.
-        * mle_tolerances [numpy.array] - The iterations to find the maximum likelihood
+        - mle_tolerances [numpy.array] - The iterations to find the maximum likelihood
             estimator for each observed data point will stop when mle_tolerances[i] <
             np.linalg.norm(data_mle[i] - model.function(data_mle[i], flag))
-        * delta_params [numpy.array] - parameter perturbations used to compute the jacobian
+        - delta_params [numpy.array] - parameter perturbations used to compute the jacobian
 
         Must also have the following methods:
-        * set_params(self, param_values) -  Function to set parameters.
-        * get_params(self) - Function to get current model parameters.
-        * function(self, x) - Returns value of model function evaluated at x.
-        * normal(self, x) - Returns value of normal to the model function evaluated at x.
+
+        - set_params(self, param_values) -  Function to set parameters.
+        - get_params(self) - Function to get current model parameters.
+        - function(self, x) - Returns value of model function evaluated at x.
+        - normal(self, x) - Returns value of normal to the model function evaluated at x.
 
         After this function has been performed, the following attributes are added to model:
 
-        * n_dof [int] - Degrees of freedom of the system.
-        * data_mle [2D numpy array] - Maximum likelihood estimates of the observed data points
+        - dof [int] - Degrees of freedom of the system.
+        - data_mle [2D numpy array] - Maximum likelihood estimates of the observed data points
             on the best-fit curve.
-        * jacobian [2D numpy array] - d(weighted_residuals)/d(parameter).
-        * weighted_residuals [numpy array] - Weighted residuals.
-        * weights [numpy array] - 1/(data variances normal to the best fit curve).
-        * WSS [float] - Weighted sum of squares residuals.
-        * popt [numpy array] - Optimized parameters.
-        * pcov [2D numpy array] - Covariance matrix of optimized parameters.
-        * noise_variance [float] - Estimate of the variance of the data normal to the curve.
+        - jacobian [2D numpy array] - d(weighted_residuals)/d(parameter).
+        - weighted_residuals [numpy array] - Weighted residuals.
+        - weights [numpy array] - 1/(data variances normal to the best fit curve).
+        - WSS [float] - Weighted sum of squares residuals.
+        - popt [numpy array] - Optimized parameters.
+        - pcov [2D numpy array] - Covariance matrix of optimized parameters.
+        - noise_variance [float] - Estimate of the variance of the data normal to the curve.
 
     This function is available as ``burnman.nonlinear_least_squares_fit``.
     """
     model.validate()
+
     n_data = len(model.data)
     n_params = len(model.get_params())
     model.dof = n_data - n_params
@@ -287,59 +304,113 @@ def nonlinear_least_squares_fit(
     if not hasattr(model, "flags"):
         model.flags = [None] * n_data
 
+    if first_run_differential_evolution:
+        nonlinear_least_squares_fit_differential_evolution(
+            model,
+            param_tolerance=param_tolerance,
+            param_priors=param_priors,
+            param_prior_inv_cov_matrix=param_prior_inv_cov_matrix,
+            seed=differential_evolution_seed,
+            polish=False,  # We will polish the result with LM iterations below
+        )
+
     with_param_priors = False
     if param_priors is not None and param_prior_inv_cov_matrix is not None:
         assert len(param_priors) == n_params
         assert param_prior_inv_cov_matrix.shape == (n_params, n_params)
         with_param_priors = True
 
-    def _update_beta(lmbda):
-        # Performs a single Levenberg-Marquardt iteration
+    def _weighted_sum_of_squares(weighted_residuals, param_values):
+        WSS = weighted_residuals @ weighted_residuals
+        if with_param_priors:
+            prior_residual = param_values - param_priors
+            WSS += prior_residual @ param_prior_inv_cov_matrix @ prior_residual
+        return WSS
+
+    # lmbda is adapted as fitting proceeds: increased whenever a step fails
+    # to reduce the objective function, decreased whenever it succeeds. This
+    # is the classic Levenberg-Marquardt trust-region behaviour, and (unlike
+    # a fixed damping factor) prevents the iteration from settling into a
+    # stable oscillation around a minimum on poorly-conditioned problems.
+    lm_damping_factor = 10.0
+    max_damping_attempts = 30
+    lmbda = lm_damping
+
+    def _update_beta():
+        nonlocal lmbda
         # Step 1: Compute Jacobian matrix of weighted residuals
-        # Note that if lmbda = 0, this is a simple Gauss-Newton iteration
         calculate_jacobian(model)
 
         # Step 2: Compute MLE projections and residuals given the current
         # parameters (does not update parameter values)
         model.data_mle, model.weighted_residuals, model.weights = find_mle(model)
 
-        # Step 2: Build data terms
+        # Step 3: Build data terms
         current_params = model.get_params()
         J = model.jacobian  # d weighted residuals / d params
-        r = model.weighted_residuals
+        WSS_current = _weighted_sum_of_squares(model.weighted_residuals, current_params)
         JTJ = J.T @ J
-        JTr = J.T @ r
+        JTr = J.T @ model.weighted_residuals
 
-        # Step 3: Add Gaussian prior if defined
+        # Step 4: Add Gaussian prior if defined
         if with_param_priors:
             prior_residual = current_params - param_priors
-            JTJ += param_prior_inv_cov_matrix
-            JTr += param_prior_inv_cov_matrix @ prior_residual
+            JTJ = JTJ + param_prior_inv_cov_matrix
+            JTr = JTr + param_prior_inv_cov_matrix @ prior_residual
 
-        # Step 4: Apply Levenberg-Marquardt update rule
-        A = JTJ + lmbda * np.diag(np.diag(JTJ))
-        delta_beta = np.linalg.solve(A, JTr)
+        diag_JTJ = np.diag(np.diag(JTJ))
 
-        # Step 5: Update parameters and compute fractional change
-        new_params = current_params - delta_beta
-        model.set_params(new_params)
+        # Step 5: Apply the Levenberg-Marquardt update rule, increasing the
+        # damping until the proposed step actually reduces the objective
+        # function (if lmbda = 0 and the first attempt succeeds, this is a
+        # simple Gauss-Newton iteration).
+        for _ in range(max_damping_attempts):
+            A = JTJ + lmbda * diag_JTJ
+            delta_beta = np.linalg.solve(A, JTr)
+            model.set_params(current_params - delta_beta)
+            # set_params may modify the step to satisfy bounds on the problem
+            new_params = model.get_params()
 
-        # set_params may modify the step to satisfy bounds on the problem
-        # We therefore need to get the params before
-        # calculating the fractional change.
-        new_params = model.get_params()
+            # In case the new_params object returns a very small value,
+            # modify to avoid a pointless comparison:
+            mod_params = np.where(
+                np.abs(new_params) < param_tolerance, param_tolerance, new_params
+            )
+            frac_delta_beta = (current_params - new_params) / mod_params
+            max_f = np.max(np.abs(frac_delta_beta))
 
-        # In case the new_params object returns a very small value,
-        # modify to avoid a pointless comparison:
-        mod_params = np.where(
-            np.abs(new_params) < param_tolerance, param_tolerance, new_params
-        )
-        return (current_params - new_params) / mod_params
+            _, weighted_residuals_new, _ = find_mle(model)
+            WSS_new = _weighted_sum_of_squares(weighted_residuals_new, new_params)
+
+            if WSS_new < WSS_current or max_f < param_tolerance:
+                # Accept the step (either a genuine improvement, or a step
+                # so small that current_params is already at the minimum to
+                # within numerical precision) and relax the damping.
+                lmbda = lmbda / lm_damping_factor
+                break
+
+            # Reject the step: revert to the previous parameters and
+            # increase the damping before trying again.
+            model.set_params(current_params)
+            lmbda = lmbda * lm_damping_factor if lmbda > 0.0 else 1.0e-3
+            if verbose:
+                print(
+                    f"  step rejected (WSS {WSS_current:.6g} -> "
+                    f"{WSS_new:.6g}), increasing damping to {lmbda:.2e}"
+                )
+        else:
+            raise ValueError(
+                "Could not find a parameter update that reduces the "
+                "objective function, even after increasing the "
+                f"Levenberg-Marquardt damping {max_damping_attempts} times."
+            )
+
+        return frac_delta_beta
 
     for n_it in range(max_lm_iterations):
         try:
-            # update the parameters with a LM iteration
-            f_delta_beta = _update_beta(lm_damping)
+            # update the parameters with an (adaptively-damped) LM iteration
+            f_delta_beta = _update_beta()
             max_f = np.max(np.abs(f_delta_beta))
 
             if np.isnan(max_f):
@@ -350,17 +421,32 @@ def nonlinear_least_squares_fit(
 
             if verbose:
                 print(f"Iteration {n_it}: max param change = {max_f:.2e}")
+                print(f"Current parameter values: {model.get_params()}")
             if max_f < param_tolerance:
                 break
+            elif n_it == max_lm_iterations - 1:
+                raise Exception(
+                    f"Error: Maximum number of iterations ({max_lm_iterations}) "
+                    "reached before convergence."
+                )
+            model.n_iterations = n_it + 1
+
         except Exception:
             raise Exception(
                 f"During non-linear fitting, Iteration {n_it} produced an "
-                "exception. This is probably due to numerical failure of "
+                "exception. This may be due to numerical failure of "
                 "the input model. "
-                "Consider imposing bounds on fitting or priors on your "
-                "parameter values to prevent this behaviour."
+                "Current parameter values are: "
+                f"{model.get_params()}"
             )
 
+    # Refresh the Jacobian and weighted residuals with the
+    # converged parameters to make them consistent with the
+    # final parameter values.
+    calculate_jacobian(model)
+    model.data_mle, model.weighted_residuals, model.weights = find_mle(model)
+
+    # Update the model attributes (WSS, popt) with the final results
     J = model.jacobian
     r = model.weighted_residuals
     model.WSS = r @ r
@@ -372,9 +458,11 @@ def nonlinear_least_squares_fit(
         model.WSS += prior_residual @ param_prior_inv_cov_matrix @ prior_residual
         JTJ += param_prior_inv_cov_matrix
 
+    # Also compute the covariance matrix of the optimized parameters,
+    # the goodness of fit, and the noise variance
     model.pcov = np.linalg.inv(JTJ) * model.WSS / model.dof
     model.goodness_of_fit = model.WSS / model.dof
-    model.noise_variance = r @ np.diag(1.0 / model.weights) @ r / model.dof
+    model.noise_variance = np.sum(r**2 / model.weights) / model.dof
 
     if verbose:
         print(
@@ -384,6 +472,106 @@ def nonlinear_least_squares_fit(
         )
         print("\nOptimized parameter values:\n", model.popt)
         print("\nParameter covariance matrix:\n", model.pcov)
+
+
+def nonlinear_least_squares_fit_differential_evolution(
+    model,
+    param_tolerance=1.0e-7,
+    param_priors=None,
+    param_prior_inv_cov_matrix=None,
+    polish=False,
+    seed=None,
+):
+    """
+    Function to compute the "best-fit" parameters for a model
+    by nonlinear least squares fitting using differential evolution.
+
+    This function is intended to be used as a first step in the
+    fitting process, especially when there might be
+    multiple local minima and/or the initial parameter guesses
+    are far from the optimal values. This function does not compute
+    the covariance matrix of the optimized parameters.
+    It is recommended to be followed by a call to
+    `nonlinear_least_squares_fit` for further refinement.
+
+    :param model: Model with fitting interface.
+    :type model: FittableModel
+
+    :param param_tolerance: Convergence tolerance, as used by scipy.optimize.differential_evolution.
+    :type param_tolerance: float
+
+    :param param_priors: Prior values for the parameters.
+    :type param_priors: 1D numpy array
+
+    :param param_prior_inv_cov_matrix: Inverse of the 1 sigma uncertainties for the prior values of the parameters.
+    :type param_prior_inv_cov_matrix: 2D numpy array (square)
+
+    :param polish: If True, perform a final local optimization using the Levenberg-Marquardt algorithm after differential evolution.
+    :type polish: bool
+
+    :param seed: The random seed to use for the differential evolution algorithm.
+    :type seed: int
+
+    :modifies: model — Sets optimized parameters, covariance matrix, weighted residuals, Jacobian, and noise estimates.
+    :type model: FittableModel
+
+    .. note:: The object passed as model must have the following attributes:
+        - `bounds`: A list of tuples specifying the lower and upper bounds for each parameter.
+
+        Other required attributes and methods are the same as those for `nonlinear_least_squares_fit`.
+    """
+
+    if not hasattr(model, "bounds"):
+        raise Exception(
+            "Model must have bounds attribute if differential evolution"
+            "is chosen as a solver strategy. "
+            "Please set model.bounds to a list of tuples specifying the "
+            "lower and upper bounds for each parameter."
+        )
+
+    # normalise the bounds to [0, 1] for the neighbourhood search
+    bounds = np.array(model.bounds)
+    bounds01 = np.array([[0.0, 1.0] for _ in range(len(bounds))])
+
+    scale_factors = bounds[:, 1] - bounds[:, 0]
+    n_params = len(scale_factors)
+
+    with_param_priors = False
+    if param_priors is not None and param_prior_inv_cov_matrix is not None:
+        assert len(param_priors) == n_params
+        assert param_prior_inv_cov_matrix.shape == (n_params, n_params)
+        with_param_priors = True
+
+    def weighted_L2_misfit(scaled_param_values):
+        # scale the parameters back to their original range
+        param_values = scaled_param_values * scale_factors + bounds[:, 0]
+        model.set_params(param_values)
+        try:
+            model.data_mle, model.weighted_residuals, model.weights = find_mle(model)
+        except ValueError:
+            # Some parameter combinations tried during the global search may be
+            # physically invalid (e.g. no volume solution exists for the EOS
+            # at some data point). Penalize these instead of letting the
+            # exception propagate and crash differential_evolution.
+            return 1.0e10
+        r = model.weighted_residuals
+        WSS = r @ r
+
+        if with_param_priors:
+            prior_residual = param_values - param_priors
+            WSS += prior_residual @ param_prior_inv_cov_matrix @ prior_residual
+
+        return WSS
+
+    # Use differential evolution to find the minimum of the weighted_L2_misfit function
+    result = differential_evolution(
+        weighted_L2_misfit, bounds01, tol=param_tolerance, seed=seed, polish=polish
+    )
+    result.x = (
+        result.x * scale_factors + bounds[:, 0]
+    )  # scale the parameters back to their original range
+    model.set_params(result.x)
+    model.WSS = result.fun
 
 
 def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=None):
@@ -398,10 +586,25 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     where df(x)/dB is the vector of partial derivatives of f(x)
     with respect to B.
 
+    The fitted quantity (response variable) is the last coordinate of model.data.
+    Its noise variance is estimated from residuals whose observation flags match
+    ``flag``, evaluated at the observed independent coordinates. The squared
+    residuals are summed and divided by the number of matching observations
+    minus the number of fitted parameters. This retains a pooled-scatter
+    approximation for a new observation representative of those data.
+
+    This variance is converted to the squared units of f using the existing
+    parameter perturbations. Prediction bounds are NaN when changes in f are
+    not locally proportional to changes in the fitted quantity (relative
+    tolerance 1e-5), the fitted quantity does not change under any perturbation, or
+    there are insufficient matching observations. Confidence bounds remain
+    available for these derived quantities.
+
     :param model: As modified (for example) by the function
         :func:`burnman.nonlinear_least_squares_fit`.
-        Should contain the following functions: get_params, set_params, function, normal
-        And attributes: delta_params, pcov, dof, noise_variance
+        Should contain the functions get_params, set_params and function,
+        and attributes data, delta_params, pcov and dof. If flags are absent,
+        all observations are assumed to use the supplied flag.
     :type model: object
 
     :param x_array: Coordinates at which to evaluate the bounds.
@@ -426,41 +629,86 @@ def confidence_prediction_bands(model, x_array, confidence_interval, f, flag=Non
     :rtype: 2D numpy.array
     """
 
-    # Check array dimensions
-    n_dimensions = len(model.data[0])
-    if len(x_array[0]) != n_dimensions:
-        raise Exception(
-            "Dimensions of each point must be the same as the "
-            "total number of dimensions"
-        )
+    x_array = np.asarray(x_array, dtype=float)
+    if x_array.ndim != 2 or x_array.shape[1] != model.data.shape[1]:
+        raise ValueError("Query dimensions must match the model data.")
+    if not 0.0 < confidence_interval < 1.0 or model.dof <= 0:
+        raise ValueError("Require 0 < confidence_interval < 1 and positive dof.")
+    if len(x_array) == 0:
+        return np.empty((4, 0))
 
-    param_values = model.get_params()
-    x_m_0s = np.empty_like(x_array)
-    f_m_0s = np.empty_like(x_array[:, 0])
-    for i, x in enumerate(x_array):
-        x_m_0s[i] = model.function(x, flag)
-        f_m_0s[i] = f(x)
-
+    param_values = np.array(model.get_params(), dtype=float, copy=True)
+    f_m_0s = np.empty(len(x_array))
+    fitted_quantity_0s = np.empty(len(x_array))
     diag_delta = np.diag(model.delta_params)
     dxdbeta = np.empty([len(param_values), len(x_array)])
+    fitted_quantity_changes = np.zeros_like(dxdbeta)
+    parameter_steps = np.zeros(len(param_values))
 
-    for i, value in enumerate(param_values):
-        model.set_params(param_values + diag_delta[i])
+    try:
+        flags = getattr(model, "flags", [flag] * len(model.data))
+        residuals = np.array(
+            [
+                model.function(x, observed_flag)[-1] - x[-1]
+                for x, observed_flag in zip(model.data, flags)
+                if observed_flag == flag
+            ]
+        )
+        noise_dof = model.dof - (len(model.data) - len(residuals))
+        fitted_quantity_noise_variance = (
+            residuals.dot(residuals) / noise_dof if noise_dof > 0 else np.nan
+        )
 
-        for j, x_m_0 in enumerate(x_m_0s):
-            x_m_1 = model.function(x_m_0, flag)
-            dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j]) / diag_delta[i][i]
+        for i, x in enumerate(x_array):
+            x_m_0 = model.function(x, flag)
+            fitted_quantity_0s[i] = x_m_0[-1]
+            f_m_0s[i] = f(x_m_0)
 
-    model.set_params(param_values)  # reset params
+        for i, value in enumerate(param_values):
+            model.set_params(param_values + diag_delta[i])
+            step = model.get_params()[i] - value
+            if step == 0.0:  # Try the other side at a parameter bound.
+                model.set_params(param_values - diag_delta[i])
+                step = model.get_params()[i] - value
+            if step == 0.0:
+                if model.pcov[i, i] != 0.0:
+                    raise ValueError(
+                        "Cannot perturb a parameter with nonzero covariance."
+                    )
+                dxdbeta[i] = 0.0
+                continue
+
+            parameter_steps[i] = step
+            for j, x in enumerate(x_array):
+                x_m_1 = model.function(x, flag)
+                fitted_quantity_changes[i, j] = x_m_1[-1] - fitted_quantity_0s[j]
+                dxdbeta[i][j] = (f(x_m_1) - f_m_0s[j]) / step
+    finally:
+        model.set_params(param_values)
+    model.function(x_array[-1], flag)
 
     variance = np.empty(len(x_array))
+    prediction_noise_variance = np.full(len(x_array), np.nan)
     for i, Gprime in enumerate(dxdbeta.T):
         variance[i] = Gprime.T.dot(model.pcov).dot(Gprime)
+        # Use actual changes, rather than derivatives in differently scaled
+        # parameter units, to identify a local transformation of the fitted quantity.
+        dy = fitted_quantity_changes[:, i]
+        df = Gprime * parameter_steps
+        dy_squared = dy.dot(dy)
+        if dy_squared > 0.0:
+            conversion = dy.dot(df) / dy_squared
+            if np.linalg.norm(df - conversion * dy) <= 1.0e-5 * np.linalg.norm(df):
+                prediction_noise_variance[i] = (
+                    conversion**2 * fitted_quantity_noise_variance
+                )
 
-    critical_value = t.isf(0.5 * (confidence_interval + 1.0), model.dof)
+    critical_value = t.ppf(0.5 * (confidence_interval + 1.0), model.dof)
 
     confidence_half_widths = critical_value * np.sqrt(variance)
-    prediction_half_widths = critical_value * np.sqrt(variance + model.noise_variance)
+    prediction_half_widths = critical_value * np.sqrt(
+        variance + prediction_noise_variance
+    )
 
     confidence_bound_0 = f_m_0s - confidence_half_widths
     confidence_bound_1 = f_m_0s + confidence_half_widths

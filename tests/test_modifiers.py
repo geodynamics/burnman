@@ -1,8 +1,9 @@
 import unittest
+import numpy as np
 from util import BurnManTest
 
 import burnman.eos.property_modifiers as pm
-from burnman.minerals import SLB_2011, HP_2011_ds62
+from burnman.minerals import SLB_2011, SLB_2024, HP_2011_ds62
 from burnman.tools.eos import check_eos_consistency
 
 linear_params = {"delta_E": 1200.0, "delta_S": 5.0, "delta_V": 1.0e-7}
@@ -45,22 +46,73 @@ thermal_delta_params = {"Theta_0": 1200.0, "S_inf": 1.0}
 
 
 fn_params = [
-    [pm._linear_excesses, "linear", linear_params],
-    [pm._landau_excesses, "landau", landau_params],
-    [pm._landau_excesses, "landau", landau_params_2],
-    [pm._landau_hp_excesses, "landau_hp", landau_hp_params],
-    [pm._landau_hp_excesses, "landau_hp", landau_hp_params_2],
-    [pm._bragg_williams_excesses, "bragg_williams", bragg_williams_params],
-    [pm._magnetic_excesses_chs, "magnetic_chs", magnetic_params],
-    [pm._magnetic_excesses_chs, "magnetic_chs", magnetic_params_2],
-    [pm._debye_excesses, "debye", thermal_params],
-    [pm._debye_delta_excesses, "debye_delta", thermal_delta_params],
-    [pm._einstein_excesses, "einstein", thermal_params],
-    [pm._einstein_delta_excesses, "einstein_delta", thermal_delta_params],
+    [pm.linear_excesses, "linear", linear_params],
+    [pm.landau_excesses, "landau", landau_params],
+    [pm.landau_excesses, "landau", landau_params_2],
+    [pm.landau_hp_excesses, "landau_hp", landau_hp_params],
+    [pm.landau_hp_excesses, "landau_hp", landau_hp_params_2],
+    [pm.bragg_williams_excesses, "bragg_williams", bragg_williams_params],
+    [pm.magnetic_excesses_chs, "magnetic_chs", magnetic_params],
+    [pm.magnetic_excesses_chs, "magnetic_chs", magnetic_params_2],
+    [pm.debye_excesses, "debye", thermal_params],
+    [pm.debye_delta_excesses, "debye_delta", thermal_delta_params],
+    [pm.einstein_excesses, "einstein", thermal_params],
+    [pm.einstein_delta_excesses, "einstein_delta", thermal_delta_params],
 ]
 
 
 class Modifiers(BurnManTest):
+    def test_landau_slb_2022_derivatives(self):
+        """
+        The Gibbs derivatives must remain consistent as pressure shifts Tc.
+        """
+        for params in (landau_params, landau_params_2):
+            Tc = params["Tc_0"] + params["V_D"] * 2.0e9 / params["S_D"]
+            states = [
+                (0.0, 300.0),
+                (2.0e9, 300.0),
+                (2.0e9, Tc - 10.0),
+                (2.0e9, Tc + 100.0),
+                (1.0e12, 300.0),
+            ]
+            for P, T in states:
+                with self.subTest(params=params, pressure=P, temperature=T):
+                    dP, dT = 1.0e5, 0.01
+                    excess = pm.landau_slb_2022_excesses(P, T, params)[0]
+                    p_plus = pm.landau_slb_2022_excesses(P + dP, T, params)[0]
+                    p_minus = pm.landau_slb_2022_excesses(P - dP, T, params)[0]
+                    t_plus = pm.landau_slb_2022_excesses(P, T + dT, params)[0]
+                    t_minus = pm.landau_slb_2022_excesses(P, T - dT, params)[0]
+                    derivatives = [
+                        ("dGdP", (p_plus["G"] - p_minus["G"]) / (2.0 * dP)),
+                        ("dGdT", (t_plus["G"] - t_minus["G"]) / (2.0 * dT)),
+                        ("d2GdP2", (p_plus["dGdP"] - p_minus["dGdP"]) / (2.0 * dP)),
+                        ("d2GdT2", (t_plus["dGdT"] - t_minus["dGdT"]) / (2.0 * dT)),
+                        ("d2GdPdT", (p_plus["dGdT"] - p_minus["dGdT"]) / (2.0 * dP)),
+                        ("d2GdPdT", (t_plus["dGdP"] - t_minus["dGdP"]) / (2.0 * dT)),
+                    ]
+                    for name, numerical in derivatives:
+                        np.testing.assert_allclose(
+                            excess[name],
+                            numerical,
+                            rtol=1.0e-6,
+                            atol=1.0e-26,
+                            err_msg=name,
+                        )
+
+    def test_landau_slb_2022_mineral_responses(self):
+        """
+        Check full EoS consistency for minerals
+        with pressure-dependent order.
+        """
+        for phase in (SLB_2024.qtz(), SLB_2024.neph()):
+            with self.subTest(mineral=phase):
+                self.assertTrue(
+                    check_eos_consistency(
+                        phase, 2.0e9, 300.0, including_shear_properties=False
+                    )
+                )
+
     def test_excess_functions(self):
         P = 1.0e11
         T = 1000.0

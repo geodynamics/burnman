@@ -14,6 +14,7 @@ import burnman.eos.slb as slb
 from burnman.tools.unitcell import molar_volume_from_unit_cell_volume
 
 import matplotlib.image as mpimg
+import warnings
 
 
 def check_birch_murnaghan():
@@ -453,7 +454,10 @@ def check_slb_fig3():
     perovskite.params["V_0"] = molar_volume_from_unit_cell_volume(168.27, 4.0)
     perovskite.params["grueneisen_0"] = 1.63
     perovskite.params["q_0"] = 1.7
-    perovskite.set_method(slb.SLB2)
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        perovskite.set_method(slb.SLB2)
 
     Vrel = np.linspace(0.6, 1.0, 100)
     grueneisen_slb = np.empty_like(Vrel)
@@ -750,17 +754,20 @@ def check_averaging():
         )
 
     fig = mpimg.imread("../../burnman/data/input_figures/watt_1976_a1.png")
-    plt.imshow(fig, extent=[0, 1.0, 0.25, 1.0], aspect="auto")
-    plt.plot(volumes, v_bulk_modulus / K2, "g-")
-    plt.plot(volumes, r_bulk_modulus / K2, "g-")
-    plt.plot(volumes, vrh_bulk_modulus / K2, "g-")
-    plt.plot(volumes, hsu_bulk_modulus / K2, "g-")
-    plt.plot(volumes, hsl_bulk_modulus / K2, "g-")
-    plt.ylim(0.25, 1.00)
-    plt.xlim(0, 1.0)
-    plt.xlabel("Volume fraction")
-    plt.ylabel("Averaged bulk modulus")
-    plt.title("Comparing with Figure 1 of Watt et al 1976")
+    # plt.imshow(fig, extent=[0, 1.0, 0.25, 1.0], aspect="auto")
+    fig1 = plt.figure(figsize=(4, 3))
+    ax = fig1.add_subplot(111)
+    ax.plot(volumes, v_bulk_modulus / K2, c="orange")
+    ax.plot(volumes, r_bulk_modulus / K2, c="orange")
+    ax.plot(volumes, vrh_bulk_modulus / K2, c="red")
+    ax.plot(volumes, hsu_bulk_modulus / K2, linestyle="--", c="blue")
+    ax.plot(volumes, hsl_bulk_modulus / K2, linestyle="--", c="blue")
+    ax.set_ylim(0.25, 1.00)
+    ax.set_xlim(0, 1.0)
+    ax.set_xlabel("Volume fraction")
+    ax.set_ylabel("Averaged bulk modulus")
+    fig1.set_layout_engine("tight")
+    # plt.title("Comparing with Figure 1 of Watt et al 1976")
     plt.show()
 
     fig = mpimg.imread("../../burnman/data/input_figures/watt_1976_a2.png")

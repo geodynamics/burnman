@@ -15,7 +15,7 @@ from .. import constants
 import warnings
 
 
-def cork_variables(cork, cork_P, cork_T, temperature):
+def _cork_variables(cork, cork_P, cork_T, temperature):
     a = (
         cork[0][0] * cork_T ** (2.5) / cork_P
         + cork[0][1] * cork_T ** (1.5) / cork_P * temperature
@@ -40,6 +40,50 @@ class CORK(eos.EquationOfState):
     the MRK equation of state to overestimate volumes at high pressures and
     accommodate the volume behaviour of coexisting gas and liquid phases along
     the saturation curve.
+
+    .. math::
+        V &= \\frac{RT}{P} + c_1 - \\frac{c_0 R T^{0.5}}{(RT + c_1 P)(RT + 2 c_1 P)} + c_2 P^{0.5} + c_3 P, \\\\
+        c_0 &= c_{0,0} T_c^{2.5}/P_c + c_{0,1} T_c^{1.5}/P_c T, \\\\
+        c_1 &= c_{1,0} T_c/P_c, \\\\
+        c_2 &= c_{2,0} T_c/P_c^{1.5} + c_{2,1}/P_c^{1.5} T, \\\\
+        c_3 &= c_{3,0} T_c/P_c^2 + c_{3,1}/P_c^2 T
+
+    where :math:`c_{i,j}` are the CoRK parameters,
+    :math:`T_c` is the critical temperature,
+    and :math:`P_c` is the critical pressure.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``H_0``
+          - Reference enthalpy.
+          - :math:`\\text{J/mol}`
+        * - ``S_0``
+          - Reference entropy.
+          - :math:`\\text{J/(mol K)}`
+        * - ``Cp``
+          - Heat capacity parameters (length 4 array).
+          - :math:`\\text{J/(mol K)}`
+        * - ``T_0``
+          - Reference temperature.
+          - :math:`\\text{K}`
+        * - ``P_0``
+          - Reference pressure.
+          - :math:`\\text{Pa}`
+        * - ``cork_params``
+          - CoRK parameters (length 4x2 array).
+          - varies
+        * - ``cork_T``
+          - Critical temperature.
+          - :math:`\\text{K}`
+        * - ``cork_P``
+          - Critical pressure.
+          - :math:`\\text{Pa}`
+
     """
 
     def volume(self, pressure, temperature, params):
@@ -47,7 +91,7 @@ class CORK(eos.EquationOfState):
         Returns volume [m^3] as a function of pressure [Pa] and temperature [K]
         Eq. 7 in Holland and Powell, 1991
         """
-        cork = cork_variables(
+        cork = _cork_variables(
             params["cork_params"], params["cork_P"], params["cork_T"], temperature
         )
         V = constants.gas_constant * temperature / pressure + (
@@ -69,7 +113,7 @@ class CORK(eos.EquationOfState):
         Returns isothermal bulk modulus [Pa] as a function of pressure [Pa],
         temperature [K], and volume [m^3].  EQ 13+2
         """
-        cork = cork_variables(
+        cork = _cork_variables(
             params["cork_params"], params["cork_P"], params["cork_T"], temperature
         )
         dVdP = -constants.gas_constant * temperature / (pressure * pressure) + (
@@ -105,7 +149,7 @@ class CORK(eos.EquationOfState):
         Returns thermal expansivity at the pressure, temperature, and volume [1/K]
         Replace -Pth in EQ 13+1 with P-Pth for non-ambient temperature
         """
-        cork = cork_variables(
+        cork = _cork_variables(
             params["cork_params"], params["cork_P"], params["cork_T"], temperature
         )
         dcorkdT = params["dcorkdT"]
@@ -152,7 +196,7 @@ class CORK(eos.EquationOfState):
         if params["cork_T"] == 0:
             d2RTlnfdTdT = 0.0
         else:
-            cork = cork_variables(
+            cork = _cork_variables(
                 params["cork_params"], params["cork_P"], params["cork_T"], temperature
             )
             dcorkdT = params["dcorkdT"]
@@ -228,7 +272,7 @@ class CORK(eos.EquationOfState):
         if params["cork_T"] == 0:
             RTlnf = 0.0
         else:
-            cork = cork_variables(
+            cork = _cork_variables(
                 params["cork_params"], params["cork_P"], params["cork_T"], temperature
             )
 
@@ -278,7 +322,7 @@ class CORK(eos.EquationOfState):
         if params["cork_T"] == 0:
             dRTlnfdT = 0.0
         else:
-            cork = cork_variables(
+            cork = _cork_variables(
                 params["cork_params"], params["cork_P"], params["cork_T"], temperature
             )
             dcorkdT = params["dcorkdT"]

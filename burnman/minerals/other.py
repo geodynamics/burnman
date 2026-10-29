@@ -9,7 +9,6 @@ Other minerals
 
 """
 
-
 from ..classes import mineral_helpers as helpers
 from ..classes.mineral import Mineral
 from ..utils.chemistry import dictionarize_formula, formula_mass

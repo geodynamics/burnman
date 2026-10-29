@@ -1,3 +1,6 @@
+2022-02-16
+^^^^^^^^^^
+
 * Changed: BurnMan now has another submodule called utils.
   Many of the functions that used to be in the tools submodule
   have now been moved into the utils submodule.

@@ -13,10 +13,10 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 
 *Uses:*
 
-* :doc:`mineral_database`
+* :ref:`ref-mineral-datasets`
 * :class:`burnman.Composite`
 * :class:`burnman.seismic.PREM`
-* :func:`burnman.geotherm.brown_shankland`
+* :class:`burnman.geotherm.BrownShankland`
 * :func:`burnman.Material.evaluate`
 * :func:`burnman.utils.math.l2_norm_profiles`
 
@@ -26,13 +26,13 @@ seismic data against PREM. For more extensive comments on this setup, see tutori
 * loops over models
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 import burnman
 from burnman import minerals
-
 
 if __name__ == "__main__":
     # Define reference model and depth to evaluate
@@ -52,7 +52,8 @@ if __name__ == "__main__":
     )
 
     # Define geotherm
-    temperature = burnman.geotherm.brown_shankland(depths)
+    geotherm = burnman.geotherm.BrownShankland()
+    temperature = geotherm.temperatures(depths)
 
     # Define solid solutions
     perovskite = minerals.SLB_2011.mg_fe_perovskite()

@@ -9,7 +9,7 @@ from scipy.integrate import quad
 from scipy.interpolate import UnivariateSpline, interp1d
 from scipy.optimize import fsolve
 from burnman import constants
-from burnman.utils import geotherm
+from .geotherm import adiabatic_profile
 import warnings
 
 from .material import Material, material_property
@@ -328,10 +328,10 @@ class Layer(object):
             self.temperature_mode == "adiabatic"
             or self.temperature_mode == "perturbed-adiabatic"
         ):
-            adiabat = geotherm.adiabatic(
+            adiabat = adiabatic_profile(
                 pressures[::-1],
-                temperature_top - self.usertemperatures[-1],
                 self.material,
+                temperature_top - self.usertemperatures[-1],
             )[::-1]
         else:
             adiabat = np.zeros_like(self.radii)
@@ -446,18 +446,18 @@ class Layer(object):
         kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
         phi = self.bulk_sound_velocity * self.bulk_sound_velocity
         try:
-            dkappadP = np.gradient(kappa, edge_order=2) / np.gradient(
-                self.pressures, edge_order=2
+            dkappadP = np.gradient(kappa, self.pressures, edge_order=2)
+            dphidr = np.gradient(phi, self.radii, edge_order=2)
+            dphidr_over_g = np.divide(
+                dphidr,
+                self.gravity,
+                out=np.full_like(dphidr, np.nan, dtype=float),
+                where=np.abs(self.gravity) > 1e-12,
             )
-            dphidr = (
-                np.gradient(phi, edge_order=2)
-                / np.gradient(self.radii, edge_order=2)
-                / self.gravity
-            )
-        except:
-            dkappadP = np.gradient(kappa) / np.gradient(self.pressures)
-            dphidr = np.gradient(phi) / np.gradient(self.radii) / self.gravity
-        bullen = dkappadP + dphidr
+        except Exception:
+            dkappadP = np.gradient(kappa, self.pressures)
+            dphidr = np.gradient(phi, self.radii) / self.gravity
+        bullen = dkappadP + dphidr_over_g
         return bullen
 
     @property

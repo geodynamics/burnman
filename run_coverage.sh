@@ -8,7 +8,7 @@ python -m pip install -q -e .[dev]
 python -m pip uninstall -y numba
 
 # Get current coverage
-coverage run -m unittest discover ./tests
+coverage run --source=burnman -m unittest discover ./tests
 coverage report > new_coverage.tmp
 current_coverage=$(coverage report --precision=7 --format=total)
 echo "Coverage: $current_coverage"

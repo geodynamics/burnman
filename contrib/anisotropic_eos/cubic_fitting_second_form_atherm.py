@@ -20,6 +20,7 @@ The script ends by making three plots; one with elastic moduli
 at high pressure, one with the corresponding shear moduli,
 and one with the elastic moduli at 1 bar.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
@@ -28,7 +29,6 @@ from tools import print_table_for_mineral_constants
 import burnman
 
 from burnman import AnisotropicMineral
-
 
 run_fitting = False
 

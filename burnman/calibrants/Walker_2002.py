@@ -3,14 +3,14 @@
 # Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
-from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
-from burnman.classes.calibrant import Calibrant
-import numpy as np
-
 """
 Walker_2002
 ^^^^^^^^^^^
 """
+
+from burnman.eos.birch_murnaghan import BirchMurnaghanBase as BM3
+from burnman.classes.calibrant import Calibrant
+import numpy as np
 
 
 class KCl_B2(Calibrant):

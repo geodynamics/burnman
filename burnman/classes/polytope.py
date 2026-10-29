@@ -15,7 +15,6 @@ from .material import cached_property
 
 from ..utils.math import independent_row_indices
 
-
 # Try to import pycddlib.
 # First, try separating the imports into float and
 # fractional, then fall back to only using the float

@@ -1,10 +1,8 @@
-0.0001, 1.0, 0.7, 4.0e-04
 0.0001, 300.0, -0.3, 2.8e-04
-1.0, 1.0, 0.6, -1.7e-05
 0.0001, 1000.0, -0.7, -4.3e-04
 1.0, 1000.0, -1.3, -7.5e-04
-3.0, 1000.0, -2.6, -5.2e-04
-10.0, 1000.0, -5.3, -5.2e-04
+3.0, 1000.0, -2.4, -5.2e-04
+10.0, 1000.0, -5.2, -5.2e-04
 40.0, 1000.0, -9.6, 1.8e-05
 Checking EoS consistency for 'burnman.minerals.SE_2015.liquid_iron' (not including shear properties)
 Expressions within tolerance of 0.000100
@@ -20,4 +18,19 @@ C_v = Cp - alpha^2*K_T*V*T : True
 K_S = K_T*Cp/Cv : True 
 gr = alpha*K_T*V/Cv : True 
 All EoS consistency constraints satisfied for 'burnman.minerals.SE_2015.liquid_iron'
+Core benchmark: published Tm=6453 K, rho=13.71 g/cm^3; inner-core averages Cp=29.45 J/mol/K, S=92 J/mol/K, gamma=1.81
+BurnMan: Tm=6453.79 K, rho=13.70916 g/cm^3, Cp=26.46071 J/mol/K, S=86.97444 J/mol/K, gamma=1.40134
+Table 1 hcp b1: Tm=7305.09 K, rho=13.57366 g/cm^3, Cp=29.40529 J/mol/K, S=92.43557 J/mol/K, gamma=1.86220
+Table 2 Liquid iron, 1000 K: alpha=4.232879e-05, fit=4.24854e-05, K=135.1453 GPa, fit=86.0685 GPa
+Table 2 Liquid iron, 2000 K: alpha=4.656299e-05, fit=4.64276e-05, K=113.0375 GPa, fit=64.4755 GPa
+Table 2 Liquid iron, 4000 K: alpha=5.036647e-05, fit=5.04924e-05, K=85.6516 GPa, fit=35.0295 GPa
+Table 2 HCP iron, 1000 K: alpha=7.582772e-05, fit=7.6162e-05, K=120.4974 GPa, fit=132.4900 GPa
+Table 2 HCP iron, 2000 K: alpha=8.922195e-05, fit=8.9198e-05, K=86.9267 GPa, fit=112.2200 GPa
+Table 2 HCP iron, 4000 K: alpha=0.0001017101, fit=0.000101962, K=52.9663 GPa, fit=83.8000 GPa
+Melting at 100 GPa: full Brosh=3585.31 K, n=4 cold curve=3581.17 K, Perple_X 7.1.13=3579.16 K
+Melting at 150 GPa: full Brosh=4250.95 K, n=4 cold curve=4239.70 K, Perple_X 7.1.13=4237.35 K
+Melting at 200 GPa: full Brosh=4833.13 K, n=4 cold curve=4811.12 K, Perple_X 7.1.13=4808.54 K
+Melting at 250 GPa: full Brosh=5364.23 K, n=4 cold curve=5327.68 K, Perple_X 7.1.13=5324.94 K
+Melting at 300 GPa: full Brosh=5859.74 K, n=4 cold curve=5804.78 K, Perple_X 7.1.13=5801.92 K
+Melting at 350 GPa: full Brosh=6328.12 K, n=4 cold curve=6250.72 K, Perple_X 7.1.13=6247.77 K
 FCC-liq equilibrium at 21.0 GPa: 2513 K

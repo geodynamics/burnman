@@ -248,7 +248,7 @@ def dhelmholtz_dTheta(T, debye_T, n):
     if T <= eps:
         return 0.0
     x = debye_T / T
-    return 3.0 * n * constants.gas_constant * debye_fn(x) / x
+    return 3.0 * n * constants.gas_constant * debye_fn_cheb(x) / x
 
 
 def d2helmholtz_dTheta2(T, debye_T, n):
@@ -259,7 +259,7 @@ def d2helmholtz_dTheta2(T, debye_T, n):
     if T <= eps:
         return 0.0
     x = debye_T / T
-    D = debye_fn(x)
+    D = debye_fn_cheb(x)
     return (
         3.0
         * n
@@ -277,5 +277,5 @@ def dentropy_dTheta(T, debye_T, n):
     if T <= eps:
         return 0.0
     x = debye_T / T
-    D = debye_fn(x)
+    D = debye_fn_cheb(x)
     return n * constants.gas_constant / T * (9.0 / (np.exp(x) - 1.0) - 12.0 * D / x)

@@ -33,6 +33,7 @@ composite polytope.
 * Completion of an independent endmember set from a partial set
 * Simplifying composites at a given bulk composition
 """
+
 import numpy as np
 from sympy import Rational
 
@@ -46,7 +47,6 @@ from burnman.tools.polytope import (
 from burnman.tools.polytope import simplify_composite_with_composition
 from burnman.tools.chemistry import site_occupancies_to_strings
 from burnman.tools.chemistry import formula_to_string
-
 
 if __name__ == "__main__":
     """

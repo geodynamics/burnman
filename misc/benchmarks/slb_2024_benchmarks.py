@@ -50,6 +50,7 @@ def check_fper_entropy():
     print("Endmember entropies (should all be zero):")
     print(np.abs(fper.solution_model.endmember_configurational_entropies))
 
+    fper.set_state(1.0e5, 300.0)
     fper.set_composition([0.0, 0.5, 0.0, 0.0, 0.5])
     Sxs = -2 * gas_constant * np.log(0.5)
     print(

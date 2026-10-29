@@ -362,10 +362,8 @@ def get_models(all_args):
         dDebye_0,
         P_tr_GPa,
     ) = scalar_args
-    (a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22) = cell_args
-    (a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, c44, c66, d44, d66) = (
-        elastic_args
-    )
+    a0Q1, b0Q1, PsiI_33_a, PsiI_33_b, PsiI_33_c, PsiI_33_d, f_PsiI_22 = cell_args
+    a11, a22, a33, a44, a55, a66, b11, b33, b44, b66, c44, c66, d44, d66 = elastic_args
 
     b22 = b11
     b55 = b44

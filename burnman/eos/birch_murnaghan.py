@@ -12,13 +12,16 @@ import warnings
 
 def bulk_modulus_third_order(volume, params):
     """
-    Bulk modulus for the third order Birch-Murnaghan equation of state.
+    Bulk modulus for the third order Birch-Murnaghan equation of state
+    :cite:`Birch1947`.
 
     :param volume: Volume of the material in the same units as
-    the reference volume.
+        the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Bulk modulus in the same units as the reference bulk modulus.
     :rtype: float
     """
@@ -44,13 +47,14 @@ def pressure_third_order(invVrel, params):
 
     :param invVrel: Reference volume divided by the volume
     :type invVrel: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :rtype: float
     """
-
     return (
         3.0
         * params["K_0"]
@@ -66,8 +70,9 @@ def volume_third_order(pressure, params):
     Volume for the third order Birch-Murnaghan equation of state.
 
     :param pressure: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :type pressure: float
+
     :param params: Parameter dictionary
     :type params: dict
 
@@ -78,14 +83,26 @@ def volume_third_order(pressure, params):
     def delta_pressure(volume):
         return pressure_third_order(params["V_0"] / volume, params) - pressure
 
+    # Ignore RuntimeWarnings for a guess that leads to a negative volume
+    # as long as a solution can be found.
     try:
-        sol = bracket(delta_pressure, params["V_0"], 1.0e-2 * params["V_0"])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            sol = bracket(
+                delta_pressure,
+                params["V_0"],
+                1.0e-2 * params["V_0"],
+            )
     except ValueError:
         raise ValueError(
             "Cannot find a volume, perhaps you are outside of the "
             "range of validity for the equation of state?"
         )
-    return opt.brentq(delta_pressure, sol[0], sol[1])
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        root = opt.brentq(delta_pressure, sol[0], sol[1])
+    return root
 
 
 def bulk_modulus_fourth_order(volume, params):
@@ -93,10 +110,12 @@ def bulk_modulus_fourth_order(volume, params):
     Bulk modulus for the fourth order Birch-Murnaghan equation of state.
 
     :param volume: Volume of the material in the same units as
-    the reference volume.
+        the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Bulk modulus in the same units as the reference bulk modulus.
     :rtype: float
     """
@@ -132,10 +151,12 @@ def pressure_fourth_order(invVrel, params):
 
     :param invVrel: Reference volume divided by the volume
     :type invVrel: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :rtype: float
     """
 
@@ -162,8 +183,9 @@ def volume_fourth_order(pressure, params):
     Volume for the fourth order Birch-Murnaghan equation of state.
 
     :param pressure: Pressure in the same units that are supplied
-    for the reference bulk modulus (params['K_0']).
+        for the reference bulk modulus (params['K_0']).
     :type pressure: float
+
     :param params: Parameter dictionary
     :type params: dict
 
@@ -191,8 +213,10 @@ def shear_modulus_second_order(volume, params):
 
     :param volume: Molar volume in the same units as the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Shear modulus in the same units as the reference shear modulus.
     :rtype: float
     """
@@ -217,8 +241,10 @@ def shear_modulus_third_order(volume, params):
 
     :param volume: Molar volume in the same units as the reference volume.
     :type volume: float
+
     :param params: Parameter dictionary
     :type params: dict
+
     :return: Shear modulus in the same units as the reference shear modulus.
     :rtype: float
     """
@@ -361,8 +387,64 @@ class BirchMurnaghanBase(eos.IsothermalEquationOfState):
 
 class BM3(BirchMurnaghanBase):
     """
-    Third order Birch Murnaghan isothermal equation of state.
-    This uses the third order expansion for shear modulus.
+    The third order Birch-Murnaghan isothermal equation of state.
+    The negative finite-strain (or compression) is defined as
+
+    .. math::
+        f=\\frac{1}{2}\\left[\\left(\\frac{V}{V_0}\\right)^{-2/3}-1\\right]
+
+    where :math:`V` is the volume at a given pressure and :math:`V_0` is the
+    volume at a reference state (:math:`P = 10^5` Pa , :math:`T` = 300 K).  The
+    pressure and elastic moduli are derived from a third-order Taylor expansion of
+    Helmholtz free energy in :math:`f` and evaluating the appropriate volume and
+    strain derivatives (e.g., :cite:`Poirier1991`).  For an isotropic
+    material one obtains for the pressure, isothermal bulk modulus, and shear
+    modulus:
+
+
+    .. math::
+        P = 3 K_0 f \\left(1+2f\\right)^{5/2} \\left[1+\\frac{3}{2} \\left(K_0^\\prime -4\\right) f\\right],
+
+    .. math::
+        K_{T} = (1+2f)^{5/2} \\biggl[ & K_0+(3K_0{K}^\\prime_{0}-5K_0)f\\\\ &+ \\frac{27}{2}(K_0{K}^\\prime_{0}-4K_0)f^2 \\biggr],
+
+    .. math::
+        G = (1+& 2f)^{5/2}  \\biggl[G_0+(3K_0{G}^\\prime_{0}-5G_0)f\\\\ & +(6K_0{G}^\\prime_{0}-24K_0-14G_{0}
+        + \\frac{9}{2}K_{0}{K}^\\prime_{0})f^2 \\biggr].
+
+    Here :math:`K_0` and :math:`G_0` are the reference bulk modulus and shear
+    modulus and :math:`K_0^\\prime` and :math:`{G}^\\prime_{0}` are the derivative
+    of the respective moduli with respect to pressure.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy
+          - J/mol
+        * - ``P_0``
+          - Reference pressure
+          - Pa
+        * - ``V_0``
+          - Reference volume
+          - :math:`\\textrm{m}^3`
+        * - ``K_0``
+          - Reference isothermal bulk modulus
+          - Pa
+        * - ``Kprime_0``
+          - Pressure derivative of the isothermal bulk modulus at the reference state
+          - Dimensionless
+        * - ``G_0``
+          - Reference shear modulus
+          - Pa
+        * - ``Gprime_0``
+          - Pressure derivative of the shear modulus at the reference state
+          - Dimensionless
+
     """
 
     def __init__(self):
@@ -371,8 +453,62 @@ class BM3(BirchMurnaghanBase):
 
 class BM3Shear2(BirchMurnaghanBase):
     """
-    Third order Birch Murnaghan isothermal equation of state.
-    This uses the second order expansion for shear modulus.
+    The third order Birch-Murnaghan isothermal equation of state with second order
+    expansion for the shear modulus. Do not use this unless you have a good reason to.
+
+    The negative finite-strain (or compression) is defined as
+
+    .. math::
+        f=\\frac{1}{2} \\left[ \\left(\\frac{V}{V_0} \\right)^{-2/3}-1 \\right]
+
+    where :math:`V` is the volume at a given pressure and :math:`V_0` is the
+    volume at a reference state (:math:`P = 10^5` Pa , :math:`T` = 300 K).
+
+    For an isotropic material one obtains for the pressure, isothermal bulk modulus, and shear
+    modulus:
+
+    .. math::
+        P=3 K_0 f \\left(1+2f\\right)^{5/2} \\left[1+\\frac{3}{2} \\left(K_0^\\prime -4\\right) f\\right],
+
+    .. math::
+        K_{T}=(1+2f)^{5/2} \\biggl[ & K_0+(3K_0{K}^\\prime_{0}-5K_0)f\\\\ &+\\frac{27}{2}(K_0{K}^\\prime_{0}-4K_0)f^2 \\biggr],
+
+    .. math::
+        G = (1 + 2f)^{5/2}  \\biggl[ G_0+(3K_0{G}^\\prime_{0}-5G_0)f \\biggr].
+
+    Here :math:`K_0` and :math:`G_0` are the reference bulk modulus and shear
+    modulus and :math:`K_0^\\prime` and :math:`{G}^\\prime_{0}` are the derivative
+    of the respective moduli with respect to pressure.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy
+          - J/mol
+        * - ``P_0``
+          - Reference pressure
+          - Pa
+        * - ``V_0``
+          - Reference volume
+          - :math:`\\textrm{m}^3`
+        * - ``K_0``
+          - Reference isothermal bulk modulus
+          - Pa
+        * - ``Kprime_0``
+          - Pressure derivative of the isothermal bulk modulus at the reference state
+          - Dimensionless
+        * - ``G_0``
+          - Reference shear modulus
+          - Pa
+        * - ``Gprime_0``
+          - Pressure derivative of the shear modulus at the reference state
+          - Dimensionless
+
     """
 
     def __init__(self):
@@ -383,6 +519,36 @@ class BM4(BirchMurnaghanBase):
     """
     Base class for the isothermal Birch Murnaghan equation of state.
     This is fourth order in strain, and has no temperature dependence.
+
+    Note that unlike the third order Birch-Murnaghan equation of state,
+    the shear modulus is not defined for this equation of state.
+
+    .. list-table::
+        :widths: 25 75 20
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+          - Units
+        * - ``F_0``
+          - Reference Helmholtz free energy
+          - J/mol
+        * - ``P_0``
+          - Reference pressure
+          - Pa
+        * - ``V_0``
+          - Reference volume
+          - :math:`\\textrm{m}^3`
+        * - ``K_0``
+          - Reference isothermal bulk modulus
+          - Pa
+        * - ``Kprime_0``
+          - Pressure derivative of the isothermal bulk modulus at the reference state
+          - Dimensionless
+        * - ``Kprime_prime_0``
+          - Second pressure derivative of the isothermal bulk modulus at the reference state
+          - Dimensionless
+
     """
 
     def volume(self, pressure, temperature, params):

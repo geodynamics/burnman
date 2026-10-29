@@ -101,7 +101,7 @@ def get_parameters(assemblage, n_free_compositional_vectors=0):
     :rtype: numpy.array
     """
     params = np.zeros(assemblage.n_endmembers + 2 + n_free_compositional_vectors)
-    n_moles_phase = assemblage.n_moles * np.array(assemblage.molar_fractions)
+    n_moles_phase = assemblage.number_of_moles * np.array(assemblage.molar_fractions)
 
     try:
         params[:2] = [
@@ -133,7 +133,7 @@ def get_endmember_amounts(assemblage):
     :returns: The current amounts of all the endmembers.
     :rtype: numpy.array
     """
-    phase_amounts = assemblage.n_moles * assemblage.molar_fractions
+    phase_amounts = assemblage.number_of_moles * assemblage.molar_fractions
     amounts = np.empty(assemblage.n_endmembers)
     j = 0
     for i, ph in enumerate(assemblage.phases):
@@ -159,8 +159,6 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
     :param parameters: The current parameter values.
     :type parameters: numpy.array
     """
-
-    assemblage.set_state(parameters[0] * P_scaling, parameters[1] * T_scaling)
     i = 2
     phase_amounts = np.zeros(len(assemblage.phases))
     for phase_idx, ph in enumerate(assemblage.phases):
@@ -177,8 +175,17 @@ def set_compositions_and_state_from_parameters(assemblage, parameters):
 
     assert np.all(phase_amounts > -1.0e-8)
     phase_amounts = np.abs(phase_amounts)
-    assemblage.n_moles = sum(phase_amounts)
-    assemblage.set_fractions(phase_amounts / assemblage.n_moles)
+    assemblage.number_of_moles = sum(phase_amounts)
+    assemblage.set_fractions(phase_amounts / assemblage.number_of_moles)
+
+    # We set_state last because setting the state may depend on the
+    # current composition of the assemblage. This would occur, for example,
+    # in the case of relaxed composites, where the relaxed state depends
+    # on the current bulk composition.
+    # Note that in the case of relaxed composites, the equilibrate function
+    # actually equilibrates the unrelaxed assemblage, and then copies the
+    # state to the relaxed assemblage afterwards.
+    assemblage.set_state(parameters[0] * P_scaling, parameters[1] * T_scaling)
     return None
 
 
@@ -223,11 +230,12 @@ def F(
     The vector-valued function for which the root is sought.
     The first two vector values depend on the
     equality_constraints chosen. For example, if
-      - eq[i][0] = 'P', F[i] = P - eq[i][1]
-      - eq[i][0] = 'T', F[i] = T - eq[i][1]
-      - eq[i][0] = 'S', F[i] = entropy - eq[i][1]
-      - eq[i][0] = 'V', F[i] = volume - eq[i][1]
-      - eq[i][0] = 'X', np.dot(eq[i][1][0], x) - eq[i][1][1]
+
+    - eq[i][0] = 'P', F[i] = P - eq[i][1]
+    - eq[i][0] = 'T', F[i] = T - eq[i][1]
+    - eq[i][0] = 'S', F[i] = entropy - eq[i][1]
+    - eq[i][0] = 'V', F[i] = volume - eq[i][1]
+    - eq[i][0] = 'X', np.dot(eq[i][1][0], x) - eq[i][1][1]
 
     The next set of vector values correspond to the reaction affinities.
     The final set of vector values correspond to the bulk
@@ -268,9 +276,9 @@ def F(
         elif type_c == "T":
             eqns[i] = (assemblage.temperature - eq_c) / T_scaling
         elif type_c == "S":
-            eqns[i] = (assemblage.molar_entropy * assemblage.n_moles - eq_c) / S_scaling
+            eqns[i] = (assemblage.entropy - eq_c) / S_scaling
         elif type_c == "V":
-            eqns[i] = (assemblage.molar_volume * assemblage.n_moles - eq_c) / V_scaling
+            eqns[i] = (assemblage.volume - eq_c) / V_scaling
         elif type_c == "X":
             eqns[i] = (np.dot(eq_c[0], x) - eq_c[1]) / X_scaling  # i.e. Ax = b
         else:
@@ -340,21 +348,15 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
         elif type_c == "S":  # dS/dx
             # dS/dP = -aV, dS/dT = Cp/T
             jacobian[ic, 0:2] = [
-                -assemblage.n_moles
-                * assemblage.alpha
-                * assemblage.molar_volume
-                / S_scaling,
-                assemblage.n_moles
-                * assemblage.molar_heat_capacity_p
-                / assemblage.temperature
-                / S_scaling,
+                -assemblage.alpha * assemblage.volume / S_scaling,
+                assemblage.heat_capacity_p / assemblage.temperature / S_scaling,
             ]
             j = 2
             for k, n in enumerate(assemblage.endmembers_per_phase):
                 jacobian[ic, j] = assemblage.phases[k].molar_entropy / S_scaling
                 if n > 1:  # for solutions with >1 endmember
                     jacobian[ic, j + 1 : j + n] = (
-                        assemblage.n_moles
+                        assemblage.number_of_moles
                         * assemblage.molar_fractions[k]
                         * (
                             assemblage.phases[k].partial_entropies[1:]
@@ -366,21 +368,17 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
         elif type_c == "V":  # dV/dx
             # dV/dP = -V/K_T, dV/dT = aV
             jacobian[ic, 0:2] = [
-                -assemblage.n_moles
-                * assemblage.molar_volume
+                -assemblage.volume
                 / assemblage.isothermal_bulk_modulus_reuss
                 / V_scaling,
-                assemblage.n_moles
-                * assemblage.molar_volume
-                * assemblage.alpha
-                / V_scaling,
+                assemblage.volume * assemblage.alpha / V_scaling,
             ]
             j = 2
             for k, n in enumerate(assemblage.endmembers_per_phase):
                 jacobian[ic, j] = assemblage.phases[k].molar_volume / V_scaling
                 if n > 1:  # for solutions with >1 stable endmember
                     jacobian[ic, j + 1 : j + n] = (
-                        assemblage.n_moles
+                        assemblage.number_of_moles
                         * assemblage.molar_fractions[k]
                         * (
                             assemblage.phases[k].partial_volumes[1:]
@@ -422,7 +420,7 @@ def jacobian(x, assemblage, equality_constraints, reduced_free_composition_vecto
 
     # Finally, let's build the compositional Hessian d2G/dfidfj = dmui/dfj
     # where fj is the fraction of endmember j in a phase
-    phase_amounts = np.array(assemblage.molar_fractions) * assemblage.n_moles
+    phase_amounts = np.array(assemblage.molar_fractions) * assemblage.number_of_moles
     comp_hessian = np.zeros((assemblage.n_endmembers, assemblage.n_endmembers))
     dfi_dxj = np.zeros((assemblage.n_endmembers, assemblage.n_endmembers))
     dpi_dxj = np.zeros((assemblage.n_endmembers, assemblage.n_endmembers))
@@ -670,22 +668,24 @@ def get_equilibration_parameters(assemblage, composition, free_compositional_vec
     :type free_compositional_vectors: list of dictionaries
 
     :returns: A tuple with attributes:
+
         - parameter_names: list of strings, the names of the parameters
-          for the current equilibrium problem
+            for the current equilibrium problem
         - default_tolerances: numpy.array, the default tolerances for each parameter
         - n_parameters: int, the number of parameters for the current equilibrium problem
         - phase_amount_indices: list of int, the indices of the parameters that
-          correspond to phase amounts
+            correspond to phase amounts
         - bulk_composition_vector: numpy.array, the bulk composition vector
         - free_compositional_vectors: 2D numpy.array, the free compositional vectors
         - reduced_composition_vector: numpy.array, the bulk composition vector
-          reduced to the independent elements
+            reduced to the independent elements
         - reduced_free_composition_vectors: 2D numpy.array, the free compositional vectors
-          reduced to the independent elements
+            reduced to the independent elements
         - constraint_vector: numpy.array, vector for the linear constraints bounding the
-          valid parameter space (b in Ax + b < eps)
+            valid parameter space (b in Ax + b < eps)
         - constraint_matrix: 2D numpy.array, matrix for the linear constraints bounding the
-          valid parameter space (A in Ax + b < eps)
+            valid parameter space (A in Ax + b < eps)
+
     :rtype: namedtuple
     """
     # Initialize a named tuple for the equilibration parameters
@@ -902,6 +902,7 @@ def equilibrate(
     <constraint type> is one of 'P', 'T', 'S', 'V', 'X',
     'phase_fraction', or 'phase_composition'. The format of the
     <constraint> object depends on the constraint type:
+
         - P: float or numpy.array of
             pressures [Pa]
         - T: float or numpy.array of
@@ -932,7 +933,7 @@ def equilibrate(
     :type composition: dict
 
     :param assemblage: The assemblage to be equilibrated.
-    :type assemblage: :class:`burnman.Composite`
+    :type assemblage: :class:`burnman.Composite` or :class:`burnman.RelaxedComposite`
 
     :param equality_constraints: The list of equality constraints. See above
         for valid formats.
@@ -988,6 +989,11 @@ def equilibrate(
     outer_logger_level = logger.level
     logger.setLevel(logging.INFO if verbose else outer_logger_level)
 
+    relaxed_assemblage = None
+    if hasattr(assemblage, "unrelaxed"):
+        relaxed_assemblage = assemblage
+        assemblage = assemblage.unrelaxed
+
     for ph in assemblage.phases:
         if isinstance(ph, Solution) and not hasattr(ph, "molar_fractions"):
             raise Exception(
@@ -1000,7 +1006,7 @@ def equilibrate(
         assemblage.set_fractions([f for i in range(n_phases)])
 
     n_atoms = sum(composition.values())
-    assemblage.n_moles = n_atoms / sum(assemblage.formula.values())
+    assemblage.number_of_moles = n_atoms / sum(assemblage.formula.values())
 
     n_equality_constraints = len(equality_constraints)
     n_free_compositional_vectors = len(free_compositional_vectors)
@@ -1036,8 +1042,10 @@ def equilibrate(
     # Set up solves
     nc = [len(eq_constraint_list) for eq_constraint_list in eq_constraint_lists]
 
-    # Find the initial state (could be none here)
-    initial_state = [assemblage.pressure, assemblage.temperature]
+    try:
+        initial_state = [assemblage.pressure, assemblage.temperature]
+    except AttributeError:
+        initial_state = [None, None]
 
     # Reset initial state if equality constraints
     # are related to pressure or temperature
@@ -1163,7 +1171,11 @@ def equilibrate(
                 )
             sol = sol3
 
-        if sol.success and len(assemblage.reaction_affinities) > 0.0:
+        if relaxed_assemblage is not None:
+            relaxed_assemblage.copy_state_from_unrelaxed()
+            assemblage = relaxed_assemblage
+
+        if sol.success and len(assemblage.reaction_affinities) > 0:
             maxres = np.max(np.abs(assemblage.reaction_affinities)) + 1.0e-5
             assemblage.equilibrium_tolerance = maxres
 

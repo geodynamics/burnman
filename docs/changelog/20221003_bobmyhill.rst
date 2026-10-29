@@ -1,3 +1,6 @@
+2022-10-03
+^^^^^^^^^^
+
 * BurnMan now has two new helper functions:
   :func:`burnman.tools.chemistry.reactions_from_stoichiometric_matrix` 
   :func:`burnman.tools.chemistry.reactions_from_formulae`.

@@ -21,19 +21,24 @@ def file_to_composition_list(fname, unit_type, normalize):
         The first read-line of the datafile contains a list of tab or
         space-separated components (e.g. FeO or SiO2), followed by the
         word Comment.
+
         Following lines are lists of floats with the amounts of each component.
         After the component amounts, the user can write anything they like
         in the Comment section.
     :type fname: str
+
     :param unit_type: 'mass', 'weight' or 'molar'
         Specify whether the compositions in the file are given as
         mass (weight) or molar amounts.
     :type unit_type: str
+
     :param normalize: If False, absolute numbers of moles/grams of component are stored,
         otherwise the component amounts of returned compositions will
         sum to one (until Composition.renormalize() is used).
-    :type normalize : bool
+    :type normalize: bool
 
+    :returns: A list of Composition objects and a list of comments.
+    :rtype: list of Composition, list of list of str
     """
     lines = list(
         filter(
@@ -54,33 +59,61 @@ def file_to_composition_list(fname, unit_type, normalize):
 
 class Composition(object):
     """
-    Class for a composition object, which can be used
+    The Composition class can be used
     to store, modify and renormalize compositions,
     and also convert between mass, molar
     and atomic amounts. Weight is provided as an alias
     for mass, as we assume that only Earthlings
     will use this software.
 
-    This class is available as ``burnman.Composition``.
+    Composition can parse dictionaries of components, rather than
+    only elements. Components are given as strings (e.g. 'MgSiO3', 'Fe2O3', etc).
+    The Composition class breaks these components down into their
+    elemental constituents internally.
+
+    Example:
+
+    .. code-block:: python
+
+        from burnman.composition import Composition
+
+        comp_dict = {'MgSiO3': 0.5, 'FeSiO3': 0.5}
+        comp = Composition(comp_dict, unit_type='molar', normalize=True)
+        print(comp.atomic_composition)
+
+        # Renormalize to 1 kg of material
+        comp.renormalize(unit_type='mass', normalization_component='total', normalization_amount=1.0)
+        print(comp.mass_composition)
+
+        # Add 0.1 moles of Al2O3 to the composition
+        comp.add_components({'Al2O3': 0.1}, unit_type='molar')
+        print(comp.molar_composition)
+
+        # Change the component set to only oxides
+        comp.change_component_set(['MgO', 'SiO2', 'FeO', 'Al2O3'])
+        print(comp.molar_composition)
+
+        # Remove components with less than 1.e-10 moles
+        comp.remove_null_components(tol=1.e-10)
+        print(comp.molar_composition)
+
+        # Pretty-print the molar composition, normalized to 100 moles total
+        comp.print(unit_type='molar', significant_figures=3, normalization_component='total', normalization_amount=100.0)
+
+    :param composition_dictionary: Dictionary of components
+        (given as a string) and their amounts.
+    :type composition_dictionary: dictionary
+    :param unit_type: 'mass', 'weight' or 'molar' (optional, 'mass' as default)
+        Specify whether the input composition is given as mass or
+        molar amounts.
+    :type unit_type: str
+    :param normalize: If False, absolute numbers of kilograms/moles of component are
+        stored, otherwise the component amounts of returned compositions
+        will sum to one (until Composition.renormalize() is used).
+    :type normalize: bool
     """
 
     def __init__(self, composition_dictionary, unit_type="mass", normalize=False):
-        """
-        Create a composition using a dictionary and unit type.
-
-        :param composition_dictionary: Dictionary of components
-            (given as a string) and their amounts.
-        :type composition_dictionary: dictionary
-        :param unit_type: 'mass', 'weight' or 'molar' (optional, 'mass' as default)
-            Specify whether the input composition is given as mass or
-            molar amounts.
-        :type unit_type: str
-        :param normalize: If False, absolute numbers of kilograms/moles of component are
-            stored, otherwise the component amounts of returned compositions
-            will sum to one (until Composition.renormalize() is used).
-        :type normalize: bool
-        """
-
         self._cached = {}
 
         n_total = float(sum(composition_dictionary.values()))
@@ -374,3 +407,71 @@ class Composition(object):
 
         for key, value in sorted(c.items()):
             print(f"{key}: {value*f:0.{significant_figures}f}")
+
+    def __add__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only add another Composition object to this Composition."
+            )
+
+        new_mass_composition = self.mass_composition + other.mass_composition
+        return Composition(new_mass_composition, "mass")
+
+    def __sub__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only subtract another Composition object from this Composition."
+            )
+
+        new_mass_composition = self.mass_composition.copy()
+        for key, value in other.mass_composition.items():
+            new_mass_composition[key] = new_mass_composition.get(key, 0) - value
+        return Composition(new_mass_composition, "mass")
+
+    __radd__ = __add__
+    __rsub__ = __sub__
+
+    def __iadd__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only add another Composition object to this Composition."
+            )
+
+        self.add_components(other.mass_composition, unit_type="mass")
+        return self
+
+    def __isub__(self, other):
+        if not isinstance(other, Composition):
+            raise TypeError(
+                "Can only subtract another Composition object from this Composition."
+            )
+
+        self = self - other
+        return self
+
+    def __mul__(self, scalar):
+        if not isinstance(scalar, (int, float)):
+            raise TypeError("Can only multiply a Composition object by a scalar.")
+
+        new_mass_composition = OrderedCounter(
+            {k: v * scalar for k, v in self.mass_composition.items()}
+        )
+        return Composition(new_mass_composition, "mass")
+
+    def __truediv__(self, scalar):
+        if not isinstance(scalar, (int, float)):
+            raise TypeError("Can only divide a Composition object by a scalar.")
+
+        new_mass_composition = OrderedCounter(
+            {k: v / scalar for k, v in self.mass_composition.items()}
+        )
+        return Composition(new_mass_composition, "mass")
+
+    def __repr__(self):
+        string = "Composition (mass):\n"
+        for key, value in self.mass_composition.items():
+            string += f"  {key}: {value}\n"
+        return string
+
+    def __str__(self):
+        return self.__repr__()

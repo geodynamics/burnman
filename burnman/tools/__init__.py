@@ -14,6 +14,7 @@ It does not contain any functions that are required by the core
 BurnMan modules.
 """
 
+__lazy_modules__ = ["burnman.tools"]
 
 from . import chemistry
 from . import eos
@@ -22,6 +23,7 @@ from . import output_seismo
 from . import partitioning
 from . import plot
 from . import polytope
+from . import seismic
 from . import solution
 from . import thermobarometry
 from . import unitcell

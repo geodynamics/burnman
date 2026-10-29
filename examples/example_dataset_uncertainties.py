@@ -21,16 +21,15 @@ Holland and Powell dataset.
 * calculating thermoelastic properties with self-consistent pressures
 * seismic comparison
 """
+
 # Here we import standard python modules that are required for
 # usage of BurnMan.
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # Here we import the relevant modules from BurnMan.
 from burnman.minerals import HP_2011_ds62
 from burnman.optimize.nonlinear_fitting import plot_cov_ellipse  # for plotting
-
 
 plt.style.use("ggplot")
 

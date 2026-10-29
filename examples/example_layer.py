@@ -31,6 +31,7 @@ Layers can also be used to build an entire planet (see example_build_planet.py)
 * calculating thermoelastic properties with self-consistent pressures
 * seismic comparison
 """
+
 # Here we import standard python modules that are required for
 # usage of BurnMan.
 import numpy as np
@@ -40,7 +41,6 @@ import matplotlib.pyplot as plt
 import burnman
 from burnman import minerals
 import warnings
-
 
 if __name__ == "__main__":
     # This is the first actual work done in this example.  We define
@@ -80,7 +80,8 @@ if __name__ == "__main__":
     # Alternatively, we choose a user-defined temperature, given by the
     # Brown & Shankland geotherm
     # lower_mantle.set_temperature_mode(temperature_mode ='user_defined',
-    # temperatures =burnman.geotherm.brown_shankland(depths))
+    # geotherm = burnman.geotherm.BrownShankland()
+    # temperatures = geotherm.temperatures(depths)
 
     # And we set a self-consistent pressure. The pressure at the top of the
     # layer and gravity at the bottom of the layer are given by the PREM.

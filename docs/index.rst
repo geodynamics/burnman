@@ -76,9 +76,24 @@ Acknowledgement and Support
   :maxdepth: 4
 
   introduction
-  background
   tutorial
-  cider_tutorial
+  materials
+  anisotropic_materials
+  relaxed_materials
+  averaging_schemes
+  mineral_datasets
+  calibrants
+  seismic_models
+  geotherms
+  compositions
+  layers_and_planets
+  material_polytopes
+  fitting
+  equilibration
+  thermobarometry
+  tools
+  utils
   examples
   api
   zreferences
+  

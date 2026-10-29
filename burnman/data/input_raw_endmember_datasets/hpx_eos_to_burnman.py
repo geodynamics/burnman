@@ -5,25 +5,28 @@
 
 
 # This is a script that converts a HPx-eos data format into the standard burnman
-# format (printed to stdout). For example, the dataset file
+# format (written to burnman/minerals/). For example, the dataset file
 # tc-thermoinput-igneous-2022-01-23/tc-ig50NCKFMASHTOCr.txt
-# can be processed  via the commands
-# python hpx_eos_to_burnman.py > ../../minerals/ig50NCKFMASHTOCr.py; black ../../minerals/ig50NCKFMASHTOCr.py
+# can be processed via the command
+# python hpx_eos_to_burnman.py
 # the text "from . import ig50NCKFMASHTOCr must then be added to the minerals __init__.py
 
 import numpy as np
 import logging
 import sys
-from sympy import Symbol, prod, sympify
+from sympy import Symbol, prod, sympify, cancel, linsolve, Poly
 from sympy.parsing.sympy_parser import parse_expr
 from burnman.constants import gas_constant
 from datetime import date
 import importlib
+import keyword
 import re
 import subprocess
 from pathlib import Path
 
 ds = [
+    ["tc-thermoinput-igW24-2025-06-28/tc-ig51W24.txt", "HPx_ds636"],
+    ["tc-thermoinput-igG25-H18corr-2024-12-21/tc-ig51G25.txt", "HPx_ds636"],
     ["tc-thermoinput-igneous-2022-01-23/tc-ig50NCKFMASHTOCr.txt", "HGP_2018_ds633"],
     ["tc-thermoinput-igneous-2022-01-23/tc-ig50NCKFMASTOCr.txt", "HGP_2018_ds633"],
     ["tc-thermoinput-metabasite-2022-01-30/tc-mb50NCKFMASHTO.txt", "HP_2011_ds62"],
@@ -32,7 +35,33 @@ ds = [
     ["tc-thermoinput-metapelite-2022-01-23/tc-mp50NCKFMASHTO.txt", "HP_2011_ds62"],
 ]
 
-ignore_solutions = ["liq", "L", "fl"]  # currently unreadable Temkin models
+
+def dataset_name(path):
+    return Path(path).stem.removeprefix("tc-")
+
+
+# The original H18 melt model was withdrawn following an algebraic error.
+# Its corrected G25 replacement uses dataset 6.36, rather than 6.33.
+# https://hpxeosandthermocalc.org/the-hpx-eos/the-hpx-eos-families/hpx-eos-igneous-sets/
+unsupported_solutions = {
+    "ig50NCKFMASHTOCr": {"liq"},
+    "ig50NCKFMASTOCr": {"liq"},
+}
+
+dataset_sources = {
+    "ig51W24": (
+        "Weller et al. (2024), doi:10.1093/petrology/egae098.\n"
+        "Source: tc-ig51W24.txt, W24 release of 2025-06-28.\n"
+        "https://hpxeosandthermocalc.org/wp-content/uploads/2025/06/"
+        "tc-thermoinput-igw24-2025-06-28.zip\n"
+    ),
+    "ig51G25": (
+        "Green et al. (2025), doi:10.1093/petrology/egae079.\n"
+        "Source: tc-ig51G25.txt, G25 release uploaded 2025-05-07.\n"
+        "https://hpxeosandthermocalc.org/wp-content/uploads/2025/05/"
+        "tc-thermoinput-igg25-h18corr-2024-12-21.zip\n"
+    ),
+}
 
 # logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 logging.basicConfig(stream=sys.stderr, level=logging.ERROR)
@@ -53,7 +82,7 @@ def reverse_polish(lines):
     sympy_syms = {u: Symbol(u) for u in unique_syms}
 
     # get expressions
-    expr = 0.0
+    expr = sympify(0)
     for line in lines:
         n_terms = int(line[0])
         i = 2
@@ -142,12 +171,144 @@ def replace_numbers(match):
     return "".join(digit_map[d] for d in num_str)
 
 
-for solution_file, mbr_dataset in ds:
+def temkin_site_formulae(mbr_proportions, site_expressions, endmember_rows):
+    """Recover variable site multiplicities from the ideal activity expressions.
+
+    Each activity factor is a ratio of linear combinations of endmember
+    amounts. Factors with proportional denominators occupy the same site.
+    Their activity exponents give the species counts on that site, and their
+    sum gives its multiplicity, which can differ between endmembers.
+    """
+    proportions = []
+    for lines in mbr_proportions:
+        expression = [line[:] for line in lines]
+        expression[0] = expression[0][2:]
+        proportions.append(reverse_polish(expression))
+
+    variables = sorted(set().union(*(p.free_symbols for p in proportions)), key=str)
+    coefficients = [Symbol(f"_coefficient_{i}") for i in range(len(proportions))]
+    linear_combination = sum(c * p for c, p in zip(coefficients, proportions))
+    exponents = {species: [] for species in site_expressions}
+    for row in endmember_rows:
+        powers = {
+            row[3 + 2 * i]: parse_expr(row[4 + 2 * i]) for i in range(int(row[2]))
+        }
+        for species in exponents:
+            exponents[species].append(powers.get(species, sympify(0)))
+
+    # Modern THERMOCALC files give species amounts and explicit denominator
+    # factors (e.g. mgM**4 / sumM**4). Turn those pairs into site fractions.
+    # Start with the largest powers to distinguish microscopic counts from
+    # molecular proportions, which may share the same expression.
+    expressions = dict(site_expressions)
+    denominators = [s for s, counts in exponents.items() if any(c < 0 for c in counts)]
+    denominators.sort(key=lambda s: min(exponents[s]))
+    paired_species = set()
+    for denominator in denominators:
+        remaining = [-c for c in exponents[denominator]]
+        if any(c < 0 for c in remaining):
+            raise ValueError(f"Mixed signs in activity factor '{denominator}'")
+        for species, counts in exponents.items():
+            if species in denominators or species in paired_species or not any(counts):
+                continue
+            if all(c == 0 or c == r for c, r in zip(counts, remaining)):
+                expressions[species] = cancel(
+                    expressions[species] / site_expressions[denominator]
+                )
+                remaining = [r - c for r, c in zip(remaining, counts)]
+                paired_species.add(species)
+        if any(remaining):
+            raise ValueError(f"Cannot pair the activity denominator '{denominator}'")
+
+    sites = {}
+    for species, expression in expressions.items():
+        counts = exponents[species]
+        if species in denominators:
+            continue
+        if not any(counts):
+            continue
+        if any(count < 0 for count in counts):
+            raise ValueError(f"Negative activity exponent for '{species}'")
+        numerator = sum(c * p for c, p in zip(counts, proportions))
+        denominator = cancel(numerator / expression)
+        equations = Poly(linear_combination - denominator, *variables).coeffs()
+        solutions = list(linsolve(equations, coefficients))
+        if len(solutions) != 1 or any(c.free_symbols for c in solutions[0]):
+            raise ValueError(f"Cannot recover the mixing site for '{species}'")
+        denominator_counts = solutions[0]
+        if any(c < 0 for c in denominator_counts):
+            raise ValueError(f"Negative site multiplicity for '{species}'")
+        scale = next(c for c in denominator_counts if c != 0)
+        site = tuple(c / scale for c in denominator_counts)
+        sites.setdefault(site, []).append((species, counts))
+
+    formulae = ["" for _ in proportions]
+    for denominator_counts, species in sites.items():
+        multiplicities = [
+            sum(counts[i] for _, counts in species) for i in range(len(proportions))
+        ]
+        scale = next(
+            m / d for m, d in zip(multiplicities, denominator_counts) if d != 0
+        )
+        if any(m != scale * d for m, d in zip(multiplicities, denominator_counts)):
+            raise ValueError("Activity factors have incompatible site multiplicities")
+        for i, multiplicity in enumerate(multiplicities):
+            if multiplicity == 0:
+                formulae[i] += "[]0"
+                continue
+            occupancies = []
+            for label, counts in species:
+                if counts[i] == 0:
+                    continue
+                label = re.sub(r"\d+", replace_numbers, label)
+                label = "".join(filter(str.isalpha, label)).title()
+                fraction = counts[i] / multiplicity
+                occupancies.append(label + (str(fraction) if fraction != 1 else ""))
+            formulae[i] += "[" + "".join(occupancies) + "]"
+            if multiplicity != 1:
+                formulae[i] += str(multiplicity)
+    return formulae
+
+
+class UniqueNames:
+    """Allocate module identifiers without overwriting imports or other objects."""
+
+    def __init__(self, reserved_names, source_names):
+        self.used_names = set(reserved_names) | set(keyword.kwlist)
+        self.source_names = set(source_names)
+
+    def allocate(self, name, context):
+        identifier = name
+        if identifier in self.used_names:
+            stem = f"{name}_{context}"
+            identifier = stem
+            suffix = 2
+            while identifier in self.used_names or identifier in self.source_names:
+                identifier = f"{stem}_{suffix}"
+                suffix += 1
+        self.used_names.add(identifier)
+        return identifier
+
+
+def convert_dataset(solution_file, mbr_dataset):
+    """Return the Python source for one HPx-eos solution dataset."""
     logging.debug(f"{solution_file}, {mbr_dataset}")
 
     dataset = importlib.import_module(f"burnman.minerals.{mbr_dataset}")
+    extra_datasets = set()
+
+    def endmember_reference(label):
+        if label == "H2O" and not hasattr(dataset, label):
+            extra_datasets.add("HP_2011_fluids")
+            return "HP_2011_fluids.H2O()"
+        if label == "and":
+            label = "andalusite"
+        return f"{mbr_dataset}.{label}()"
+
     out_ss = ""
     out_make = ""
+    solution_dataset = dataset_name(solution_file)
+    excluded = unsupported_solutions.get(solution_dataset, set())
 
     i = 0
     data = []
@@ -156,7 +317,7 @@ for solution_file, mbr_dataset in ds:
         process = True
         for line in file:
             # Process the line (for example, print it)
-            ln = line.strip().split()
+            ln = line.split("%", 1)[0].strip().split()
             if len(ln) > 0:
                 if ln[0] == "verbatim" or ln[0] == "header":
                     process = not process
@@ -171,14 +332,93 @@ for solution_file, mbr_dataset in ds:
 
         start_indices = []
         for i_d, d in enumerate(data):
-            if len(d) == 3:
-                if d[0] != "check" and d[0] != "%" and d[0] not in ignore_solutions:
-                    if int(d[1]) > 1.1:
-                        start_indices.append(i_d)
+            legacy_header = len(d) == 3 and d[1].isdigit() and d[2] in ("1", "2")
+            modern_header = (
+                len(d) >= 5
+                and d[1].isdigit()
+                and d[2] == "2"
+                and re.fullmatch(r"[A-Za-z][\w-]*", d[3]) is not None
+                and re.fullmatch(r"\w+", d[0]) is not None
+            )
+            if (
+                (legacy_header or modern_header)
+                and int(d[1]) > 1
+                and d[0] not in excluded
+            ):
+                start_indices.append(i_d)
 
-    n_data = len(data)
+    identifiers = UniqueNames(
+        [
+            "np",
+            "array",
+            "nan",
+            mbr_dataset,
+            "HP_2011_fluids",
+            "Mineral",
+            "Solution",
+            "SymmetricRegularSolution",
+            "AsymmetricRegularSolution",
+            "CombinedMineral",
+        ],
+        [line[0] for line in data],
+    )
+    # Allocate classes first so that endmembers cannot shadow solution names.
+    solution_identifiers = {
+        ind: identifiers.allocate(data[ind][0], "solution") for ind in start_indices
+    }
+    noods = {}
+    combined_endmembers = {}
 
-    noods = []
+    def resolve_endmember(rows, context):
+        nonlocal out_make
+        label = rows[0][0]
+        commands = [row[0] for row in rows[1:]]
+        if not any(c == "make" or c == "DQF" or "delG" in c for c in commands):
+            return endmember_reference(label)
+        if "make" in commands:
+            make = next(row[1:] for row in rows if row[0] == "make")
+        else:
+            make = ["1", label, "1"]
+        corrections = [
+            np.array(row[1:4], dtype=float)
+            for row in rows
+            if "delG" in row[0] or row[0] == "DQF"
+        ]
+        delG = np.sum(corrections, axis=0) if corrections else np.zeros(3)
+        delG *= [1.0e3, -1.0e3, 1.0e-5]
+        combined_mbrs, combined_amounts = [], []
+        el = 1
+        for _ in range(int(make[0])):
+            if make[el] in ("ordered", "disordered"):
+                ordered = make[el] == "ordered"
+                el += 1
+                m_string = make[el]
+                amount = float(parse_expr(make[el + 1]))
+                mineral = getattr(dataset, m_string)()
+                delG += (
+                    ordering_modifier(mineral.property_modifiers[0], ordered) * amount
+                )
+                if m_string not in noods:
+                    noods[m_string] = identifiers.allocate(
+                        f"{m_string}_nood", "endmember"
+                    )
+                combined_mbrs.append(noods[m_string])
+            else:
+                if make[el] == "equilibrium":
+                    el += 1
+                combined_mbrs.append(endmember_reference(make[el]))
+            combined_amounts.append(float(parse_expr(make[el + 1])))
+            el += 2
+        # Labels are local to each solution. Reuse identical definitions,
+        # including reordered recipes, without overwriting distinct objects.
+        recipe = tuple(sorted(zip(combined_mbrs, combined_amounts)))
+        definition = (label, recipe, tuple(delG))
+        if definition not in combined_endmembers:
+            identifier = identifiers.allocate(label, context)
+            combined_endmembers[definition] = identifier
+            out_make += f'{identifier} = CombinedMineral([{", ".join(combined_mbrs)}], {combined_amounts}, {list(delG)}, "{label}")\n'
+        return combined_endmembers[definition]
+
     names = []
     for ind in start_indices:
         i = ind
@@ -201,6 +441,9 @@ for solution_file, mbr_dataset in ds:
             i += n_lines
         logging.debug(mbr_proportions)
 
+        if len(set(mbr_names)) != len(mbr_names):
+            raise ValueError(f"Duplicate endmember names in solution '{name}'")
+
         formulation = data[i][0]
         logging.debug(f"formulation: {formulation}")
         i += 1
@@ -219,7 +462,7 @@ for solution_file, mbr_dataset in ds:
             m0 = mbr_names.index(m[0])
             m1 = mbr_names.index(m[1])
             We[m0][m1 - m0 - 1] = float(ints[1]) * 1.0e3
-            Ws[m0][m1 - m0 - 1] = -float(ints[2])
+            Ws[m0][m1 - m0 - 1] = -float(ints[2]) * 1.0e3
             Wv[m0][m1 - m0 - 1] = float(ints[3]) * 1.0e-5
 
             if np.abs(Ws[m0][m1 - m0 - 1]) > 1.0e-10:
@@ -260,11 +503,13 @@ for solution_file, mbr_dataset in ds:
 
         summed = 0.0
         sites = [[]]
+        site_expressions = {}
         for site_species_and_expression in site_fractions:
             site_species = site_species_and_expression[0][0]
-            expression = site_species_and_expression
+            expression = [line[:] for line in site_species_and_expression]
             expression[0] = expression[0][2:]
             expression = reverse_polish(expression)
+            site_expressions[site_species] = expression
             summed += expression
             summed = sympify(summed)
             sites[-1].append(site_species)
@@ -281,7 +526,7 @@ for solution_file, mbr_dataset in ds:
         endmember_site_fractions_and_checks = []
         for j in range(n_mbrs):
             n_lines = 1
-            while True:
+            while i + n_lines < len(data):
                 if (
                     data[i + n_lines][0] == "make"
                     or data[i + n_lines][0] == "delG(tran)"
@@ -298,55 +543,24 @@ for solution_file, mbr_dataset in ds:
             endmember_site_fractions_and_checks.append(data[i : i + n_lines])
             i += n_lines
 
+        temkin_formulae = None
+        if any(
+            f[0][3 + 2 * j] not in site_species or parse_expr(f[0][4 + 2 * j]) < 0
+            for f in endmember_site_fractions_and_checks
+            for j in range(int(f[0][2]))
+        ):
+            temkin_formulae = temkin_site_formulae(
+                mbr_proportions,
+                site_expressions,
+                [f[0] for f in endmember_site_fractions_and_checks],
+            )
+
         mbr_initializations = []
-        for f in endmember_site_fractions_and_checks:
-            mbr = f[0][0]
-            if len(f) == 1:
-                mbr = f"{mbr_dataset}.{mbr}()"
-            elif len(f) == 2:
-                mbr = f"{mbr_dataset}.{mbr}()"
-                assert f[1][0] == "check"
-            else:
-                make_idx = [g[0] for g in f].index("make")
-                make = f[make_idx][1:]
-                delG = [np.array(g[1:4], dtype=float) for g in f if "delG" in g[0]]
-                delG = np.array([0.0, 0.0, 0.0]) if len(delG) == 0 else delG[0]
-                delG *= [1.0e3, -1.0e3, 1.0e-5]
-                n_make = int(make[0])
-                el = 1
-                combined_mbrs = "["
-                combined_amounts = "["
-                for j in range(n_make):
-                    if make[el] == "ordered":
-                        el += 1
-                        m_string = make[el]
-                        m_amount = float(parse_expr(make[el + 1]))
-                        mineral = getattr(dataset, m_string)()
-                        property_modifier = mineral.property_modifiers[0]
-                        delG += ordering_modifier(property_modifier, True) * m_amount
-                        combined_mbrs += f"{make[el]}_nood, "
-                        noods.append(make[el])
-                    elif make[el] == "disordered":
-                        el += 1
-                        m_string = make[el]
-                        m_amount = float(parse_expr(make[el + 1]))
-                        mineral = getattr(dataset, m_string)()
-                        property_modifier = mineral.property_modifiers[0]
-                        delG += ordering_modifier(property_modifier, False) * m_amount
-                        combined_mbrs += f"{make[el]}_nood, "
-                        noods.append(make[el])
-                    elif make[el] == "equilibrium":
-                        el += 1
-                        combined_mbrs += f"{mbr_dataset}.{make[el]}(), "
-                    else:
-                        combined_mbrs += f"{mbr_dataset}.{make[el]}(), "
-                    combined_amounts += f"{float(parse_expr(make[el+1]))}, "
-                    el += 2
-                combined_mbrs = combined_mbrs[:-2]
-                combined_amounts = combined_amounts[:-2]
-                combined_mbrs += "]"
-                combined_amounts += "]"
-                out_make += f'{mbr} = CombinedMineral({combined_mbrs}, {combined_amounts}, {list(delG)}, "{mbr}")\n'
+        for i_mbr, f in enumerate(endmember_site_fractions_and_checks):
+            mbr = resolve_endmember(f, name)
+            if temkin_formulae is not None:
+                mbr_initializations.append(f'[{mbr}, "{temkin_formulae[i_mbr]}"]')
+                continue
             n_occs = int(f[0][2])
             site_occ = [[] for ln in range(n_sites)]
             site_occ_list = f[0][3:]
@@ -397,7 +611,7 @@ for solution_file, mbr_dataset in ds:
             doc += "\n        This is implemented as a symmetric solution.\n"
         doc += '        """\n'
 
-        out_ss += f"class {name}(Solution):\n"
+        out_ss += f"class {solution_identifiers[ind]}(Solution):\n"
         out_ss += "    def __init__(self, molar_fractions=None):\n"
         out_ss += doc
         out_ss += f'        self.name = "{name}"\n'
@@ -424,15 +638,23 @@ for solution_file, mbr_dataset in ds:
         logging.debug(endmember_site_fractions_and_checks)
         logging.debug("")
 
+    buffers = []
+    for i, row in enumerate(data):
+        if len(row) >= 3 and row[1:3] == ["1", "buffer"]:
+            rows = [row]
+            for command in data[i + 1 :]:
+                if command[0] not in ("make", "DQF") and "delG" not in command[0]:
+                    break
+                rows.append(command)
+            buffers.append(resolve_endmember(rows, "buffer"))
+
     out_noods = ""
-    noods = np.unique(sorted(noods))
-    for nood in noods:
+    for nood in sorted(noods):
         mineral = getattr(dataset, nood)()
         params = mineral.params
-        out_noods += f"{nood}_nood = Mineral({params})\n\n"
+        out_noods += f"{noods[nood]} = Mineral({params})\n\n"
 
     # Preamble
-    solution_dataset = solution_file.split("-")[-1].split(".")[0]
     underline = "^" * len(solution_dataset)
     preamble = (
         "# This file is part of BurnMan - a thermoelastic\n"
@@ -451,6 +673,20 @@ for solution_file, mbr_dataset in ds:
     for name in names:
         preamble += f"* {name}\n"
 
+    if buffers:
+        preamble += "\nOxygen buffers: " + ", ".join(buffers) + ".\n"
+
+    if solution_dataset in dataset_sources:
+        preamble += "\n" + dataset_sources[solution_dataset]
+
+    if excluded:
+        preamble += (
+            "\nThe original H18 liq model is omitted because its authors withdrew it\n"
+            "after discovering an algebraic error. The corrected G25 replacement\n"
+            "requires endmember dataset 6.36. See:\n"
+            "https://hpxeosandthermocalc.org/the-hpx-eos/the-hpx-eos-families/hpx-eos-igneous-sets/\n"
+        )
+
     preamble += (
         "\nThe values in this document are all in S.I. units,\n"
         "unlike those in the original THERMOCALC file.\n\n"
@@ -459,7 +695,8 @@ for solution_file, mbr_dataset in ds:
         f"import numpy as np\n"
         f"from numpy import array, nan\n"
         f"from . import {mbr_dataset}\n"
-        "from ..classes.mineral import Mineral\n"
+        + "".join(f"from . import {d}\n" for d in sorted(extra_datasets))
+        + "from ..classes.mineral import Mineral\n"
         "from ..classes.solution import Solution\n"
         "from ..classes.solutionmodel import SymmetricRegularSolution\n"
         "from ..classes.solutionmodel import AsymmetricRegularSolution\n"
@@ -468,13 +705,24 @@ for solution_file, mbr_dataset in ds:
 
     output_string = f"{preamble}\n{out_noods}\n{out_make}\n{out_ss}"
 
-    output_file = f"../../minerals/{solution_dataset}.py"
+    return output_string
 
-    with open(output_file, "w") as text_file:
+
+def main():
+    source_directory = Path(__file__).resolve().parent
+    output_directory = source_directory.parent.parent / "minerals"
+    output_files = []
+    for solution_file, mbr_dataset in ds:
+        output_string = convert_dataset(source_directory / solution_file, mbr_dataset)
+        solution_dataset = dataset_name(solution_file)
+        output_file = output_directory / f"{solution_dataset}.py"
+        output_file.write_text(output_string)
+        output_files.append(str(output_file))
         print(f"from . import {solution_dataset}")
-        text_file.write(output_string)
 
-print("Copy the above to ../../minerals/__init__.py.\n")
+    print("Copy the above to ../../minerals/__init__.py.\n")
+    subprocess.run([sys.executable, "-m", "black", *output_files], check=True)
 
-directory = Path("../../minerals/")
-subprocess.run(["black", str(directory)])
+
+if __name__ == "__main__":
+    main()

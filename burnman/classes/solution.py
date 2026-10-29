@@ -1,12 +1,11 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2024 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
 import numpy as np
 from sympy import Matrix, nsimplify
-from collections import OrderedDict
 
 from .material import material_property, cached_property
 from .mineral import Mineral
@@ -25,31 +24,52 @@ from scipy.optimize import minimize
 
 class Solution(Mineral):
     """
-    This is the base class for all solutions.
-    Site occupancies, endmember activities and the constant
-    and pressure and temperature dependencies of the excess
-    properties can be queried after using set_composition().
-    States of the solution can only be queried after setting
-    the pressure, temperature and composition using set_state().
+    The Solution class has overall responsibility for calculating
+    thermodynamically self-consistent properties of a solution phase.
 
-    This class is available as :class:`burnman.Solution`.
-    It uses an instance of :class:`burnman.SolutionModel` to
-    calculate interaction terms between endmembers.
+    In this class, solutions are treated as a collection of independent
+    endmember phases (components), plus a model that describes the
+    excess properties of the solution. It stores the current state
+    (pressure, temperature and molar fractions of all the endmembers)
+    of the solution, and interrogates a SolutionModel object to calculate
+    the excess properties of the solution. It then combines these with the
+    properties of the individual endmember phases (also stored in the
+    SolutionModel) to calculate the overall properties of the solution.
+    This is done using standard thermodynamic relations:
 
-    All the solution parameters are expected to be in SI units.  This
-    means that the interaction parameters should be in J/mol, with the T
-    and P derivatives in J/K/mol and m^3/mol.
+    .. math::
+        G = \\sum_i X_i G_i + G^{\\text{excess}} \\\\
+        V = \\sum_i X_i V_i + V^{\\text{excess}} \\\\
+        S = \\sum_i X_i S_i + S^{\\text{excess}} \\\\
+        C_p = \\sum_i X_i C_{p,i} + C_p^{\\text{excess}} \\\\
+        \\alpha V = \\sum_i X_i \\alpha_i V_i + (\\alpha V)^{\\text{excess}} \\\\
+        \\frac{V}{K_T} = \\sum_i X_i \\frac{V_i}{K_{T,i}} + \\left(\\frac{V}{K_T}\\right)^{\\text{excess}}
 
-    The parameters are relevant to all solution models. Please
-    see the documentation for individual models for details about
-    other parameters.
+
+    After instantiation, the user can set the composition of the solution
+    using the set_composition() method, and the pressure and temperature
+    using the set_state() method.
+
+    Instantiation of a Solution object can be achieved in just a few lines:
+
+    .. code-block:: python
+
+        from burnman import Solution, SolutionModel
+
+        # Create a SolutionModel object (explained in the documentation for that class)
+        solution_model = SolutionModel(...)
+
+        # Create a Solution object
+        solution = Solution(name="MySolution", solution_model=solution_model, molar_fractions=...)
+
+    where the arguments are as follows:
 
     :param name: Name of the solution.
     :type name: string
     :param solution_model: The SolutionModel object defining the properties
         of the solution.
     :type solution_model: :class:`burnman.SolutionModel`
-    :param molar_fractions: The molar fractions of each endmember
+    :param molar_fractions: The initial molar fractions of each endmember
         in the solution. Can be reset using the set_composition() method.
     :type molar_fractions: numpy.array
     """
@@ -468,7 +488,9 @@ class Solution(Mineral):
                         for i in range(self.n_endmembers)
                     ]
                 )
-                + self.solution_model.VoverKT_excess()
+                + self.solution_model.VoverKT_excess(
+                    self.pressure, self.temperature, self.molar_fractions
+                )
             )
         )
 
@@ -577,7 +599,9 @@ class Solution(Mineral):
                     for i in range(self.n_endmembers)
                 ]
             )
-            + self.solution_model.alphaV_excess()
+            + self.solution_model.alphaV_excess(
+                self.pressure, self.temperature, self.molar_fractions
+            )
         )
 
     @material_property
@@ -603,15 +627,14 @@ class Solution(Mineral):
         of the solution [J/K/mol].
         Aliased with self.C_p.
         """
-        return (
-            sum(
-                [
-                    self.solution_model.endmembers[i][0].molar_heat_capacity_p
-                    * self.molar_fractions[i]
-                    for i in range(self.n_endmembers)
-                ]
-            )
-            + self.solution_model.Cp_excess()
+        return sum(
+            [
+                self.solution_model.endmembers[i][0].molar_heat_capacity_p
+                * self.molar_fractions[i]
+                for i in range(self.n_endmembers)
+            ]
+        ) + self.solution_model.Cp_excess(
+            self.pressure, self.temperature, self.molar_fractions
         )
 
     @cached_property
@@ -650,7 +673,7 @@ class Solution(Mineral):
         involved in reaction[i].
 
         :returns: An array where each row defines a balanced chemical reaction
-        in terms of molar amounts of endmembers.
+            in terms of molar amounts of endmembers.
         :rtype: numpy.ndarray
         """
         reaction_basis = np.array(
@@ -673,20 +696,20 @@ class Solution(Mineral):
     def compositional_basis(self):
         """
         :returns: A basis for the compositional degrees of freedom,
-        orthogonal to the reaction space.
+            orthogonal to the reaction space.
 
-        Each row of the returned array defines an independent
-        compositional constraint in terms of moles of endmembers.
-        These constraints span the row space of the stoichiometric
-        matrix and are complementary to the reaction basis
-        (which spans the left null space).
+            Each row of the returned array defines an independent
+            compositional constraint in terms of moles of endmembers.
+            These constraints span the row space of the stoichiometric
+            matrix and are complementary to the reaction basis
+            (which spans the left null space).
 
-        For example, endmembers with site-species occupancies
-        [Fe][Mg] and [Mg][Fe] have reaction basis vector [1, -1].
-        A compositional basis vector orthogonal to this is: [1, 1],
-        which satisfies the requirement that the Fe-Mg ratio of the
-        system remains fixed and the total amount of the two sites
-        remains equal.
+            For example, endmembers with site-species occupancies
+            [Fe][Mg] and [Mg][Fe] have reaction basis vector [1, -1].
+            A compositional basis vector orthogonal to this is: [1, 1],
+            which satisfies the requirement that the Fe-Mg ratio of the
+            system remains fixed and the total amount of the two sites
+            remains equal.
         :rtype: numpy.ndarray
         """
 
@@ -737,7 +760,7 @@ class Solution(Mineral):
         endmembers.
 
         :return: A 2D array where each row is a basis vector of the
-        nullspace.
+            nullspace.
         :rtype: numpy.ndarray
         """
         null = self.stoichiometric_matrix.nullspace()
@@ -862,10 +885,13 @@ class RelaxedSolution(Solution):
         :type relaxed: bool, optional
         """
         self.unrelaxed.set_state(pressure, temperature)
+        Solution.set_state(self, pressure, temperature)
 
-        if hasattr(self.unrelaxed, "molar_fractions") and relaxed:
-            self._relax_at_PTX()
-            Solution.set_state(self, pressure, temperature)
+        if relaxed:
+            try:  # relax if composition has already been set
+                self._relax_at_PTX()
+            except AttributeError:
+                pass
 
     def set_composition(self, molar_fractions, q_initial=None, relaxed=True):
         """
@@ -897,10 +923,12 @@ class RelaxedSolution(Solution):
 
         self.unrelaxed.set_composition(n)
 
-        if self.unrelaxed.pressure is not None and relaxed:
-            Solution.set_composition(self, n)
-            self._relax_at_PTX()
-            self.unrelaxed.set_composition(self.molar_fractions)
+        if relaxed:
+            try:  # relax if state has already been set
+                Solution.set_composition(self, n)
+                self._relax_at_PTX()
+            except AttributeError:
+                pass
 
     def _relax_at_PTX(self):
         """
@@ -923,6 +951,7 @@ class RelaxedSolution(Solution):
         n = n0 + np.einsum("ij, j", self.dndq, sol.x)
         self.unrelaxed.set_composition(n)
         Solution.set_composition(self, n)
+        self.unrelaxed.set_composition(self.molar_fractions)
 
     def set_state_with_volume(
         self, volume, temperature, pressure_guesses=[0.0e9, 10.0e9]

@@ -6,11 +6,13 @@ K_0: (2.4 +/- 0.7) x 1e+11
 Kprime_0: (6 +/- 2) x 1e+00
 Weighted sum of squares: 7.56
 Goodness of fit: 0.84
+Number of iterations: 6
 
 Optimized equation of state for stishovite with weak prior; K' = 4(1):
-V_0: (1.400 +/- 0.005) x 1e-05
-K_0: (3.2 +/- 0.2) x 1e+11
-Kprime_0: (3.9 +/- 0.8) x 1e+00
-Weighted sum of squares: 8.66
-Goodness of fit: 0.96
+V_0: (1.404 +/- 0.005) x 1e-05
+K_0: (3.0 +/- 0.2) x 1e+11
+Kprime_0: (4.4 +/- 0.8) x 1e+00
+Weighted sum of squares: 8.39
+Goodness of fit: 0.93
+Number of iterations: 3
 

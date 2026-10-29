@@ -267,18 +267,19 @@ class SeismicTable(Seismic1DModel):
         phi = v_phi * v_phi
         kappa = phi * density
         try:
-            dkappadP = np.gradient(kappa, edge_order=2) / np.gradient(
-                self.pressure(depth), edge_order=2
+            dkappadP = np.gradient(kappa, self.pressure(depth), edge_order=2)
+            dphidz = np.gradient(phi, depth, edge_order=2)
+
+            dphidz_over_g = np.divide(
+                dphidz,
+                self.gravity(depth),
+                out=np.full_like(dphidz, np.nan, dtype=float),
+                where=np.abs(self.gravity(depth)) > 1e-12,
             )
-            dphidz = (
-                np.gradient(phi, edge_order=2)
-                / np.gradient(depth, edge_order=2)
-                / self.gravity(depth)
-            )
-        except:
-            dkappadP = np.gradient(kappa) / np.gradient(self.pressure(depth))
-            dphidz = np.gradient(phi) / np.gradient(depth) / self.gravity(depth)
-        bullen = dkappadP - dphidz
+        except Exception:
+            dkappadP = np.gradient(kappa, self.pressure(depth))
+            dphidz = np.gradient(phi, depth) / self.gravity(depth)
+        bullen = dkappadP - dphidz_over_g
         return bullen
 
     def depth(self, pressure):
@@ -505,40 +506,6 @@ class AK135(SeismicTable):
         self.table_vs = table[:, 4]
         self.table_QG = table[:, 5]
         self.table_QK = table[:, 6]
-
-
-def attenuation_correction(v_p, v_s, v_phi, Qs, Qphi):
-    """
-    Applies the attenuation correction following Matas et al. (2007), page 4.
-    This is simplified, and there is also currently no 1D Q model implemented.
-    The correction, however, only slightly reduces the velocities,
-    and can be ignored for our current applications.
-    Arguably, it might not be as relevant when comparing computations
-    to PREM for periods of 1s as is implemented here.
-    Called from :func:`burnman.main.apply_attenuation_correction`
-
-    :param v_p: P wave velocity in [m/s].
-    :type v_p: float
-    :param v_s: S wave velocitiy in [m/s].
-    :type v_s: float
-    :param v_phi: Bulk sound velocity in [m/s].
-    :type v_phi: float
-    :param Qs: Shear quality factor [dimensionless].
-    :type Qs: float
-    :param Qphi: Bulk quality factor [dimensionless].
-    :type Qphi: float
-
-    :returns: Corrected P wave, S wave and bulk sound velocities in [m/s].
-    :rtype: tuple
-    """
-    beta = 0.3  # Matas et al. (2007) page 4
-    Qp = 3.0 / 4.0 * pow((v_p / v_s), 2.0) * Qs  # Matas et al. (2007) page 4
-
-    cot = 1.0 / np.tan(beta * np.pi / 2.0)
-    v_p *= 1.0 - 1.0 / 2.0 * cot * 1.0 / Qp  # Matas et al. (2007) page 1
-    v_s *= 1.0 - 1.0 / 2.0 * cot * 1.0 / Qs
-    v_phi *= 1.0 - 1.0 / 2.0 * cot * 1.0 / Qphi
-    return v_p, v_s, v_phi
 
 
 """

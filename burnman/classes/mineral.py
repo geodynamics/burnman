@@ -212,7 +212,9 @@ class Mineral(Material):
             self.set_state(
                 self.method.pressure(temperature, volume, self.params), temperature
             )
-        self._cached["_molar_volume_unmodified"] = volume
+        self._cached["_molar_volume_unmodified"] = (
+            volume - self._property_modifiers["dGdP"]
+        )
 
     """
     Properties from equations of state

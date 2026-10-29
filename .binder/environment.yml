@@ -6,8 +6,8 @@ channels:
 
 dependencies:
   # runtime dependencies
-  - python >=3.8,<3.10.0a0
-  - jupyterlab >=3,<4.0.0a0
+  - python >=3.10,<=3.14
+  - jupyterlab >=3,<=4.4.9
   - pip
   - ipympl
   - ipywidgets

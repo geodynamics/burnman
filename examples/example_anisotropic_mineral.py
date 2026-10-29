@@ -20,13 +20,13 @@ object.
 * anisotropic functions
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from burnman import AnisotropicMineral
 from burnman.minerals import SLB_2011
 from burnman.tools.eos import check_anisotropic_eos_consistency
 from burnman.tools.plot import plot_projected_elastic_properties
-
 
 if __name__ == "__main__":
     # Let's create a first approximation to an olivine mineral.

@@ -37,6 +37,7 @@ properties of mineral assemblages, which is important for:
 * :class:`burnman.Composite`
 * :func:`burnman.equilibrate`
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

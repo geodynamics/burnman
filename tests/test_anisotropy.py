@@ -1,12 +1,14 @@
 import unittest
 from util import BurnManTest
 import numpy as np
+from scipy.linalg import logm
 
 from burnman.classes import anisotropy
 from burnman.utils.unitcell import (
     cell_parameters_to_vectors,
     cell_vectors_to_parameters,
 )
+from burnman.utils.anisotropy import polar_decomposition
 
 
 class test_anisotropy(BurnManTest):
@@ -70,6 +72,27 @@ class test_anisotropy(BurnManTest):
         ]
 
         self.assertArraysAlmostEqual(array_1, array_2)
+
+    def test_christoffel_under_hydrostatic_stress(self):
+        """
+        Hydrostatic stress preserves the isotropic acoustic tensor in every direction.
+        """
+        lam, G = 0.4e11, 0.24e11
+        m = anisotropy.IsotropicMaterial(2735.0, [lam, G])
+        directions = np.array(
+            [[[1.0, 0.0, 0.0], [-1.0, 2.0, 3.0]], [[0.0, 2.0, 0.0], [3.0, 0.0, 4.0]]]
+        )
+        n = directions / np.linalg.norm(directions, axis=-1, keepdims=True)
+        expected = G * np.eye(3) + (lam + G) * np.einsum("...i,...k->...ik", n, n)
+
+        actual = m.christoffel_tensor(directions)
+        self.assertEqual(actual.shape, expected.shape)
+        self.assertArraysAlmostEqual(
+            (actual / G).flatten(),
+            (expected / G).flatten(),
+            tol=1.0e-12,
+            tol_zero=1.0e-12,
+        )
 
     def test_crystal_systems(self):
         m = anisotropy.IsotropicMaterial(3000.0, [1.0, 1.0])
@@ -165,6 +188,65 @@ class test_anisotropy(BurnManTest):
             )
             self.assertArraysAlmostEqual(cos_a, cos_a2)
             self.assertArraysAlmostEqual(lengths_orig, lengths)
+
+    def test_cell_parameters_conversions_with_rotation(self):
+        cell_parameters = np.array([1.0, 4.2, 2.2, 80.0, 85.0, 88.0])
+        lengths_orig = cell_parameters[:3]
+        cos_a = np.cos(np.deg2rad(cell_parameters[3:]))
+        for convention in [
+            [0, 1, 2],
+            [0, 2, 1],
+            [1, 0, 2],
+            [1, 2, 0],
+            [2, 1, 0],
+            [2, 0, 1],
+        ]:
+            v = cell_parameters_to_vectors(cell_parameters, convention)
+
+            # make a rotation matrix
+            theta = 0.34
+            c, s = np.cos(theta), np.sin(theta)
+            R = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
+            v = np.dot(v, R)
+            p = cell_vectors_to_parameters(v, convention, rotate=True)
+            self.assertArraysAlmostEqual(cell_parameters, p)
+
+            # check angles
+            lengths = np.linalg.norm(v, axis=1)
+            cos_a2 = np.array(
+                [
+                    np.dot(v[1], v[2]) / lengths[1] / lengths[2],
+                    np.dot(v[0], v[2]) / lengths[0] / lengths[2],
+                    np.dot(v[0], v[1]) / lengths[0] / lengths[1],
+                ]
+            )
+            self.assertArraysAlmostEqual(cos_a, cos_a2)
+            self.assertArraysAlmostEqual(lengths_orig, lengths)
+
+    def test_polar_decomposition(self):
+        F = np.array([[1.0, 0.2, 0.3], [0.0, 1.0, 0.4], [0.0, 0.0, 1.0]])
+        R1, U = polar_decomposition(F)
+        R2, U = polar_decomposition(F, "U")
+        R3, V = polar_decomposition(F, "V")
+        R4, H = polar_decomposition(F, "H")
+
+        # check that R is a proper rotation matrix
+        self.assertArraysAlmostEqual(
+            np.dot(R1.T, R1).flatten(), np.eye(3).flatten(), tol_zero=1e-12
+        )
+
+        # check that the rotation matrices are the same
+        self.assertArraysAlmostEqual(R1.flatten(), R2.flatten(), tol_zero=1e-12)
+        self.assertArraysAlmostEqual(R1.flatten(), R3.flatten(), tol_zero=1e-12)
+        self.assertArraysAlmostEqual(R1.flatten(), R4.flatten(), tol_zero=1e-12)
+
+        # check that F = R * U = V * R
+        self.assertArraysAlmostEqual(
+            np.dot(R1, U).flatten(), np.dot(V, R1).flatten(), tol_zero=1e-12
+        )
+
+        # check that H = logm(U)
+        self.assertArraysAlmostEqual(logm(U).flatten(), H.flatten(), tol_zero=1e-12)
 
 
 if __name__ == "__main__":
