@@ -43,6 +43,7 @@ magnetic_params_2 = {
 }
 thermal_params = {"Theta_0": 1200.0, "Cv_inf": 1.0}
 thermal_delta_params = {"Theta_0": 1200.0, "S_inf": 1.0}
+volume_ww_params = {"dV0": 1.0e-7, "Pc": 1.0e10}
 
 
 fn_params = [
@@ -58,6 +59,7 @@ fn_params = [
     [pm.debye_delta_excesses, "debye_delta", thermal_delta_params],
     [pm.einstein_excesses, "einstein", thermal_params],
     [pm.einstein_delta_excesses, "einstein_delta", thermal_delta_params],
+    [pm.volume_ww_excesses, "volume_ww", volume_ww_params],
 ]
 
 
@@ -130,6 +132,7 @@ class Modifiers(BurnManTest):
             -620.7977,
             -358.3824,
             -517.2153,
+            999.9546,
         ]
         gibbs_excesses_output = []
         for fn, name, params in fn_params:
