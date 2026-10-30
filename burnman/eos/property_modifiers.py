@@ -902,6 +902,54 @@ def einstein_delta_excesses(pressure, temperature, params):
     return (excesses, None)
 
 
+def volume_ww_excesses(pressure, temperature, params):
+    """
+    Exponential (WW) volume-based correction expressed in Gibbs space.
+    The pressure-dependent volume correction follows Wu et al. (2008)
+    [JGR Solid Earth, doi:10.1029/2007JB005275], where
+    delta V = delta V0 * exp(-P / Pc) was introduced for the MgO
+    pressure scale. Marcondes and Wentzcovitch (2015)
+    [J. Appl. Phys., doi:10.1063/1.4921904] refer to this as the
+    Wu-Wentzcovitch (WW) correction and compare it with related
+    hybrid ab-initio/experimental EoS correction schemes.
+
+    Parameters in ``params``:
+    dV0
+        Amplitude of delta V at P = P0.
+    Pc
+        Characteristic pressure in Pa.
+    P0
+        Reference pressure in Pa. Defaults to zero.
+
+    The model is:
+        delta V(P) = dV0 * exp(-(P - P0) / Pc)
+        delta G(P) = dV0 * Pc * (1 - exp(-(P - P0) / Pc))
+    """
+    dV0 = params["dV0"]
+    Pc = params["Pc"]
+    P0 = params.get("P0", 0.0)
+
+    xP = pressure - P0
+
+    dGdP = dV0 * np.exp(-xP / Pc)
+    G = dV0 * Pc * (1.0 - np.exp(-xP / Pc))
+    d2GdP2 = -(dV0 / Pc) * np.exp(-xP / Pc)
+
+    dGdT = 0.0
+    d2GdT2 = 0.0
+    d2GdPdT = 0.0
+
+    excesses = {
+        "G": G,
+        "dGdT": dGdT,
+        "dGdP": dGdP,
+        "d2GdT2": d2GdT2,
+        "d2GdP2": d2GdP2,
+        "d2GdPdT": d2GdPdT,
+    }
+    return (excesses, None)
+
+
 modifier_names = OrderedDict()
 modifier_names["landau"] = "Landau tricritical model (Putnis, 1992)"
 modifier_names["landau_slb_2022"] = (
@@ -915,6 +963,9 @@ modifier_names["debye"] = "Debye model excess (Helmholtz)"
 modifier_names["debye_delta"] = "Debye model excess (internal energy)"
 modifier_names["einstein"] = "Einstein model excess (Helmholtz)"
 modifier_names["einstein_delta"] = "Einstein model excess (internal energy)"
+modifier_names["volume_ww"] = (
+    "Exponential volume correction (Wu and Wentzcovitch, 2008)"
+)
 
 modifier_functions = OrderedDict()
 modifier_functions["landau"] = landau_excesses
@@ -927,6 +978,7 @@ modifier_functions["debye"] = debye_excesses
 modifier_functions["debye_delta"] = debye_delta_excesses
 modifier_functions["einstein"] = einstein_excesses
 modifier_functions["einstein_delta"] = einstein_delta_excesses
+modifier_functions["volume_ww"] = volume_ww_excesses
 
 
 def calculate_property_modifications(mineral):
