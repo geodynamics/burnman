@@ -111,7 +111,7 @@ def deformation_gradient_alpha_and_compliance(
     # Calculate the unrotated isothermal compliance
     # tensor in Voigt form.
     S_T = beta_TR * dPsidf_T_Voigt
-    for i, j, k in [[0, 1, 2], [1, 2, 0], [0, 2, 1]]:
+    for i, j, k in [[0, 1, 2], [1, 2, 0], [2, 0, 1]]:
         S_T[i][j] = 0.5 * (
             -S_T[i][i]
             - S_T[j][j]

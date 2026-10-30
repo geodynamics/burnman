@@ -121,6 +121,21 @@ class test_anisotropic_mineral(BurnManTest):
             alpha.flatten(), (0.5 * (L + L.T)).flatten(), tol=1.0e-12, tol_zero=1.0e-18
         )
 
+    def test_compliance_matches_deformation_compressibility(self):
+        """Reconstruct all three shear components of the compressibility."""
+        from burnman.utils.anisotropy import voigt_notation_to_compliance_tensor
+
+        PsiI = np.array([[-0.1, 0.02, -0.03], [0.02, -0.2, 0.04], [-0.03, 0.04, 0.15]])
+        dPsiIdf = np.array([[0.2, 0.1, -0.04], [0.1, 0.3, 0.02], [-0.04, 0.02, 0.5]])
+        beta = 1.0e-11
+        F, dFdf, _, compliance = deformation_gradient_alpha_and_compliance(
+            2.0e-5, beta, PsiI, np.eye(6), dPsiIdf, np.zeros((3, 3))
+        )
+        L = beta * dFdf @ np.linalg.inv(F).T
+        expected = 0.5 * (L + L.T)
+        actual = np.einsum("ijkk->ij", voigt_notation_to_compliance_tensor(compliance))
+        np.testing.assert_allclose(actual, expected, rtol=1.0e-12, atol=1.0e-24)
+
     def test_isotropic_grueneisen(self):
         per = periclase()
         a = np.cbrt(per.params["V_0"])
