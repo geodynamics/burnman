@@ -203,7 +203,15 @@ def volume_fourth_order(pressure, params):
             "Cannot find a volume, perhaps you are outside of "
             "the range of validity for the equation of state?"
         )
-    return opt.brentq(delta_pressure, sol[0], sol[1])
+    # Molar volumes are small and depend on the formula-unit scale. Avoid
+    # scipy's absolute default tolerance in SI volume units.
+    return opt.brentq(
+        delta_pressure,
+        sol[0],
+        sol[1],
+        xtol=np.finfo(float).tiny,
+        rtol=4.0 * np.finfo(float).eps,
+    )
 
 
 def shear_modulus_second_order(volume, params):

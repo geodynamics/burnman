@@ -31,43 +31,51 @@ class min2(min1):
         self.params["V_0"] = 10e-6
 
 
+# Reference values from independent hydrostatic boundary-value integration.
+
+
 class test_layer(BurnManTest):
     def layer1(self):
         rock = min1()
         rock.set_method("slb3")
 
-        depths = np.linspace(660.0e3, 2890.0e3, 10)
-        temperatures = np.linspace(2000.0, 2000.0, 10)
+        radii = np.linspace(660.0e3, 2890.0e3, 257)
+        temperatures = np.full(len(radii), 2000.0)
 
-        layer = Layer("m1", depths)
+        layer = Layer("m1", radii)
         layer.set_material(rock)
         layer.set_temperature_mode("user-defined", temperatures=temperatures)
         layer.set_pressure_mode(
-            "self-consistent", pressure_top=22.5e9, gravity_bottom=10.0
+            "self-consistent", pressure_top=22.5e9, gravity_bottom=10.0, max_delta=1e-11
         )
         layer.make()
         return layer
 
     def test_pressures(self):
         m = self.layer1()
-        self.assertArraysAlmostEqual(m.pressures[0::9] / 1.0e9, [61.62679132, 22.5])
+        self.assertArraysAlmostEqual(
+            m.pressures[[0, -1]] / 1.0e9, [60.95639688227379, 22.5]
+        )
 
     def test_vs1(self):
         m = self.layer1()
         self.assertArraysAlmostEqual(
-            m.shear_wave_velocity[0::9] / 1.0e3, [6.72149374, 5.94945973]
+            m.shear_wave_velocity[[0, -1]] / 1.0e3,
+            [6.711860911802672, 5.94945976586669],
         )
 
     def test_vp1(self):
         m = self.layer1()
         self.assertArraysAlmostEqual(
-            m.p_wave_velocity[0::9] / 1.0e3, [11.82332527, 10.21538394]
+            m.p_wave_velocity[[0, -1]] / 1.0e3,
+            [11.801888100498513, 10.215384021484955],
         )
 
     def test_vphi1(self):
         m = self.layer1()
         self.assertArraysAlmostEqual(
-            m.bulk_sound_velocity[0::9] / 1.0e3, [8.91925163, 7.56037749]
+            m.bulk_sound_velocity[[0, -1]] / 1.0e3,
+            [8.900512730783674, 7.560377550020552],
         )
 
     def test_evaluate(self):
@@ -78,8 +86,8 @@ class test_layer(BurnManTest):
             [700.0e3, 800.0e3, 750.0e3],
         )
 
-        d0 = [1.90903185e-05, 1.97610550e-05, 1.94185684e-05]
-        d1 = [5.14621379e01, 5.15786478e01, 5.15191396e01]
+        d0 = [1.9266858705237977e-05, 1.9961283585897523e-05, 1.9626669161472518e-05]
+        d1 = [51.49279132548997, 51.613458411319186, 51.555292976809795]
 
         self.assertArraysAlmostEqual(d[0], d0)
         self.assertArraysAlmostEqual(d[1], d1)

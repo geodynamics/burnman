@@ -1,18 +1,83 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit for
 # the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2017 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2026 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 import numpy as np
-from scipy.integrate import odeint
-from scipy.integrate import quad
-from scipy.interpolate import UnivariateSpline, interp1d
+from scipy.interpolate import CubicSpline, PPoly, interp1d
 from scipy.optimize import fsolve
 from burnman import constants
 from .geotherm import adiabatic_profile
 import warnings
 
 from .material import Material, material_property
+
+_gauss_nodes, _gauss_weights = np.polynomial.legendre.leggauss(4)
+
+
+def _radial_spline(radii, values):
+    """
+    This function limits cubic overshoot on monotone intervals
+    with a local linear fallback. Neighbouring slope reversals
+    protect supported smooth extrema.
+
+    :param radii: Radii at which values are defined.
+    :type radii: array of floats
+    :param values: Values to be interpolated.
+    :type values: array of floats
+    :returns: A PPoly object representing the cubic spline with overshoot control.
+    :rtype: PPoly
+    """
+    values = np.asarray(values, dtype=float)
+    spline = CubicSpline(radii, values)
+    radii = spline.x
+    tolerance = (
+        64.0 * np.finfo(float).eps * np.maximum(np.abs(values[:-1]), np.abs(values[1:]))
+    )
+    delta = np.diff(values)
+    delta = np.where(np.abs(delta) <= tolerance, 0.0, delta)
+    neighbours = np.array(
+        [np.r_[delta[0], delta[:-1]], delta, np.r_[delta[1:], delta[-1]]]
+    )
+    monotone = (neighbours.min(axis=0) >= 0.0) | (neighbours.max(axis=0) <= 0.0)
+
+    extrema = spline.derivative().roots(extrapolate=False)
+    extrema = extrema[np.isfinite(extrema)]
+    intervals = np.clip(
+        np.searchsorted(radii, extrema, side="right") - 1, 0, len(delta) - 1
+    )
+    low = np.minimum(values[intervals], values[intervals + 1])
+    high = np.maximum(values[intervals], values[intervals + 1])
+    overshoot = (spline(extrema) < low - tolerance[intervals]) | (
+        spline(extrema) > high + tolerance[intervals]
+    )
+    limited = np.unique(intervals[overshoot & monotone[intervals]])
+    spline.c[:2, limited] = 0.0
+    spline.c[2, limited] = np.diff(values)[limited] / np.diff(radii)[limited]
+    spline.c[3, limited] = values[limited]
+    return PPoly(spline.c, radii)
+
+
+def _spline_integrals(radii, *splines, power=0):
+    """
+    Exact interval integrals for cubic products
+    and density moments up to r^4.
+
+    :param radii: Radii at which the spline is defined.
+    :type radii: array of floats
+    :param splines: The splines to integrate.
+    :type splines: tuple of PPoly objects
+    :param power: The power to which the radius is raised.
+    :type power: float
+    :returns: The exact interval integrals.
+    :rtype: array of floats
+    """
+    dr = np.diff(radii)
+    r = radii[:-1, None] + 0.5 * dr[:, None] * (_gauss_nodes + 1.0)
+    values = r**power
+    for spline in splines:
+        values *= spline(r)
+    return 0.5 * dr * (values @ _gauss_weights)
 
 
 class Layer(object):
@@ -38,11 +103,27 @@ class Layer(object):
     although the evaluate() function can take a newly defined depthlist
     and values are interpolated between these (sufficient sampling of the layer
     is needed for this to be accurate).
+
+    Radial integration uses cubic interpolation, with a local linear fallback
+    for overshoot where neighbouring samples are monotone. Extrema indicated
+    by neighbouring slope reversals are retained. True density discontinuities
+    should be separate layer boundaries; the fallback suppresses ringing but
+    does not locate unresolved interfaces.
     """
 
     def __init__(self, name=None, radii=None, verbose=False):
         self.name = name
-        assert np.all(np.diff(radii) > 0)
+        radii = np.array(radii, dtype=float, copy=True)
+        if (
+            radii.ndim != 1
+            or len(radii) < 2
+            or not np.all(np.isfinite(radii))
+            or radii[0] < 0.0
+            or np.any(np.diff(radii) <= 0.0)
+        ):
+            raise ValueError(
+                "Radii must be finite, nonnegative and strictly increasing."
+            )
         self.radii = radii
         self.outer_radius = max(self.radii)
         self.inner_radius = min(self.radii)
@@ -53,6 +134,8 @@ class Layer(object):
         self._pressures = None
         self._temperatures = None
         self.sublayers = None
+        self.converged = False
+        self.n_iterations = 0
         self.material = None
         self.pressure_mode = "self-consistent"
         self.temperature_mode = None
@@ -77,6 +160,8 @@ class Layer(object):
         self._pressures = None
         self._temperatures = None
         self.sublayers = None
+        self.converged = False
+        self.n_iterations = 0
 
     def set_material(self, material):
         """
@@ -168,7 +253,7 @@ class Layer(object):
         :param n_max_iterations: Maximum number of iterations to reach
             self-consistent pressures.
         :type n_max_iterations: integer
-        :param max_delta: Relative update to the highest pressure in the layer between
+        :param max_delta: Maximum pressure-profile update relative to the largest pressure between
             iterations to stop iterations.
         :type max_delta: float
         """
@@ -177,6 +262,10 @@ class Layer(object):
         self.pressure_mode = pressure_mode
 
         assert gravity_bottom is not None
+        if not np.isfinite(gravity_bottom) or gravity_bottom < 0.0:
+            raise ValueError("gravity_bottom must be finite and nonnegative.")
+        if self.inner_radius == 0.0 and gravity_bottom != 0.0:
+            raise ValueError("Gravity must be zero at the centre.")
         self.gravity_bottom = gravity_bottom
 
         if pressure_mode == "user-defined":
@@ -188,6 +277,10 @@ class Layer(object):
                 "are unlikely to be self-consistent"
             )
         elif pressure_mode == "self-consistent":
+            if pressure_top is None or not np.isfinite(pressure_top):
+                raise ValueError("Supply a finite pressure_top.")
+            if n_max_iterations < 1 or not np.isfinite(max_delta) or max_delta <= 0.0:
+                raise ValueError("Iteration count and tolerance must be positive.")
             self.pressure_top = pressure_top
             self.n_max_iterations = n_max_iterations
             self.max_delta = max_delta
@@ -204,11 +297,11 @@ class Layer(object):
         materials from which properties can be computed.
         """
         self.reset()
-        if not hasattr(self, "material"):
+        if self.material is None:
             raise AttributeError(
                 "You must set_material() for the layer " "before running make()."
             )
-        if not hasattr(self, "temperature_mode"):
+        if self.temperature_mode is None:
             raise AttributeError(
                 "You must set_temperature_mode() for the "
                 "layer before running make()."
@@ -222,6 +315,7 @@ class Layer(object):
             self.temperatures = self._evaluate_temperature(
                 self.pressures, self.temperature_top
             )
+            self.converged = True
         elif self.pressure_mode == "self-consistent":
             new_press = (
                 self.pressure_top + (-self.radii + max(self.radii)) * 1.0e3
@@ -239,7 +333,10 @@ class Layer(object):
                 temperatures = self._evaluate_temperature(
                     new_press, self.temperature_top
                 )
-                rel_err = abs((max(ref_press) - max(new_press)) / max(new_press))
+                rel_err = np.max(np.abs(new_press - ref_press)) / max(
+                    1.0, np.max(np.abs(new_press))
+                )
+                self.n_iterations = i
                 if self.verbose:
                     print(
                         f"Iteration {i:0d} maximum relative pressure error: "
@@ -247,7 +344,12 @@ class Layer(object):
                     )
 
                 if rel_err < self.max_delta:
+                    self.converged = True
                     break
+            if not self.converged:
+                warnings.warn(
+                    "Layer pressure iteration did not converge.", RuntimeWarning
+                )
 
             self.pressures = new_press
             self.temperatures = temperatures
@@ -353,77 +455,39 @@ class Layer(object):
         Computes the gravity of a layer
         Used by _evaluate_eos()
         """
-        # Create a spline fit of density as a function of radius
-        rhofunc = UnivariateSpline(self.radii, density)
-        # Numerically integrate Poisson's equation
-
-        def poisson(p, x):
-            return 4.0 * np.pi * constants.G * rhofunc(x) * x * x
-
-        grav = np.ravel(
-            odeint(poisson, gravity_bottom * self.radii[0] * self.radii[0], self.radii)
+        rho = _radial_spline(self.radii, density)
+        enclosed = (
+            gravity_bottom * self.radii[0] ** 2
+            + np.r_[
+                0.0,
+                4.0
+                * np.pi
+                * constants.G
+                * np.cumsum(_spline_integrals(self.radii, rho, power=2)),
+            ]
         )
-
-        if self.radii[0] == 0:
-            grav[0] = 0
-            grav[1:] = grav[1:] / self.radii[1:] / self.radii[1:]
-        else:
-            grav[:] = grav[:] / self.radii[:] / self.radii[:]
-        return grav
+        return np.divide(
+            enclosed, self.radii**2, out=np.zeros_like(enclosed), where=self.radii > 0.0
+        )
 
     def _compute_pressure(self, density, gravity, pressure_top):
-        """
-        Calculate the pressure profile based on density and gravity.
-        This integrates the equation for hydrostatic equilibrium P = rho g z.
-        Used by _evaluate_eos()
-        """
-        # flip radius, density and gravity to increasing pressure
-        depthfromtop = -self.radii[::-1] + max(self.radii)
-        density = density[::-1]
-        gravity = gravity[::-1]
-        # Make a spline fit of density as a function of depth
-        rhofunc = UnivariateSpline(depthfromtop, density)
-        # Make a spline fit of gravity as a function of depth
-        gfunc = UnivariateSpline(depthfromtop, gravity)
-
-        # integrate the hydrostatic equation
-        pressure = np.ravel(
-            odeint((lambda p, x: gfunc(x) * rhofunc(x)), pressure_top, depthfromtop)
-        )
-
-        return pressure[::-1]
+        """Integrate dP/dr = -rho*g from the upper boundary."""
+        rho = _radial_spline(self.radii, density)
+        g = _radial_spline(self.radii, gravity)
+        increments = _spline_integrals(self.radii, rho, g)
+        return pressure_top + np.r_[np.cumsum(increments[::-1])[::-1], 0.0]
 
     @property
     def mass(self):
-        """
-        Calculates the mass of the layer [kg]
-        """
-        mass = 0.0
-        radii = self.radii
-        density = self.evaluate(["density"])
-        rhofunc = UnivariateSpline(radii, density)
-        mass = np.abs(
-            quad(lambda r: 4 * np.pi * rhofunc(r) * r * r, radii[0], radii[-1])[0]
-        )
-        return mass
+        """Mass of the layer [kg], using the same density profile as gravity."""
+        rho = _radial_spline(self.radii, self.density)
+        return 4.0 * np.pi * np.sum(_spline_integrals(self.radii, rho, power=2))
 
     @property
     def moment_of_inertia(self):
-        """
-        Returns the moment of inertia of the layer [kg m^2]
-        """
-        moment = 0.0
-        radii = self.radii
-        density = self.evaluate(["density"])
-        rhofunc = UnivariateSpline(radii, density)
-        moment = np.abs(
-            quad(
-                lambda r: 8.0 / 3.0 * np.pi * rhofunc(r) * r * r * r * r,
-                radii[0],
-                radii[-1],
-            )[0]
-        )
-        return moment
+        """Axial moment of inertia of the layer [kg m^2]."""
+        rho = _radial_spline(self.radii, self.density)
+        return 8.0 * np.pi / 3.0 * np.sum(_spline_integrals(self.radii, rho, power=4))
 
     @property
     def gravity(self):
@@ -465,9 +529,10 @@ class Layer(object):
         """
         Returns the brunt-vasala (or buoyancy) frequency, N, across the layer.
         This frequency assess the stabilty of the layer:
-        N < 0, fluid will convect
-        N= 0, fluid is neutral
-        N > 0, fluid is stabily stratified.
+        N^2 < 0, fluid is unstable
+        N^2 = 0, fluid is neutral
+        N^2 > 0, fluid is stably stratified.
+        The returned quantity is N^2 in s^-2, not N.
         """
         kappa = self.bulk_sound_velocity * self.bulk_sound_velocity * self.density
         brunt_vasala = (

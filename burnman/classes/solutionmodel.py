@@ -389,6 +389,10 @@ class MechanicalSolution(SolutionModel):
     the total gibbs free energy of the solution is equal to the
     dot product of the molar gibbs free energies and molar fractions
     of the constituent materials.
+
+    The shared name ``molar_fractions`` is retained for compatibility. For this
+    model the entries are linear mixing coefficients: they may be signed and
+    need not sum to one. No normalization is applied automatically.
     """
 
     def __init__(self, endmembers):
