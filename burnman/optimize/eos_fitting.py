@@ -782,10 +782,12 @@ class SolutionFit(NonLinearModel):
             xT0[-2] = xP1[-2] - dT
             xT1[-2] = xP1[-2] + dT
 
+            # The predicted property follows
+            # all composition and state coordinates.
             dPdp = (2.0 * dP) / (
-                self.function(xP1, flag)[2] - self.function(xP0, flag)[2]
+                self.function(xP1, flag)[-1] - self.function(xP0, flag)[-1]
             )
-            dpdT = (self.function(xT1, flag)[2] - self.function(xT0, flag)[2]) / (
+            dpdT = (self.function(xT1, flag)[-1] - self.function(xT0, flag)[-1]) / (
                 2.0 * dT
             )
         dPdT = -dPdp * dpdT
