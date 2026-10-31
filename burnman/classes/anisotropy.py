@@ -15,6 +15,15 @@ from ..utils.anisotropy import (
 )
 
 
+def _unit_direction(direction):
+    direction = np.asarray(direction)
+    assert (
+        direction.ndim > 0 and direction.size > 0 and direction.shape[-1] == 3
+    ), "Directions must have shape (..., 3) and be nonempty"
+    assert np.isrealobj(direction), "Directions must be real"
+    return unit_normalize(direction)
+
+
 class AnisotropicMaterial(Material):
     """
     A base class for anisotropic elastic materials. The base class
@@ -31,13 +40,37 @@ class AnisotropicMaterial(Material):
     """
 
     def __init__(self, rho, cijs):
+        cijs = np.asarray(cijs)
+        assert (
+            np.ndim(rho) == 0 and np.isrealobj(rho) and np.isfinite(rho) and rho > 0.0
+        ), "density must be positive and finite"
+        assert cijs.shape == (6, 6), "cijs must be in Voigt notation (6x6)"
+        assert np.isrealobj(cijs) and np.all(
+            np.isfinite(cijs)
+        ), "stiffness_tensor must be real and finite"
+        assert np.array_equal(cijs.T, cijs), "stiffness_tensor must be symmetric"
         self._isentropic_stiffness_tensor = cijs
         self._rho = rho
 
-        assert cijs.shape == (6, 6), "cijs must be in Voigt notation (6x6)"
-        assert np.allclose(cijs.T, cijs), "stiffness_tensor must be symmetric"
-
         Material.__init__(self)
+
+    def assert_stable(self):
+        """Assert positive-definite symmetric isentropic stiffness.
+
+        This is an opt-in elastic stability check for unstressed materials.
+        Nonhydrostatic states require their stress-dependent acoustic criteria.
+        """
+        cijs = self.isentropic_stiffness_tensor
+        assert np.isrealobj(cijs) and np.all(
+            np.isfinite(cijs)
+        ), "stiffness_tensor must be real and finite"
+        tolerance = 100.0 * np.finfo(float).eps * np.max(np.abs(cijs))
+        assert np.allclose(
+            cijs, cijs.T, rtol=0.0, atol=tolerance
+        ), "stiffness_tensor must be symmetric to test stability"
+        assert np.all(
+            np.linalg.eigvalsh(cijs) > 0.0
+        ), "stiffness_tensor must be positive definite for elastic stability"
 
     @material_property
     def isentropic_stiffness_tensor(self):
@@ -202,9 +235,7 @@ class AnisotropicMaterial(Material):
         :returns: Christoffel tensor in Pa, with shape (..., 3, 3).
         :rtype: numpy.ndarray
         """
-        n = np.asarray(propagation_direction, dtype=float)
-        norms = np.linalg.norm(n, axis=-1, keepdims=True)
-        n = n / np.where(norms == 0.0, 1.0, norms)
+        n = _unit_direction(propagation_direction)
         Q_B = np.einsum(
             "ijkl,...j,...l->...ik", self.full_isentropic_stiffness_tensor, n, n
         )
@@ -229,7 +260,7 @@ class AnisotropicMaterial(Material):
             relative to the stiffness tensor [1/Pa].
         :rtype: float
         """
-        direction = unit_normalize(direction)
+        direction = _unit_direction(direction)
         beta = np.einsum(
             "ijkk, ...i, ...j",
             self.full_isentropic_compliance_tensor,
@@ -244,7 +275,7 @@ class AnisotropicMaterial(Material):
             relative to the stiffness tensor [Pa].
         :rtype: float
         """
-        direction = unit_normalize(direction)
+        direction = _unit_direction(direction)
         S = np.einsum(
             "ijkl, ...i, ...j, ...k, ...l",
             self.full_isentropic_compliance_tensor,
@@ -261,11 +292,11 @@ class AnisotropicMaterial(Material):
             shear direction relative to the stiffness tensor [Pa].
         :rtype: float
         """
-        plane_normal = unit_normalize(plane_normal)
-        shear_direction = unit_normalize(shear_direction)
+        plane_normal = _unit_direction(plane_normal)
+        shear_direction = _unit_direction(shear_direction)
 
-        assert (
-            np.abs(plane_normal.dot(shear_direction)) < np.finfo(float).eps
+        assert np.all(
+            np.abs(np.einsum("...i,...i->...", plane_normal, shear_direction)) < 1.0e-12
         ), "plane_normal and shear_direction must be orthogonal"
 
         G = np.einsum(
@@ -286,8 +317,8 @@ class AnisotropicMaterial(Material):
         :rtype: float
         """
 
-        axial_direction = unit_normalize(axial_direction)
-        lateral_direction = unit_normalize(lateral_direction)
+        axial_direction = _unit_direction(axial_direction)
+        lateral_direction = _unit_direction(lateral_direction)
 
         if len(axial_direction.shape) == 1:
             assert (
@@ -318,21 +349,29 @@ class AnisotropicMaterial(Material):
             shear wave velocities in a given propagation direction [m/s].
         :rtype: list, containing the wave speeds and directions
             of particle motion relative to the stiffness tensor
+
+        Polarizations are columns, ordered with the decreasing wave speeds.
+        Negative acoustic eigenvalues raise AssertionError.
         """
         Tik = self.christoffel_tensor(propagation_direction)
 
-        eigenvalues, eigenvectors = np.linalg.eig(Tik)
-        eigenvectors = np.real_if_close(eigenvectors)
+        assert np.isrealobj(Tik) and np.all(
+            np.isfinite(Tik)
+        ), "Christoffel tensor must be real and finite"
+        tolerance = 100.0 * np.finfo(float).eps * np.max(np.abs(Tik))
+        assert np.allclose(
+            Tik, Tik.swapaxes(-1, -2), rtol=0.0, atol=tolerance
+        ), "Christoffel tensor must be symmetric"
+        eigenvalues, eigenvectors = np.linalg.eigh(Tik)
+        assert np.all(
+            eigenvalues >= 0.0
+        ), "Christoffel tensor has negative eigenvalues; real wave speeds are undefined"
+        assert (
+            np.isfinite(self.density) and self.density > 0.0
+        ), "density must be positive and finite"
+        velocities = np.sqrt(eigenvalues[..., ::-1] / self.density)
 
-        # sort eigs by decreasing eigenvalue
-        idx = np.flip(eigenvalues.argsort(axis=-1), axis=-1)
-        vidx = np.expand_dims(idx, -1)
-        eigenvalues = np.take_along_axis(eigenvalues, idx, axis=-1)
-        eigenvectors = np.take_along_axis(eigenvectors, vidx, axis=-2)
-        eigenvalues = np.real(eigenvalues)
-        velocities = np.sqrt(eigenvalues / self.density)
-
-        return velocities, eigenvectors
+        return velocities, eigenvectors[..., :, ::-1]
 
 
 class IsotropicMaterial(AnisotropicMaterial):
@@ -452,10 +491,17 @@ class RhombohedralMaterial(AnisotropicMaterial):
     Initialization takes two input parameters; rho and
     [C11, C12, C13, C14, C33, C44, C66] or
     [C11, C12, C13, C14, C15, C33, C44, C66]
+
+    Only six or seven coefficients are independent: C66 must equal
+    (C11 - C12)/2. Inconsistent supplied values raise AssertionError.
     """
 
     def __init__(self, rho, cijs):
         cijs = list(cijs)
+        assert len(cijs) in (7, 8), "Rhombohedral materials require 7 or 8 Cijs"
+        assert np.isclose(
+            cijs[-1], (cijs[0] - cijs[1]) / 2.0, rtol=1.0e-12, atol=0.0
+        ), "Rhombohedral C66 must equal (C11 - C12)/2"
         if len(cijs) == 7:
             # Rhombohedral I / Laue class \bar{3}m
             cijs.insert(4, -cijs[3])  # C24 = -C14
@@ -486,11 +532,6 @@ class RhombohedralMaterial(AnisotropicMaterial):
                 [(3, 3), (4, 4)],  # C44
                 [(5, 5)],
             ]  # C66
-
-        else:
-            raise Exception(
-                "Rhombohedral materials should have " "either 7 or 8 independent Cijs"
-            )
 
         AnisotropicMaterial.__init__(
             self, rho, voigt_array_from_cijs(cijs, index_lists)

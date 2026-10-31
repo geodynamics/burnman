@@ -15,6 +15,7 @@ from burnman.utils.chemistry import formula_to_string
 from burnman.utils.misc import extract_lines_between_markers
 from burnman.utils.misc import run_cli_program_with_input
 from burnman.utils.math import smooth_array
+from burnman.utils.math import unit_normalize
 from burnman.utils.math import l2_norm_profile, l2_norm_profiles
 from burnman.utils.math import chisqr_profiles
 from burnman.utils.math import independent_row_indices
@@ -24,6 +25,36 @@ from burnman.utils.plotting import visual_center_of_polygon
 
 
 class test_utils(BurnManTest):
+    def test_unit_normalize_axes_and_batches(self):
+        values = np.array([[3.0, 4.0, 0.0], [0.0, 0.0, 12.0]])
+        expected = np.array([[0.6, 0.8, 0.0], [0.0, 0.0, 1.0]])
+        for array, axis, result in (
+            (values[0], -1, expected[0]),
+            (values, -1, expected),
+            (values.T, 0, expected.T),
+            (np.stack([values, values * 2.0]), -1, np.stack([expected, expected])),
+        ):
+            with self.subTest(shape=array.shape, axis=axis):
+                self.assertArraysAlmostEqual(
+                    unit_normalize(array, axis=axis).flatten(),
+                    result.flatten(),
+                    tol=1.0e-14,
+                )
+        self.assertArraysAlmostEqual(
+            unit_normalize([3.0, 4.0, 0.0], order=1), [3.0 / 7.0, 4.0 / 7.0, 0.0]
+        )
+
+    def test_unit_normalize_rejects_zero_and_nonfinite_vectors(self):
+        for values in (
+            [0.0, 0.0, 0.0],
+            [[1.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+            [np.nan, 0.0, 1.0],
+            [np.inf, 0.0, 1.0],
+        ):
+            with self.subTest(values=values):
+                with self.assertRaises(AssertionError):
+                    unit_normalize(values)
+
     def setUp(self):
         self.array = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         self.grid_spacing = np.array([1.0, 1.0])

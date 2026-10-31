@@ -22,13 +22,16 @@ def round_to_n(x, xerr, n):
 
 def unit_normalize(a, order=2, axis=-1):
     """
-    Calculates the L2 normalized array of numpy array a
-    of a given order and along a given axis.
+    Normalize each vector along the given axis using the requested norm.
+    Zero and nonfinite vectors raise AssertionError.
     """
-    l2 = np.atleast_1d(np.apply_along_axis(np.linalg.norm, axis, a, order))
-
-    l2[l2 == 0] = 1
-    return a / np.expand_dims(l2, axis)[0][0]
+    a = np.asarray(a)
+    assert np.all(np.isfinite(a)), "Vectors must be finite"
+    norms = np.linalg.norm(a, ord=order, axis=axis, keepdims=True)
+    assert np.all(np.isfinite(norms)) and np.all(
+        norms > 0.0
+    ), "Vector norms must be finite and nonzero"
+    return a / norms
 
 
 def linear_interpol(x, x1, x2, y1, y2):
