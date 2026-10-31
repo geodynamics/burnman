@@ -737,6 +737,52 @@ class test_fitting(BurnManTest):
         with self.assertRaises(Exception):
             _ = burnman.eos_fitting.fit_VTP_data(fo, params, VTP, verbose=False)
 
+    def _check_solution_fit_density_normal(self, solution, compositions):
+        for fractions in compositions:
+            for pressure, temperature in ((5.0e9, 1000.0), (25.0e9, 1600.0)):
+                with self.subTest(
+                    composition=fractions, pressure=pressure, temperature=temperature
+                ):
+                    solution.set_composition(fractions)
+                    solution.set_state(pressure, temperature)
+                    density = solution.rho
+                    point = np.array([*fractions, pressure, temperature, density])
+                    covariance = np.diag(
+                        [0.0] * solution.n_endmembers + [1.0e12, 1.0, 1.0]
+                    )
+                    model = SolutionFit(
+                        solution=solution,
+                        data=np.array([point]),
+                        data_covariances=np.array([covariance]),
+                        flags=["rho"],
+                        fit_params=[["V_0", 0]],
+                        mle_tolerances=np.array([1.0e-8]),
+                    )
+                    # At fixed composition, d(rho)/dP = rho/K_T and
+                    # d(rho)/dT = -alpha*rho. Composition normals stay zero.
+                    expected = np.zeros_like(point)
+                    expected[-3:] = [
+                        -density / solution.isothermal_bulk_modulus_reuss,
+                        solution.alpha * density,
+                        1.0,
+                    ]
+                    expected /= np.linalg.norm(expected)
+                    normal = model.normal(point, "rho")
+                    self.assertTrue(np.isfinite(normal).all())
+                    self.assertArraysAlmostEqual(normal, expected, tol=1.0e-6)
+
+    def test_solution_fit_binary_density_normal(self):
+        self._check_solution_fit_density_normal(
+            burnman.minerals.SLB_2011.mg_fe_olivine(),
+            [[0.7, 0.3], [0.2, 0.8]],
+        )
+
+    def test_solution_fit_ternary_density_normal(self):
+        self._check_solution_fit_density_normal(
+            burnman.minerals.SLB_2011.mg_fe_perovskite(),
+            [[0.7, 0.2, 0.1], [0.2, 0.5, 0.3]],
+        )
+
     def test_solution_fit_array_parameter_round_trip(self):
         for bounded in (False, True):
             with self.subTest(bounded=bounded):
