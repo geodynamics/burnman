@@ -31,7 +31,7 @@ class Planet(object):
         :param n_max_iterations: Maximum number of iterations to reach
             self-consistent planet.
         :type n_max_iterations: int
-        :param max_delta: Relative update to the center pressure of the planet between
+        :param max_delta: Maximum pressure-profile update relative to the largest pressure between
             iterations to stop iterations.
         :type max_delta: float
         """
@@ -49,10 +49,14 @@ class Planet(object):
         self.radius_planet = max(self.radii)
         self.volume = 4.0 / 3.0 * np.pi * np.power(self.radius_planet, 3.0)
 
+        start = 0
         for layer in self.layers:
-            layer.n_start = np.where(self.radii == layer.inner_radius)[0][-1]
-            layer.n_end = np.where(self.radii == layer.outer_radius)[0][0] + 1
+            layer.n_start = start
+            start += len(layer.radii)
+            layer.n_end = start
         self._cached = {}
+        self.converged = False
+        self.n_iterations = 0
         self.verbose = verbose
         self.set_pressure_mode(n_max_iterations=n_max_iterations, max_delta=max_delta)
 
@@ -77,6 +81,8 @@ class Planet(object):
         It is typically not required for the user to call this function.
         """
         self._cached = {}
+        self.converged = False
+        self.n_iterations = 0
 
     def get_layer(self, name):
         """
@@ -104,7 +110,7 @@ class Planet(object):
         :rtype: :class:`burnman.Layer`
         """
         for layer in self.layers:
-            if layer.outer_radius >= radius:
+            if layer.inner_radius <= radius <= layer.outer_radius:
                 return layer
         raise LookupError()
 
@@ -148,19 +154,11 @@ class Planet(object):
                         j += len(vals)
         else:
             values = np.empty([len(properties), len(radlist)])
-            l_idx = [
-                i
-                for i, layer in enumerate(self.layers)
-                for r in radlist
-                if r >= layer.inner_radius and r <= layer.outer_radius
-            ]
-
             for j, r in enumerate(radlist):
-                values[:, j] = (
-                    self.layers[l_idx[j]]
-                    .evaluate(properties, [r], self.radius_planet)
-                    .T[0]
-                )
+                layer = self.get_layer_by_radius(r)
+                values[:, j] = np.asarray(
+                    layer.evaluate(properties, [r], self.radius_planet)
+                ).reshape(-1)
 
         if values.shape[0] == 1:
             values = values[0]
@@ -180,7 +178,7 @@ class Planet(object):
         self-consistent fashion.
         pressure_mode is 'user-defined' or 'self-consistent'.
         The default for the planet is self-consistent, with zero pressure at
-        the surface and zero pressure at the center.
+        the surface and zero gravity at the center.
 
         :param pressure_mode: This can be set to 'user-defined' or 'self-consistent'.
         :type pressure_mode: str
@@ -199,17 +197,25 @@ class Planet(object):
         assert pressure_mode == "user-defined" or pressure_mode == "self-consistent"
 
         self.pressure_mode = pressure_mode
+        if not np.isfinite(gravity_bottom) or gravity_bottom < 0.0:
+            raise ValueError("gravity_bottom must be finite and nonnegative.")
+        if self.radii[0] == 0.0 and gravity_bottom != 0.0:
+            raise ValueError("Gravity must be zero at the centre.")
         self.gravity_bottom = gravity_bottom
 
         if pressure_mode == "user-defined":
             assert len(pressures) == len(self.radii)
-            self._pressures = pressures
+            self.pressures = np.array(pressures, dtype=float, copy=True)
             warnings.warn(
                 "User-defined pressures mean that the planet is "
                 "unlikely to be self-consistent"
             )
 
         if pressure_mode == "self-consistent":
+            if not np.isfinite(pressure_top):
+                raise ValueError("Supply a finite pressure_top.")
+            if n_max_iterations < 1 or not np.isfinite(max_delta) or max_delta <= 0.0:
+                raise ValueError("Iteration count and tolerance must be positive.")
             self.pressure_top = pressure_top
             self.n_max_iterations = n_max_iterations
             self.max_delta = max_delta
@@ -227,7 +233,8 @@ class Planet(object):
             assert layer.temperature_mode is not None
 
         if self.pressure_mode == "user-defined":
-            self._temperatures = self._evaluate_temperature(self._pressures)
+            self.temperatures = self._evaluate_temperature(self.pressures)
+            self.converged = True
 
         if self.pressure_mode == "self-consistent":
             new_press = (
@@ -244,7 +251,10 @@ class Planet(object):
                     new_press, temperatures, self.gravity_bottom, self.pressure_top
                 )
                 temperatures = self._evaluate_temperature(new_press)
-                rel_err = abs((max(ref_press) - max(new_press)) / max(new_press))
+                rel_err = np.max(np.abs(new_press - ref_press)) / max(
+                    1.0, np.max(np.abs(new_press))
+                )
+                self.n_iterations = i
                 if self.verbose:
                     print(
                         f"Iteration {i:0d} maximum relative pressure error: "
@@ -252,17 +262,30 @@ class Planet(object):
                     )
 
                 if rel_err < self.max_delta:
+                    self.converged = True
                     break
+            if not self.converged:
+                warnings.warn(
+                    "Planet pressure iteration did not converge.", RuntimeWarning
+                )
 
             self.pressures = new_press
             self.temperatures = temperatures
-            self._gravity = new_grav
+
+        # Gravity and mass must use the final density, not the previous iterate.
+        self._gravity = self._compute_gravity(
+            self._evaluate_density(self.pressures, self.temperatures),
+            self.gravity_bottom,
+        )
 
         for layer in self.layers:
+            layer.reset()
             layer.sublayers = []
             layer.pressures = self.pressures[layer.n_start : layer.n_end]
             layer.temperatures = self.temperatures[layer.n_start : layer.n_end]
-            layer.gravity_bottom = self._gravity[layer.n_start - 1]
+            layer.gravity_bottom = self._gravity[layer.n_start]
+            layer.converged = self.converged
+            layer.n_iterations = self.n_iterations
             layer.pressure_mode = "set-in-planet"
             for i in range(len(layer.radii)):
                 layer.sublayers.append(layer.material.copy())

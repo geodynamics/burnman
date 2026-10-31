@@ -89,7 +89,11 @@ def fit_composition_to_solution(
 
     :returns: (molar_fractions, covariance_matrix, weighted_residual):
 
-        - molar_fractions: Optimized molar fractions of each endmember.
+        - molar_fractions: Optimized endmember coefficients. With
+            ``normalize=True`` these sum to one. With ``normalize=False`` they
+            are unnormalized fitted amounts; the return name is retained for
+            compatibility. Endmember coordinates may be signed in either case,
+            while the fitted site occupancies must remain nonnegative.
         - covariance_matrix: Covariance matrix of the optimized molar
             fractions, computed from the pseudo-inverse of the weighted
             design matrix.
