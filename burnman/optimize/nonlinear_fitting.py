@@ -800,7 +800,7 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.0):
     scaling = 1.0 / np.power(10.0, np.around(np.log10(np.abs(popt)) - 0.5))
     scaling = np.outer(scaling, scaling)
 
-    fig, ax = plt.subplots(n_params - 1, n_params - 1)
+    fig, ax = plt.subplots(n_params - 1, n_params - 1, squeeze=False)
     fig.set_size_inches(3.0 * (n_params - 1), 3.0 * (n_params - 1))
 
     for j in range(n_params - 1):

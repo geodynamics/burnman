@@ -59,6 +59,44 @@ class JacobianLineModel(NonLinearModel):
 
 
 class test_fitting(BurnManTest):
+    def test_corner_plot(self):
+        for n in [2, 3, 4]:
+            for labelled in [False, True]:
+                with self.subTest(n_params=n, labelled=labelled):
+                    popt = np.arange(1.0, n + 1.0)
+                    pcov = np.eye(n) + 0.25 * np.ones((n, n))
+                    names = [f"p{i}" for i in range(n)] if labelled else []
+                    fig, axes = burnman.nonlinear_fitting.corner_plot(
+                        popt, pcov, param_names=names, n_std=2.0
+                    )
+                    try:
+                        self.assertEqual(axes.shape, (n - 1, n - 1))
+                        self.assertEqual(len(fig.axes), n * (n - 1) // 2)
+                        for j in range(n - 1):
+                            for i in range(j, n - 1):
+                                ax = axes[i, j]
+                                self.assertEqual(len(ax.patches), 1)
+                                ellipse = ax.patches[0]
+                                self.assertArraysAlmostEqual(
+                                    ellipse.center, [popt[j], popt[i + 1]]
+                                )
+                                self.assertFloatEqual(ellipse.width, 4.0 * np.sqrt(1.5))
+                                self.assertFloatEqual(ellipse.height, 4.0)
+                                self.assertArraysAlmostEqual(
+                                    ax.get_xlim(),
+                                    popt[j] + np.array([-3.0, 3.0]) * np.sqrt(1.25),
+                                )
+                                self.assertArraysAlmostEqual(
+                                    ax.get_ylim(),
+                                    popt[i + 1] + np.array([-3.0, 3.0]) * np.sqrt(1.25),
+                                )
+                        if labelled:
+                            self.assertIn(names[0], axes[-1, 0].get_xlabel())
+                            self.assertIn(names[-1], axes[-1, 0].get_ylabel())
+                        fig.canvas.draw()
+                    finally:
+                        plt.close(fig)
+
     def test_jacobian_in_place_setter(self):
         model = JacobianLineModel()
         baseline = model.get_params().copy()
