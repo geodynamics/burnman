@@ -65,7 +65,7 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
 
         # Initialise as both Material and Solution object
         Material.__init__(self)
-        Solution.__init__(self, name, solution_model, molar_fractions)
+        Solution.__init__(self, name, solution_model)
 
         # Store a scalar copy of the solution model to speed up set_state
         scalar_solution_model = copy.copy(solution_model)
@@ -81,9 +81,10 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         self.anisotropic_params = anisotropic_parameters
         self.psi_excess_function = psi_excess_function
 
-        # Finally, set the composition
+        # Initialize endmember fractions after the anisotropic bookkeeping.
+        # Subclasses may take reduced composition coordinates instead.
         if molar_fractions is not None:
-            self.set_composition(molar_fractions)
+            AnisotropicSolution.set_composition(self, molar_fractions)
 
     def set_state(self, pressure, temperature):
         # Set solution conditions
