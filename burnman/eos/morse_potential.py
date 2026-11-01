@@ -73,7 +73,13 @@ def volume(pressure, params):
             "Cannot find a volume, perhaps you are outside "
             "of the range of validity for the equation of state?"
         )
-    return opt.brentq(delta_pressure, sol[0], sol[1])
+    return opt.brentq(
+        delta_pressure,
+        sol[0],
+        sol[1],
+        xtol=np.finfo(float).tiny,
+        rtol=4.0 * np.finfo(float).eps,
+    )
 
 
 class Morse(eos.IsothermalEquationOfState):

@@ -101,7 +101,13 @@ def volume_third_order(pressure, params):
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
-        root = opt.brentq(delta_pressure, sol[0], sol[1])
+        root = opt.brentq(
+            delta_pressure,
+            sol[0],
+            sol[1],
+            xtol=np.finfo(float).tiny,
+            rtol=4.0 * np.finfo(float).eps,
+        )
     return root
 
 

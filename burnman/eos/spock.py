@@ -95,7 +95,13 @@ class SPOCK(eos.IsothermalEquationOfState):
         def delta_pressure(x):
             return self.pressure(0.0, x, params) - pressure
 
-        V = opt.brentq(delta_pressure, 0.1 * params["V_0"], 1.5 * params["V_0"])
+        V = opt.brentq(
+            delta_pressure,
+            0.1 * params["V_0"],
+            1.5 * params["V_0"],
+            xtol=np.finfo(float).tiny,
+            rtol=4.0 * np.finfo(float).eps,
+        )
         return V
 
     def pressure(self, temperature, volume, params):

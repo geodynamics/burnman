@@ -537,8 +537,7 @@ class test_cold_eos_reference_pressure(BurnManTest):
         for eos in self.eoses:
             for P_0 in [1.0e5, 2.5e9, 1.0e10]:
                 m = self._mineral(eos, P_0)
-                # At V_0, some volume solvers cannot resolve the checker's 1 kPa step.
-                for ratio in [0.8, 0.9, 1.1]:
+                for ratio in [0.8, 0.9, 1.0, 1.1]:
                     with self.subTest(eos=eos, P_0=P_0, ratio=ratio):
                         V = ratio * self.params["V_0"]
                         P = m.method.pressure(self.params["T_0"], V, m.params)
@@ -549,6 +548,27 @@ class test_cold_eos_reference_pressure(BurnManTest):
                                 T=self.params["T_0"],
                                 including_shear_properties=False,
                             )
+                        )
+
+    def test_volume_resolution_at_reference_pressure(self):
+        for eos in self.eoses:
+            for P_0 in [0.0, 2.5e9, 1.0e10]:
+                for scale in [1.0e-3, 1.0, 1.0e3]:
+                    with self.subTest(eos=eos, P_0=P_0, scale=scale):
+                        m = self._mineral(eos, P_0)
+                        m.params["V_0"] *= scale
+                        V_0, K_0 = m.params["V_0"], m.params["K_0"]
+                        volumes = []
+                        for dP in [-1000.0, 0.0, 1000.0]:
+                            V = m.method.volume(P_0 + dP, self.params["T_0"], m.params)
+                            P = m.method.pressure(self.params["T_0"], V, m.params)
+                            self.assertFloatEqual(P, P_0 + dP, tol=0.0, tol_zero=1.0e-3)
+                            self.assertFloatEqual(V / V_0, 1.0 - dP / K_0, tol=1.0e-14)
+                            volumes.append(V)
+                        self.assertGreater(volumes[0], volumes[1])
+                        self.assertGreater(volumes[1], volumes[2])
+                        self.assertFloatEqual(
+                            -V_0 * 2000.0 / (volumes[2] - volumes[0]), K_0, tol=2.0e-7
                         )
 
 
