@@ -48,7 +48,7 @@ def make_nonorthotropic_mineral(a, b, c, alpha, beta, gamma, d, e, f):
     return m
 
 
-def make_nonorthotropic_solution(two_fos=False, monoclinic=False):
+def make_nonorthotropic_solution(two_fos=False, monoclinic=False, molar_fractions=None):
 
     cell_lengths_A = np.array([4.7646, 10.2296, 5.9942])
     lth = cell_lengths_A * 1.0e-10 * np.cbrt(Avogadro / 4.0)
@@ -95,12 +95,54 @@ def make_nonorthotropic_solution(two_fos=False, monoclinic=False):
         solution_model=solution_model,
         psi_excess_function=fn,
         anisotropic_parameters=prm,
+        molar_fractions=molar_fractions,
     )
 
     return ss
 
 
 class test_two_member_solution(BurnManTest):
+    def test_initial_composition(self):
+        for two_fos, fractions in [(False, [0.8, 0.2]), (True, [0.4, 0.4, 0.2])]:
+            with self.subTest(two_fos=two_fos):
+                ss = make_nonorthotropic_solution(
+                    two_fos=two_fos, molar_fractions=fractions
+                )
+                reference = make_nonorthotropic_solution(two_fos=two_fos)
+                reference.set_composition(fractions)
+                self.assertArraysAlmostEqual(ss.molar_fractions, fractions)
+                self.assertArraysAlmostEqual(
+                    ss._scalar_solution.molar_fractions, fractions
+                )
+                self.assertArraysAlmostEqual(
+                    ss.cell_vectors_0.flatten(), reference.cell_vectors_0.flatten()
+                )
+                for solution in [ss, reference]:
+                    solution.set_state(2.0e10, 1000.0)
+                self.assertEqual(ss.formula, reference.formula)
+                for prop in ["molar_volume", "molar_gibbs", "molar_entropy"]:
+                    self.assertFloatEqual(getattr(ss, prop), getattr(reference, prop))
+                for prop in ["cell_vectors", "isothermal_stiffness_tensor"]:
+                    self.assertArraysAlmostEqual(
+                        getattr(ss, prop).flatten(), getattr(reference, prop).flatten()
+                    )
+
+    def test_relaxed_initial_composition(self):
+        unrelaxed = make_nonorthotropic_solution(two_fos=True)
+        fractions = [0.4, 0.4, 0.2]
+        unrelaxed.set_composition(fractions)
+        ss = RelaxedAnisotropicSolution(
+            unrelaxed, [[1.0, -1.0, 0.0]], [[0.5, 0.5, 0.0], [0.0, 0.0, 1.0]]
+        )
+        self.assertArraysAlmostEqual(ss.molar_fractions, fractions)
+        self.assertArraysAlmostEqual(ss._scalar_solution.molar_fractions, fractions)
+        self.assertArraysAlmostEqual(unrelaxed.molar_fractions, fractions)
+        ss.set_composition([0.8, 0.2])
+        ss.set_state(2.0e10, 1000.0)
+        self.assertArraysAlmostEqual(ss.molar_fractions, fractions)
+        self.assertArraysAlmostEqual(ss.molar_fractions, unrelaxed.molar_fractions)
+        self.assertFloatEqual(ss.molar_gibbs, unrelaxed.molar_gibbs)
+
     def test_composition_derivatives_at_fixed_volume(self):
         """Compare cell and deformation derivatives with composition changes."""
         ss = make_nonorthotropic_solution()

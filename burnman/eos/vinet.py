@@ -3,6 +3,7 @@
 # GPL v2 or later.
 
 
+import numpy as np
 import scipy.optimize as opt
 from . import equation_of_state as eos
 import warnings
@@ -53,7 +54,13 @@ def volume_vinet(pressure, params):
     def func(V):
         return pressure_vinet(V / params["V_0"], params) - pressure
 
-    V = opt.brentq(func, 0.1 * params["V_0"], 1.5 * params["V_0"])
+    V = opt.brentq(
+        func,
+        0.1 * params["V_0"],
+        1.5 * params["V_0"],
+        xtol=np.finfo(float).tiny,
+        rtol=4.0 * np.finfo(float).eps,
+    )
     return V
 
 

@@ -800,7 +800,7 @@ def corner_plot(popt, pcov, param_names=[], n_std=1.0):
     scaling = 1.0 / np.power(10.0, np.around(np.log10(np.abs(popt)) - 0.5))
     scaling = np.outer(scaling, scaling)
 
-    fig, ax = plt.subplots(n_params - 1, n_params - 1)
+    fig, ax = plt.subplots(n_params - 1, n_params - 1, squeeze=False)
     fig.set_size_inches(3.0 * (n_params - 1), 3.0 * (n_params - 1))
 
     for j in range(n_params - 1):
@@ -977,45 +977,42 @@ def extreme_values(weighted_residuals, confidence_interval):
     return confidence_bound, indices, probabilities
 
 
-def plot_residuals(ax, weighted_residuals, n_bins=None, flags=[]):
-    if flags is []:
-        flags = [""] * len(weighted_residuals)
-        list_flags = [""]
-    else:
-        list_flags = list(set(flags))
+def plot_residuals(ax, weighted_residuals, n_bins=None, flags=None):
+    """Plot residual densities by flag and their weighted standard normal densities."""
+    weighted_residuals = np.asarray(weighted_residuals, dtype=float)
+    if (
+        weighted_residuals.ndim != 1
+        or weighted_residuals.size == 0
+        or not np.isfinite(weighted_residuals).all()
+    ):
+        raise ValueError("Residuals must be a nonempty, finite, one-dimensional array.")
+    if flags is None or len(flags) == 0:
+        flags = ["Residuals"] * len(weighted_residuals)
+    flags = np.asarray(flags, dtype=object)
+    if flags.shape != weighted_residuals.shape:
+        raise ValueError("One flag is required for each residual.")
 
-    if n_bins is None:
-        try:  # Only works for recent versions of numpy
-            bin_heights, bin_bounds = np.histogram(
-                weighted_residuals, bins="auto", density=True
-            )
-            n_bins = len(bin_heights)
-        except:
-            n_bins = 11.0
-
-    mask = [i for i, f in enumerate(flags)]
-    for flag in list_flags:
-        binwidth = np.ptp(weighted_residuals) / n_bins
-        dmin = min(weighted_residuals) - binwidth
-        dmax = max(weighted_residuals) + binwidth
-        bins = np.linspace(dmin, dmax, n_bins)
-        bin_heights, bin_bounds = np.histogram(
-            weighted_residuals[mask], bins=bins, density=True
+    bin_bounds = np.histogram_bin_edges(
+        weighted_residuals, bins="auto" if n_bins is None else n_bins
+    )
+    bin_centers = (bin_bounds[:-1] + bin_bounds[1:]) / 2.0
+    bin_widths = np.diff(bin_bounds)
+    x = np.linspace(bin_bounds[0], bin_bounds[-1], 1001)
+    for flag in dict.fromkeys(flags):
+        mask = flags == flag
+        bin_heights, _ = np.histogram(weighted_residuals[mask], bins=bin_bounds)
+        bin_heights = bin_heights / (len(weighted_residuals) * bin_widths)
+        normalisation = np.count_nonzero(mask) / len(weighted_residuals)
+        ax.bar(
+            bin_centers,
+            bin_heights,
+            width=bin_widths,
+            label=str(flag) or "Residuals",
+            alpha=0.2,
         )
-
-        normalisation = float(len(weighted_residuals[mask])) / float(
-            len(weighted_residuals)
-        )
-        bin_centers = (bin_bounds[:-1] + bin_bounds[1:]) / 2.0
-        bin_heights = bin_heights * normalisation
-        bin_widths = bin_bounds[1] - bin_bounds[0]
-        plt.bar(bin_centers, bin_heights, width=bin_widths, label=flag, alpha=0.2)
-        mask = [i for i, f in enumerate(flags) if f != flag and i in mask]
-
-        x = np.linspace(bin_bounds[0], bin_bounds[-1], 1001)
         ax.plot(x, norm.pdf(x) * normalisation)
 
     ax.set_title("Residual plot versus expected normal distribution")
     ax.set_xlabel("Number of standard deviations from the mean")
-    ax.set_ylabel("Probability")
+    ax.set_ylabel("Probability density")
     ax.legend(loc="upper right")
