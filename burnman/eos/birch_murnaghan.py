@@ -332,6 +332,7 @@ class BirchMurnaghanBase(eos.IsothermalEquationOfState):
                 - xi1 * (x6 / 6.0 - x4 / 4.0 + 1.0 / 12.0)
             )
         )
+        intPdV += params["P_0"] * (volume - params["V_0"])
 
         return -intPdV + params["F_0"]
 
@@ -613,6 +614,7 @@ class BM4(BirchMurnaghanBase):
                 + xi2 * (x8 / 8 - x6 / 2 + 3.0 * x4 / 4.0 - x2 / 2.0 + 1.0 / 8.0)
             )
         )
+        intPdV += params["P_0"] * (volume - params["V_0"])
 
         return -intPdV + params["F_0"]
 

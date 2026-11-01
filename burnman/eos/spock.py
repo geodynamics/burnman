@@ -139,7 +139,7 @@ class SPOCK(eos.IsothermalEquationOfState):
         )
         I2 = generalised_gammainc((1.0 - ci) / ai, bi * np.exp(ai * lnVrel), bi)
 
-        return params["F_0"] + params["P_0"] * (volume - params["V_0"]) + f * (I1 - I2)
+        return params["F_0"] + params["P_0"] * (params["V_0"] - volume) + f * (I1 - I2)
 
     def gibbs_energy(self, pressure, temperature, volume, params):
         """

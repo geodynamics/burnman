@@ -143,6 +143,7 @@ class Morse(eos.IsothermalEquationOfState):
             / np.power(params["Kprime_0"] - 1.0, 2.0)
             * (2.0 * np.exp(x) - np.exp(2.0 * x) - 1.0)
         )
+        intPdV += params["P_0"] * (volume - params["V_0"])
 
         return -intPdV + params["F_0"]
 
