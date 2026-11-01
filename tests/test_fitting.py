@@ -59,6 +59,111 @@ class JacobianLineModel(NonLinearModel):
 
 
 class test_fitting(BurnManTest):
+
+    def test_plot_residuals_without_flags(self):
+        for kwargs in [{}, {"flags": []}, {"flags": np.array([])}, {"flags": None}]:
+            with self.subTest(kwargs=kwargs):
+                fig, (ax, other) = plt.subplots(1, 2)
+                try:
+                    burnman.nonlinear_fitting.plot_residuals(
+                        ax, [-1.5, -0.5, 0.5, 1.5], **kwargs
+                    )
+                    self.assertEqual(len(ax.containers), 1)
+                    bars = ax.containers[0]
+                    self.assertArraysAlmostEqual(
+                        [bar.get_height() for bar in bars], [0.25, 0.25, 0.5]
+                    )
+                    self.assertArraysAlmostEqual(
+                        [bar.get_width() for bar in bars], [1.0, 1.0, 1.0]
+                    )
+                    self.assertEqual(len(ax.lines), 1)
+                    x, y = ax.lines[0].get_data()
+                    self.assertArraysAlmostEqual(
+                        y, np.exp(-0.5 * x**2) / np.sqrt(2.0 * np.pi)
+                    )
+                    self.assertEqual(
+                        [text.get_text() for text in ax.get_legend().get_texts()],
+                        ["Residuals"],
+                    )
+                    self.assertEqual(len(other.patches), 0)
+                    self.assertEqual(len(other.lines), 0)
+                    fig.canvas.draw()
+                finally:
+                    plt.close(fig)
+
+    def test_plot_residuals_flagged_densities(self):
+        fig, (ax, other) = plt.subplots(1, 2)
+        try:
+            burnman.nonlinear_fitting.plot_residuals(
+                ax,
+                np.array([-1.5, -1.0, -0.5, 0.5, 1.5]),
+                n_bins=3,
+                flags=np.array(["b", "a", "a", "b", "a"]),
+            )
+            expected = {"a": ([0.2, 0.2, 0.2], 0.6), "b": ([0.2, 0.0, 0.2], 0.4)}
+            self.assertEqual(len(ax.containers), 2)
+            self.assertEqual(len(ax.lines), 2)
+            area = 0.0
+            for bars, line in zip(ax.containers, ax.lines):
+                heights, weight = expected[bars.get_label()]
+                self.assertArraysAlmostEqual(
+                    [bar.get_height() for bar in bars], heights
+                )
+                self.assertArraysAlmostEqual(
+                    [bar.get_width() for bar in bars], [1.0] * 3
+                )
+                self.assertArraysAlmostEqual(
+                    [bar.get_x() + 0.5 * bar.get_width() for bar in bars],
+                    [-1.0, 0.0, 1.0],
+                )
+                group_area = sum(bar.get_height() * bar.get_width() for bar in bars)
+                self.assertFloatEqual(group_area, weight)
+                area += group_area
+                x, y = line.get_data()
+                self.assertArraysAlmostEqual(
+                    y, weight * np.exp(-0.5 * x**2) / np.sqrt(2.0 * np.pi)
+                )
+            self.assertFloatEqual(area, 1.0)
+            self.assertEqual(len(other.patches), 0)
+            self.assertEqual(len(other.lines), 0)
+            fig.canvas.draw()
+        finally:
+            plt.close(fig)
+
+    def test_plot_residuals_constant_data(self):
+        for residuals in [[2.0], [2.0, 2.0, 2.0]]:
+            with self.subTest(residuals=residuals):
+                fig, ax = plt.subplots()
+                try:
+                    burnman.nonlinear_fitting.plot_residuals(ax, residuals)
+                    self.assertEqual(len(ax.patches), 1)
+                    bar = ax.patches[0]
+                    self.assertFloatEqual(bar.get_height() * bar.get_width(), 1.0)
+                    self.assertTrue(np.isfinite(ax.lines[0].get_ydata()).all())
+                finally:
+                    plt.close(fig)
+
+    def test_plot_residuals_invalid_input(self):
+        fig, ax = plt.subplots()
+        try:
+            for residuals, flags in [
+                ([], None),
+                ([np.nan], None),
+                ([np.inf], None),
+                ([[1.0, 2.0]], None),
+                ([1.0, 2.0], ["a"]),
+                ([1.0, 2.0], [["a"], ["b"]]),
+            ]:
+                with self.subTest(residuals=residuals, flags=flags):
+                    with self.assertRaises(ValueError):
+                        burnman.nonlinear_fitting.plot_residuals(
+                            ax, residuals, flags=flags
+                        )
+            self.assertEqual(len(ax.patches), 0)
+            self.assertEqual(len(ax.lines), 0)
+        finally:
+            plt.close(fig)
+
     def test_corner_plot(self):
         for n in [2, 3, 4]:
             for labelled in [False, True]:
