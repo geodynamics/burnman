@@ -5,6 +5,7 @@
 
 
 import scipy.optimize as opt
+from scipy.integrate import quad
 from . import equation_of_state as eos
 from ..utils.math import generalised_gammainc
 import warnings
@@ -112,6 +113,16 @@ class SPOCK(eos.IsothermalEquationOfState):
             params["K_0"], params["Kprime_0"], params["Kprime_inf"], params["Kdprime_0"]
         )
         lnVrel = np.log(volume / params["V_0"])
+        if abs(lnVrel) < 0.05 and abs(ai * lnVrel) < 0.05:
+            # Integrate dP/dln(V) = -K near V_0 to avoid gamma-function cancellation.
+            integral, _ = quad(
+                lambda x: np.exp(-bi * np.expm1(ai * x) - ci * x),
+                0.0,
+                lnVrel,
+                epsabs=0.0,
+                epsrel=1.0e-12,
+            )
+            return params["P_0"] - params["K_0"] * integral
         return params["P_0"] + (
             params["K_0"]
             * np.exp(bi)

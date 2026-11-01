@@ -571,6 +571,19 @@ class test_cold_eos_reference_pressure(BurnManTest):
                             -V_0 * 2000.0 / (volumes[2] - volumes[0]), K_0, tol=2.0e-7
                         )
 
+    def test_spock_pressure_at_small_strain(self):
+        for scale in [1.0e-3, 1.0, 1.0e3]:
+            m = self._mineral("spock", 0.0)
+            m.params["V_0"] *= scale
+            for ratio in [1.0 - 1.0e-8, 1.0 + 1.0e-8, 1.0 - 1.0e-12, 1.0 + 1.0e-12]:
+                with self.subTest(scale=scale, ratio=ratio):
+                    V = m.params["V_0"] * ratio
+                    strain = V / m.params["V_0"] - 1.0
+                    P = m.method.pressure(self.params["T_0"], V, m.params)
+                    self.assertFloatEqual(
+                        P, -m.params["K_0"] * strain, tol=1.0e-7, tol_zero=0.0
+                    )
+
 
 if __name__ == "__main__":
     unittest.main()
