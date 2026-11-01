@@ -129,6 +129,7 @@ class Vinet(eos.IsothermalEquationOfState):
             / (eta * eta)
             * ((1.0 - eta * (1.0 - x)) * exp(eta * (1.0 - x)) - 1.0)
         )
+        intPdV += params["P_0"] * (volume - params["V_0"])
 
         return params["F_0"] - intPdV + volume * pressure
 

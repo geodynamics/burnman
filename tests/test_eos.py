@@ -5,6 +5,7 @@ import warnings
 import burnman
 from burnman import minerals
 from burnman.eos import debye
+from burnman.tools.eos import check_eos_consistency
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 import logging
 
@@ -476,6 +477,79 @@ class test_eos_validation(BurnManTest):
             m.set_state(P * 1.01, T)
             m.set_state_with_volume(V, T)
         self.assertAlmostEqual(m.pressure / 1.0e5, P / 1.0e5, places=3)
+
+
+class test_cold_eos_reference_pressure(BurnManTest):
+    def setUp(self):
+        self.eoses = ["bm3shear2", "bm3", "bm4", "vinet", "morse", "spock"]
+        self.params = {
+            "F_0": 1000.0,
+            "T_0": 100.0,
+            "V_0": 7.95626e-6,
+            "K_0": 109.7e9,
+            "Kprime_0": 4.66,
+            "Kprime_inf": 3.0,
+            "Kprime_prime_0": -0.043e-9,
+            "Kdprime_0": -4.66 / 100.0e9,
+            "molar_mass": 0.055845,
+        }
+
+    def _mineral(self, eos, reference_pressure):
+        return burnman.Mineral(
+            dict(self.params, equation_of_state=eos, P_0=reference_pressure)
+        )
+
+    def _helmholtz(self, m, volume):
+        T = m.params["T_0"]
+        P = m.method.pressure(T, volume, m.params)
+        return m.method.gibbs_energy(P, T, volume, m.params) - P * volume
+
+    def test_reference_pressure_work(self):
+        for eos in self.eoses:
+            zero = self._mineral(eos, 0.0)
+            for P_0 in [1.0e5, 2.5e9, 1.0e10]:
+                m = self._mineral(eos, P_0)
+                for ratio in [0.8, 1.0, 1.1]:
+                    with self.subTest(eos=eos, P_0=P_0, ratio=ratio):
+                        V = ratio * self.params["V_0"]
+                        self.assertFloatEqual(
+                            self._helmholtz(m, V) - self._helmholtz(zero, V),
+                            P_0 * (self.params["V_0"] - V),
+                            tol=1.0e-10,
+                            tol_zero=1.0e-8,
+                        )
+
+    def test_reference_energies(self):
+        for eos in self.eoses:
+            for P_0 in [0.0, 1.0e5, 2.5e9, 1.0e10]:
+                with self.subTest(eos=eos, P_0=P_0):
+                    m = self._mineral(eos, P_0)
+                    self.assertFloatEqual(
+                        self._helmholtz(m, self.params["V_0"]),
+                        self.params["F_0"],
+                        tol=1.0e-12,
+                        tol_zero=1.0e-8,
+                    )
+                    m.set_state(P_0, self.params["T_0"])
+                    self.assertFloatEqual(m.molar_helmholtz, self.params["F_0"])
+
+    def test_eos_consistency(self):
+        for eos in self.eoses:
+            for P_0 in [1.0e5, 2.5e9, 1.0e10]:
+                m = self._mineral(eos, P_0)
+                # At V_0, some volume solvers cannot resolve the checker's 1 kPa step.
+                for ratio in [0.8, 0.9, 1.1]:
+                    with self.subTest(eos=eos, P_0=P_0, ratio=ratio):
+                        V = ratio * self.params["V_0"]
+                        P = m.method.pressure(self.params["T_0"], V, m.params)
+                        self.assertTrue(
+                            check_eos_consistency(
+                                m,
+                                P=P,
+                                T=self.params["T_0"],
+                                including_shear_properties=False,
+                            )
+                        )
 
 
 if __name__ == "__main__":
