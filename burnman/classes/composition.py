@@ -205,6 +205,7 @@ class Composition(object):
         The components are added to the current state of the
         (mass, weight or molar) composition; if the composition has
         been renormalised, then this should be taken into account.
+        Zero and negative component amounts are retained.
 
         :param composition_dictionary: Components to add, and their amounts.
         :type composition_dictionary: dictionary
@@ -221,7 +222,8 @@ class Composition(object):
                 "Unit type not recognised. " "Should be either mass, weight or molar."
             )
 
-        composition += OrderedCounter(composition_dictionary)
+        # Counter.update() adds amounts without dropping nonpositive entries.
+        composition.update(composition_dictionary)
 
         # Reinitialize composition object
         self.__init__(composition, unit_type)
@@ -414,7 +416,8 @@ class Composition(object):
                 "Can only add another Composition object to this Composition."
             )
 
-        new_mass_composition = self.mass_composition + other.mass_composition
+        new_mass_composition = self.mass_composition.copy()
+        new_mass_composition.update(other.mass_composition)
         return Composition(new_mass_composition, "mass")
 
     def __sub__(self, other):
