@@ -77,6 +77,36 @@ class composition(BurnManTest):
             np.array(list(c_dict.values())) * 2.0, c.weight_composition.values()
         )
 
+    def test_add_components_signed_amounts(self):
+        c_dict = {"MgO": 1.0, "SiO2": 1.0, "Al2O3": -0.5}
+        additions = {"MgO": -2.0, "SiO2": -1.0, "FeO": -3.0, "CaO": 0.0}
+        expected = {"MgO": -1.0, "SiO2": 0.0, "Al2O3": -0.5, "FeO": -3.0, "CaO": 0.0}
+
+        for unit_type in ["molar", "mass", "weight"]:
+            with self.subTest(unit_type=unit_type):
+                c = Composition(c_dict, unit_type=unit_type, normalize=False)
+                c.add_components(additions, unit_type=unit_type)
+
+                amounts = c.composition(unit_type)
+                self.assertEqual(list(amounts.keys()), list(expected.keys()))
+                self.assertArraysAlmostEqual(amounts.values(), expected.values())
+
+    def test_add_negative_oxygen_and_change_component_set(self):
+        c = Composition({"FeO": 2.0, "SiO2": 1.0}, unit_type="molar")
+        c.add_components({"O": -0.5}, unit_type="molar")
+
+        self.assertFloatEqual(c.molar_composition["O"], -0.5)
+        self.assertArraysAlmostEqual(
+            [c.atomic_composition[element] for element in ["Fe", "Si", "O"]],
+            [2.0, 1.0, 3.5],
+        )
+
+        c.change_component_set(["Fe", "Fe2O3", "SiO2"])
+        self.assertArraysAlmostEqual(
+            [c.molar_composition[component] for component in ["Fe", "Fe2O3", "SiO2"]],
+            [1.0, 0.5, 1.0],
+        )
+
     def test_change_component_set(self):
         c_dict = {"MgO": 1.0, "SiO2": 1.0}
         c = Composition(c_dict, unit_type="molar", normalize=False)
@@ -112,6 +142,34 @@ class composition(BurnManTest):
         self.assertArraysAlmostEqual(
             np.array([2.0, 3.0]), [c2.molar_composition[key] for key in ["MgO", "FeO"]]
         )
+
+    def test_add_signed_compositions(self):
+        c_dict_1 = {"MgO": 1.0, "SiO2": 1.0, "Al2O3": -0.5}
+        c_dict_2 = {"MgO": -2.0, "SiO2": -1.0, "FeO": -3.0, "CaO": 0.0}
+        expected = {"MgO": -1.0, "SiO2": 0.0, "Al2O3": -0.5, "FeO": -3.0, "CaO": 0.0}
+
+        for in_place in [False, True]:
+            with self.subTest(in_place=in_place):
+                c1 = Composition(c_dict_1, unit_type="molar")
+                c2 = Composition(c_dict_2, unit_type="molar")
+                if in_place:
+                    c1 += c2
+                    result = c1
+                else:
+                    result = c1 + c2
+                    self.assertArraysAlmostEqual(
+                        c1.molar_composition.values(), c_dict_1.values()
+                    )
+
+                self.assertEqual(
+                    list(result.molar_composition.keys()), list(expected.keys())
+                )
+                self.assertArraysAlmostEqual(
+                    result.molar_composition.values(), expected.values()
+                )
+                self.assertArraysAlmostEqual(
+                    c2.molar_composition.values(), c_dict_2.values()
+                )
 
     def test_difference_two_compositions(self):
         c_dict_1 = {"MgO": 1.0, "SiO2": 1.0}
