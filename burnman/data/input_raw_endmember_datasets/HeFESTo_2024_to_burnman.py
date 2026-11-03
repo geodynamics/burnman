@@ -348,7 +348,6 @@ for f in mbrdir.iterdir():
             "eta_s_0": rfloat(idict["eta_s_0"]),
             "n": rfloat(idict["n"]),
             "Z": rfloat(idict["Z"]),
-            "molar_mass": rfloat(idict["molar_mass"], 1.0e-3),
         }
 
         # electronic terms
@@ -457,7 +456,8 @@ print(
     "    IdealSolution,\n"
     "    SymmetricRegularSolution,\n"
     "    AsymmetricRegularSolution,\n"
-    ")\n\n"
+    ")\n"
+    "from ..utils.chemistry import formula_mass\n\n"
 )
 
 
@@ -555,13 +555,21 @@ print('"""\n' "ENDMEMBERS\n" '"""\n')
 for key, mbr_prm in sorted(mbr_params.items()):
     if key == "st":
         print(st_class)
-        mbr_prm = mbr_prm.__repr__().replace("'slb3'", "SLB3Stishovite()")
-        mbr_prm = mbr_prm.replace("slb3", "fault")
     print(
         f"\nclass {key}(Mineral):\n"
         "    def __init__(self):\n"
-        f"        self.params = {mbr_prm}\n"
+        f"        formula = {mbr_prm['formula']}\n"
+        "        self.params = {"
     )
+    for param, value in mbr_prm.items():
+        if param == "formula":
+            value = "formula"
+        elif key == "st" and param == "equation_of_state":
+            value = "SLB3Stishovite()"
+        else:
+            value = repr(value)
+        print(f"            {param!r}: {value},")
+    print("            'molar_mass': formula_mass(formula),\n        }\n")
     if key in mbr_mods:
         print(
             f"        self.property_modifiers = {mbr_mods[key]}",
