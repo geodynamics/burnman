@@ -12,19 +12,21 @@ Minerals from Stixrude & Lithgow-Bertelloni 2005 and references therein
 """
 
 from ..classes.mineral import Mineral
+from ..utils.chemistry import formula_mass
 
 
 class stishovite(Mineral):
     def __init__(self):
+        formula = {"Si": 1.0, "O": 2.0}
         self.params = {
-            "formula": {"Si": 1.0, "O": 2.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "V_0": 14.02e-6,
             "K_0": 314.0e9,
             "Kprime_0": 4.4,
             "G_0": 220.0e9,
             "Gprime_0": 1.6,
-            "molar_mass": 0.0601,
+            "molar_mass": formula_mass(formula),
             "n": 3,
             "Debye_0": 1044.0,
             "grueneisen_0": 1.34,
@@ -37,15 +39,16 @@ class stishovite(Mineral):
 
 class periclase(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "O": 1.0}
         self.params = {
-            "formula": {"Mg": 1.0, "O": 1.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "V_0": 11.24e-6,
             "K_0": 161.0e9,
             "Kprime_0": 3.8,
             "G_0": 131.0e9,
             "Gprime_0": 2.1,
-            "molar_mass": 0.0403,
+            "molar_mass": formula_mass(formula),
             "n": 2,
             "Debye_0": 773.0,
             "grueneisen_0": 1.5,
@@ -57,15 +60,16 @@ class periclase(Mineral):
 
 class wuestite(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "O": 1.0}
         self.params = {
             "equation_of_state": "slb3",
-            "formula": {"Fe": 1.0, "O": 1.0},
+            "formula": formula,
             "V_0": 12.06e-6,
             "K_0": 152.0e9,
             "Kprime_0": 4.9,
             "G_0": 47.0e9,
             "Gprime_0": 0.7,
-            "molar_mass": 0.0718,
+            "molar_mass": formula_mass(formula),
             "n": 2,
             "Debye_0": 455.0,
             "grueneisen_0": 1.28,
@@ -78,15 +82,16 @@ class wuestite(Mineral):
 
 class mg_perovskite(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
-            "formula": {"Mg": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "V_0": 24.45e-6,
             "K_0": 251.0e9,
             "Kprime_0": 4.1,
             "G_0": 175.0e9,
             "Gprime_0": 1.7,
-            "molar_mass": 0.1000,
+            "molar_mass": formula_mass(formula),
             "n": 5,
             "Debye_0": 1070.0,
             "grueneisen_0": 1.48,
@@ -99,15 +104,16 @@ class mg_perovskite(Mineral):
 
 class fe_perovskite(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
-            "formula": {"Fe": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "V_0": 25.48e-6,
             "K_0": 281.0e9,
             "Kprime_0": 4.1,
             "G_0": 138.0e9,
             "Gprime_0": 1.7,
-            "molar_mass": 0.1319,
+            "molar_mass": formula_mass(formula),
             "n": 5,
             "Debye_0": 841.0,
             "grueneisen_0": 1.48,

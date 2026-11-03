@@ -210,9 +210,9 @@ class composite(BurnManTest):
         d2 = pyrolite.phases[1].density
         dmix = pyrolite.density
 
-        self.assertFloatEqual(d1, 4494.483)
-        self.assertFloatEqual(d2, 4130.096)
-        self.assertFloatEqual(dmix, 4486.263)
+        self.assertFloatEqual(d1, 4511.954)
+        self.assertFloatEqual(d2, 4130.547)
+        self.assertFloatEqual(dmix, 4503.349)
 
     def test_thermodynamic_potentials(self):
         rock1 = burnman.Composite(

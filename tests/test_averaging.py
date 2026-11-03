@@ -118,10 +118,10 @@ class VRH(BurnManTest):
             [10.0e9],
             [300.0],
         )
-        self.assertFloatEqual(4881.469, rho[0])
-        self.assertFloatEqual(9957.665, v_p[0])
-        self.assertFloatEqual(5606.916, v_s[0])
-        self.assertFloatEqual(7565.607, v_phi[0])
+        self.assertFloatEqual(4882.407, rho[0])
+        self.assertFloatEqual(9956.708, v_p[0])
+        self.assertFloatEqual(5606.378, v_s[0])
+        self.assertFloatEqual(7564.880, v_phi[0])
         self.assertFloatEqual(279.408, K_vrh[0] / 1.0e9)
         self.assertFloatEqual(153.461, G_vrh[0] / 1.0e9)
 
@@ -173,10 +173,10 @@ class Reuss(BurnManTest):
             [10.0e9],
             [300.0],
         )
-        self.assertFloatEqual(4881.469, rho[0])
-        self.assertFloatEqual(9887.625, v_p[0])
-        self.assertFloatEqual(5606.745, v_s[0])
-        self.assertFloatEqual(7473.353, v_phi[0])
+        self.assertFloatEqual(4882.407, rho[0])
+        self.assertFloatEqual(9886.675, v_p[0])
+        self.assertFloatEqual(5606.207, v_s[0])
+        self.assertFloatEqual(7472.635, v_phi[0])
         self.assertFloatEqual(272.635, K[0] / 1.0e9)
         self.assertFloatEqual(153.452, G[0] / 1.0e9)
 
@@ -270,10 +270,10 @@ class Voigt(BurnManTest):
             [10.0e9],
             [300.0],
         )
-        self.assertFloatEqual(4881.469, rho[0])
-        self.assertFloatEqual(10027.216, v_p[0])
-        self.assertFloatEqual(5607.087, v_s[0])
-        self.assertFloatEqual(7656.750, v_phi[0])
+        self.assertFloatEqual(4882.407, rho[0])
+        self.assertFloatEqual(10026.252, v_p[0])
+        self.assertFloatEqual(5606.549, v_s[0])
+        self.assertFloatEqual(7656.014, v_phi[0])
         self.assertFloatEqual(286.180, K[0] / 1.0e9)
         self.assertFloatEqual(153.471, G[0] / 1.0e9)
 
@@ -325,10 +325,10 @@ class HSLower(BurnManTest):
             [10.0e9],
             [300.0],
         )
-        self.assertFloatEqual(4881.469, rho[0])
-        self.assertFloatEqual(9951.957, v_p[0])
-        self.assertFloatEqual(5606.916, v_s[0])
-        self.assertFloatEqual(7558.094, v_phi[0])
+        self.assertFloatEqual(4882.407, rho[0])
+        self.assertFloatEqual(9951.001, v_p[0])
+        self.assertFloatEqual(5606.377, v_s[0])
+        self.assertFloatEqual(7557.367, v_phi[0])
         self.assertFloatEqual(278.853, K[0] / 1.0e9)
         self.assertFloatEqual(153.461, G[0] / 1.0e9)
 
@@ -380,10 +380,10 @@ class HSUpper(BurnManTest):
             [10.0e9],
             [300.0],
         )
-        self.assertFloatEqual(4881.469, rho[0])
-        self.assertFloatEqual(9952.798, v_p[0])
-        self.assertFloatEqual(5606.925, v_s[0])
-        self.assertFloatEqual(7559.192, v_phi[0])
+        self.assertFloatEqual(4882.407, rho[0])
+        self.assertFloatEqual(9951.842, v_p[0])
+        self.assertFloatEqual(5606.387, v_s[0])
+        self.assertFloatEqual(7558.466, v_phi[0])
         self.assertFloatEqual(278.934, K[0] / 1.0e9)
         self.assertFloatEqual(153.462, G[0] / 1.0e9)
 
@@ -434,10 +434,10 @@ class HSAverage(BurnManTest):
             [10.0e9],
             [300.0],
         )
-        self.assertFloatEqual(4881.469, rho[0])
-        self.assertFloatEqual(9952.378, v_p[0])
-        self.assertFloatEqual(5606.920, v_s[0])
-        self.assertFloatEqual(7558.643, v_phi[0])
+        self.assertFloatEqual(4882.407, rho[0])
+        self.assertFloatEqual(9951.421, v_p[0])
+        self.assertFloatEqual(5606.382, v_s[0])
+        self.assertFloatEqual(7557.917, v_phi[0])
         self.assertFloatEqual(278.893, K[0] / 1.0e9)
         self.assertFloatEqual(153.461, G[0] / 1.0e9)
 

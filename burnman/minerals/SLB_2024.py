@@ -121,6 +121,7 @@ from ..classes.solutionmodel import (
     SymmetricRegularSolution,
     AsymmetricRegularSolution,
 )
+from ..utils.chemistry import formula_mass
 
 """
 ENDMEMBERS
@@ -129,9 +130,10 @@ ENDMEMBERS
 
 class ab(Mineral):
     def __init__(self):
+        formula = {"Na": 1.0, "Al": 1.0, "Si": 3.0, "O": 8.0}
         self.params = {
             "name": "Albite",
-            "formula": {"Na": 1.0, "Al": 1.0, "Si": 3.0, "O": 8.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -3717909.79,
             "V_0": 0.000100452,
@@ -145,7 +147,7 @@ class ab(Mineral):
             "eta_s_0": 1.02954,
             "n": 13.0,
             "Z": 4.0,
-            "molar_mass": 0.262223,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -153,9 +155,10 @@ class ab(Mineral):
 
 class acm(Mineral):
     def __init__(self):
+        formula = {"Na": 1.0, "Fe": 1.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Acmite",
-            "formula": {"Na": 1.0, "Fe": 1.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2419124.39,
             "V_0": 6.4606e-05,
@@ -169,7 +172,7 @@ class acm(Mineral):
             "eta_s_0": 1.7391,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.231,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -181,9 +184,10 @@ class acm(Mineral):
 
 class al(Mineral):
     def __init__(self):
+        formula = {"Fe": 3.0, "Al": 2.0, "Si": 3.0, "O": 12.0}
         self.params = {
             "name": "Almandine",
-            "formula": {"Fe": 3.0, "Al": 2.0, "Si": 3.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -4930861.659999999,
             "V_0": 0.00011543,
@@ -197,7 +201,7 @@ class al(Mineral):
             "eta_s_0": 2.09289,
             "n": 20.0,
             "Z": 4.0,
-            "molar_mass": 0.49776,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -209,9 +213,10 @@ class al(Mineral):
 
 class alpv(Mineral):
     def __init__(self):
+        formula = {"Al": 2.0, "O": 3.0}
         self.params = {
             "name": "Al-Perovskite",
-            "formula": {"Al": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1517031.0,
             "V_0": 2.4944e-05,
@@ -225,7 +230,7 @@ class alpv(Mineral):
             "eta_s_0": 2.27978,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.101961,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -233,9 +238,10 @@ class alpv(Mineral):
 
 class an(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Al": 2.0, "Si": 2.0, "O": 8.0}
         self.params = {
             "name": "Anorthite",
-            "formula": {"Ca": 1.0, "Al": 2.0, "Si": 2.0, "O": 8.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -4012381.1300000004,
             "V_0": 0.00010061,
@@ -249,7 +255,7 @@ class an(Mineral):
             "eta_s_0": 1.63405,
             "n": 13.0,
             "Z": 2.0,
-            "molar_mass": 0.278211,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -257,9 +263,10 @@ class an(Mineral):
 
 class anao(Mineral):
     def __init__(self):
+        formula = {"Na": 2.0, "Al": 2.0, "O": 4.0}
         self.params = {
             "name": "alpha-NaO2_phase",
-            "formula": {"Na": 2.0, "Al": 2.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2124562.13,
             "V_0": 4.542e-05,
@@ -273,7 +280,7 @@ class anao(Mineral):
             "eta_s_0": 0.77305,
             "n": 8.0,
             "Z": 1.0,
-            "molar_mass": 0.16394023,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -281,9 +288,10 @@ class anao(Mineral):
 
 class andr(Mineral):
     def __init__(self):
+        formula = {"Ca": 3.0, "Fe": 2.0, "Si": 3.0, "O": 12.0}
         self.params = {
             "name": "Grossular",
-            "formula": {"Ca": 3.0, "Fe": 2.0, "Si": 3.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -5414950.41,
             "V_0": 0.00013199,
@@ -297,7 +305,7 @@ class andr(Mineral):
             "eta_s_0": 2.84503,
             "n": 20.0,
             "Z": 4.0,
-            "molar_mass": 0.50817,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -309,9 +317,10 @@ class andr(Mineral):
 
 class apbo(Mineral):
     def __init__(self):
+        formula = {"Si": 1.0, "O": 2.0}
         self.params = {
             "name": "alpha-PbO_2-SiO_2",
-            "formula": {"Si": 1.0, "O": 2.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -792997.39,
             "V_0": 1.367e-05,
@@ -325,7 +334,7 @@ class apbo(Mineral):
             "eta_s_0": 4.56617,
             "n": 3.0,
             "Z": 4.0,
-            "molar_mass": 0.060085,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -333,9 +342,10 @@ class apbo(Mineral):
 
 class appv(Mineral):
     def __init__(self):
+        formula = {"Al": 2.0, "O": 3.0}
         self.params = {
             "name": "Al-Post-Perovskite",
-            "formula": {"Al": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1434367.18,
             "V_0": 2.45e-05,
@@ -349,7 +359,7 @@ class appv(Mineral):
             "eta_s_0": 2.70624,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.101961,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -357,9 +367,10 @@ class appv(Mineral):
 
 class capv(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Ca-Perovskite",
-            "formula": {"Ca": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1461201.28,
             "V_0": 2.745e-05,
@@ -373,7 +384,7 @@ class capv(Mineral):
             "eta_s_0": 1.35422,
             "n": 5.0,
             "Z": 1.0,
-            "molar_mass": 0.116164,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -381,9 +392,10 @@ class capv(Mineral):
 
 class cats(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Al": 2.0, "Si": 1.0, "O": 6.0}
         self.params = {
             "name": "Lime_Tschermak'",
-            "formula": {"Ca": 1.0, "Al": 2.0, "Si": 1.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -3119890.8000000003,
             "V_0": 6.3574e-05,
@@ -397,7 +409,7 @@ class cats(Mineral):
             "eta_s_0": 1.77238,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.218123,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -405,9 +417,10 @@ class cats(Mineral):
 
 class cen(Mineral):
     def __init__(self):
+        formula = {"Mg": 2.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Clinoenstatite",
-            "formula": {"Mg": 2.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2904584.98,
             "V_0": 6.25e-05,
@@ -421,7 +434,7 @@ class cen(Mineral):
             "eta_s_0": 1.42387,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.2007774,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -429,9 +442,10 @@ class cen(Mineral):
 
 class co(Mineral):
     def __init__(self):
+        formula = {"Al": 2.0, "O": 3.0}
         self.params = {
             "name": "Corundum",
-            "formula": {"Al": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1582443.1400000001,
             "V_0": 2.5577e-05,
@@ -445,7 +459,7 @@ class co(Mineral):
             "eta_s_0": 2.84761,
             "n": 5.0,
             "Z": 2.0,
-            "molar_mass": 0.101961,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -453,9 +467,10 @@ class co(Mineral):
 
 class coes(Mineral):
     def __init__(self):
+        formula = {"Si": 1.0, "O": 2.0}
         self.params = {
             "name": "Coesite",
-            "formula": {"Si": 1.0, "O": 2.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -853834.92,
             "V_0": 2.0657e-05,
@@ -469,7 +484,7 @@ class coes(Mineral):
             "eta_s_0": 2.75631,
             "n": 3.0,
             "Z": 16.0,
-            "molar_mass": 0.060085,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -477,9 +492,10 @@ class coes(Mineral):
 
 class cppv(Mineral):
     def __init__(self):
+        formula = {"Cr": 2.0, "O": 3.0}
         self.params = {
             "name": "Cr-Post-Perovskite",
-            "formula": {"Cr": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1110023.23,
             "V_0": 2.6949e-05,
@@ -493,7 +509,7 @@ class cppv(Mineral):
             "eta_s_0": 3.16235,
             "n": 5.0,
             "Z": 2.0,
-            "molar_mass": 0.15199,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -505,9 +521,10 @@ class cppv(Mineral):
 
 class crcf(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Cr": 2.0, "O": 4.0}
         self.params = {
             "name": "Cr_Ca-Ferrite",
-            "formula": {"Mg": 1.0, "Cr": 2.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1736682.29,
             "V_0": 3.9421e-05,
@@ -521,7 +538,7 @@ class crcf(Mineral):
             "eta_s_0": 1.93943,
             "n": 7.0,
             "Z": 8.0,
-            "molar_mass": 0.19229,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -533,9 +550,10 @@ class crcf(Mineral):
 
 class crpv(Mineral):
     def __init__(self):
+        formula = {"Cr": 2.0, "O": 3.0}
         self.params = {
             "name": "Cr-Perovskite",
-            "formula": {"Cr": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1186685.95,
             "V_0": 2.8189e-05,
@@ -549,7 +567,7 @@ class crpv(Mineral):
             "eta_s_0": 2.83537,
             "n": 5.0,
             "Z": 2.0,
-            "molar_mass": 0.15199,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -561,9 +579,10 @@ class crpv(Mineral):
 
 class di(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Mg": 1.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Diopside",
-            "formula": {"Ca": 1.0, "Mg": 1.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -3029614.78,
             "V_0": 6.6039e-05,
@@ -577,7 +596,7 @@ class di(Mineral):
             "eta_s_0": 1.06175,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.2165504,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -585,9 +604,10 @@ class di(Mineral):
 
 class en(Mineral):
     def __init__(self):
+        formula = {"Mg": 2.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Enstatite",
-            "formula": {"Mg": 2.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2912202.5,
             "V_0": 6.2676e-05,
@@ -601,7 +621,7 @@ class en(Mineral):
             "eta_s_0": 2.5045,
             "n": 10.0,
             "Z": 4.0,
-            "molar_mass": 0.2007774,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -609,9 +629,10 @@ class en(Mineral):
 
 class esk(Mineral):
     def __init__(self):
+        formula = {"Cr": 2.0, "O": 3.0}
         self.params = {
             "name": "Eskolaite",
-            "formula": {"Cr": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1206914.71,
             "V_0": 2.8904e-05,
@@ -625,7 +646,7 @@ class esk(Mineral):
             "eta_s_0": 2.55521,
             "n": 5.0,
             "Z": 2.0,
-            "molar_mass": 0.15199,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -637,9 +658,10 @@ class esk(Mineral):
 
 class fa(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Fayalite",
-            "formula": {"Fe": 2.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1371708.3399999999,
             "V_0": 4.629e-05,
@@ -653,7 +675,7 @@ class fa(Mineral):
             "eta_s_0": 1.65937,
             "n": 7.0,
             "Z": 4.0,
-            "molar_mass": 0.203777,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -665,9 +687,10 @@ class fa(Mineral):
 
 class fapv(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "Al": 1.0, "O": 3.0}
         self.params = {
             "name": "FeAlO3-Perovskite_HS",
-            "formula": {"Fe": 1.0, "Al": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1131674.78,
             "V_0": 2.709e-05,
@@ -681,7 +704,7 @@ class fapv(Mineral):
             "eta_s_0": 2.8548,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.1308249,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -693,9 +716,10 @@ class fapv(Mineral):
 
 class fea(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0}
         self.params = {
             "name": "alpha_(bcc)_Iron",
-            "formula": {"Fe": 1.0},
+            "formula": formula,
             "equation_of_state": "slb3-conductive",
             "F_0": 11.82,
             "V_0": 7.093e-06,
@@ -709,7 +733,7 @@ class fea(Mineral):
             "eta_s_0": 5.96207,
             "n": 1.0,
             "Z": 2.0,
-            "molar_mass": 0.05584515,
+            "molar_mass": formula_mass(formula),
             "bel_0": 0.00388,
             "gel": 1.4796,
         }
@@ -734,9 +758,10 @@ class fea(Mineral):
 
 class fec2(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "HP-Clinoferrosilite",
-            "formula": {"Fe": 2.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2219723.5300000003,
             "V_0": 6.38541e-05,
@@ -750,7 +775,7 @@ class fec2(Mineral):
             "eta_s_0": 1.14272,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.2638614,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -762,9 +787,10 @@ class fec2(Mineral):
 
 class fecf(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "Al": 2.0, "O": 4.0}
         self.params = {
             "name": "Fe-Ca-Ferrite",
-            "formula": {"Fe": 1.0, "Al": 2.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1768312.12,
             "V_0": 3.7216e-05,
@@ -778,7 +804,7 @@ class fecf(Mineral):
             "eta_s_0": 2.46745,
             "n": 7.0,
             "Z": 4.0,
-            "molar_mass": 0.173806,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -790,9 +816,10 @@ class fecf(Mineral):
 
 class fee(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0}
         self.params = {
             "name": "epsilon_(hcp)_Iron",
-            "formula": {"Fe": 1.0},
+            "formula": formula,
             "equation_of_state": "slb3-conductive",
             "F_0": 3428.48,
             "V_0": 6.7651e-06,
@@ -806,7 +833,7 @@ class fee(Mineral):
             "eta_s_0": 5.20603,
             "n": 1.0,
             "Z": 2.0,
-            "molar_mass": 0.05584515,
+            "molar_mass": formula_mass(formula),
             "bel_0": 0.00411,
             "gel": 1.6927,
         }
@@ -816,9 +843,10 @@ class fee(Mineral):
 
 class feg(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0}
         self.params = {
             "name": "gamma_(fcc)_Iron",
-            "formula": {"Fe": 1.0},
+            "formula": formula,
             "equation_of_state": "slb3-conductive",
             "F_0": 4675.83,
             "V_0": 6.9883e-06,
@@ -832,7 +860,7 @@ class feg(Mineral):
             "eta_s_0": 6.50014,
             "n": 1.0,
             "Z": 2.0,
-            "molar_mass": 0.05584515,
+            "molar_mass": formula_mass(formula),
             "bel_0": 0.00375,
             "gel": 1.4796,
         }
@@ -842,9 +870,10 @@ class feg(Mineral):
 
 class feil(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Fe-Akimotoite",
-            "formula": {"Fe": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1044260.0800000001,
             "V_0": 2.6854e-05,
@@ -858,7 +887,7 @@ class feil(Mineral):
             "eta_s_0": 3.6318,
             "n": 5.0,
             "Z": 2.0,
-            "molar_mass": 0.131931,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -870,9 +899,10 @@ class feil(Mineral):
 
 class fepv(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Fe-Perovskite",
-            "formula": {"Fe": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1002026.07,
             "V_0": 2.5321e-05,
@@ -886,7 +916,7 @@ class fepv(Mineral):
             "eta_s_0": 2.08541,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.131931,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -898,9 +928,10 @@ class fepv(Mineral):
 
 class feri(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Fe-Ringwoodite",
-            "formula": {"Fe": 2.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1356599.78,
             "V_0": 4.186e-05,
@@ -914,7 +945,7 @@ class feri(Mineral):
             "eta_s_0": 1.76941,
             "n": 7.0,
             "Z": 2.0,
-            "molar_mass": 0.203777,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -926,9 +957,10 @@ class feri(Mineral):
 
 class fewa(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Fe-Wadsleyite",
-            "formula": {"Fe": 2.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1356211.64,
             "V_0": 4.28e-05,
@@ -942,7 +974,7 @@ class fewa(Mineral):
             "eta_s_0": 0.94487,
             "n": 7.0,
             "Z": 8.0,
-            "molar_mass": 0.203777,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -954,9 +986,10 @@ class fewa(Mineral):
 
 class fnal(Mineral):
     def __init__(self):
+        formula = {"Na": 1.0, "Fe": 2.0, "Al": 5.0, "Si": 1.0, "O": 12.0}
         self.params = {
             "name": "Fe-NAL_Phase",
-            "formula": {"Na": 1.0, "Fe": 2.0, "Al": 5.0, "Si": 1.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -5465247.03,
             "V_0": 0.000112045,
@@ -970,7 +1003,7 @@ class fnal(Mineral):
             "eta_s_0": 2.73801,
             "n": 21.0,
             "Z": 1.0,
-            "molar_mass": 0.48966601,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -982,9 +1015,10 @@ class fnal(Mineral):
 
 class fo(Mineral):
     def __init__(self):
+        formula = {"Mg": 2.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Forsterite",
-            "formula": {"Mg": 2.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2055345.33,
             "V_0": 4.3603e-05,
@@ -998,7 +1032,7 @@ class fo(Mineral):
             "eta_s_0": 2.29968,
             "n": 7.0,
             "Z": 4.0,
-            "molar_mass": 0.140695,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1006,9 +1040,10 @@ class fo(Mineral):
 
 class fppv(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Fe-PostPerovskite",
-            "formula": {"Fe": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -988569.5,
             "V_0": 2.52963e-05,
@@ -1022,7 +1057,7 @@ class fppv(Mineral):
             "eta_s_0": 1.8495,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.131931,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1034,9 +1069,10 @@ class fppv(Mineral):
 
 class fs(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Ferrosilite",
-            "formula": {"Fe": 2.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2224559.86,
             "V_0": 6.5941e-05,
@@ -1050,7 +1086,7 @@ class fs(Mineral):
             "eta_s_0": 1.08228,
             "n": 10.0,
             "Z": 4.0,
-            "molar_mass": 0.2638614,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1062,9 +1098,10 @@ class fs(Mineral):
 
 class gr(Mineral):
     def __init__(self):
+        formula = {"Ca": 3.0, "Al": 2.0, "Si": 3.0, "O": 12.0}
         self.params = {
             "name": "Grossular",
-            "formula": {"Ca": 3.0, "Al": 2.0, "Si": 3.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -6276906.68,
             "V_0": 0.00012512,
@@ -1078,7 +1115,7 @@ class gr(Mineral):
             "eta_s_0": 2.38415,
             "n": 20.0,
             "Z": 4.0,
-            "molar_mass": 0.450449,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1086,9 +1123,10 @@ class gr(Mineral):
 
 class hc(Mineral):
     def __init__(self):
+        formula = {"Fe": 1.0, "Al": 2.0, "O": 4.0}
         self.params = {
             "name": "Hercynite",
-            "formula": {"Fe": 1.0, "Al": 2.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1841813.73,
             "V_0": 4.0843e-05,
@@ -1102,7 +1140,7 @@ class hc(Mineral):
             "eta_s_0": 2.46339,
             "n": 7.0,
             "Z": 8.0,
-            "molar_mass": 0.17381,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1114,9 +1152,10 @@ class hc(Mineral):
 
 class he(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Fe": 1.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Hedenbergite",
-            "formula": {"Ca": 1.0, "Fe": 1.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2675636.34,
             "V_0": 6.7867e-05,
@@ -1130,7 +1169,7 @@ class he(Mineral):
             "eta_s_0": 1.01745,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.2480924,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1142,9 +1181,10 @@ class he(Mineral):
 
 class hem(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "O": 3.0}
         self.params = {
             "name": "Hematite",
-            "formula": {"Fe": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -744045.2000000001,
             "V_0": 3.0287e-05,
@@ -1158,7 +1198,7 @@ class hem(Mineral):
             "eta_s_0": 0.5241,
             "n": 5.0,
             "Z": 1.0,
-            "molar_mass": 0.15968852,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1170,9 +1210,10 @@ class hem(Mineral):
 
 class hepv(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "O": 3.0}
         self.params = {
             "name": "Fe2O3-Perovskite_HS",
-            "formula": {"Fe": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -706527.0299999999,
             "V_0": 2.95768e-05,
@@ -1186,7 +1227,7 @@ class hepv(Mineral):
             "eta_s_0": 1.88876,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.15968852,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1198,9 +1239,10 @@ class hepv(Mineral):
 
 class hlpv(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "O": 3.0}
         self.params = {
             "name": "Fe2O3-Perovskite_LS",
-            "formula": {"Fe": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -597158.86,
             "V_0": 2.75209e-05,
@@ -1214,7 +1256,7 @@ class hlpv(Mineral):
             "eta_s_0": 3.54218,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.15968852,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1226,9 +1268,10 @@ class hlpv(Mineral):
 
 class hmag(Mineral):
     def __init__(self):
+        formula = {"Fe": 3.0, "O": 4.0}
         self.params = {
             "name": "High-Pressure_Magnetit",
-            "formula": {"Fe": 3.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -993123.89,
             "V_0": 4.1702e-05,
@@ -1242,7 +1285,7 @@ class hmag(Mineral):
             "eta_s_0": 1.37608,
             "n": 7.0,
             "Z": 1.0,
-            "molar_mass": 0.23153307,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1265,9 +1308,10 @@ class hmag(Mineral):
 
 class hppv(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "O": 3.0}
         self.params = {
             "name": "HS_Fe2O3-Post-Perovski",
-            "formula": {"Fe": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -620839.7200000001,
             "V_0": 2.76884e-05,
@@ -1281,7 +1325,7 @@ class hppv(Mineral):
             "eta_s_0": 2.56327,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.15968852,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1293,9 +1337,10 @@ class hppv(Mineral):
 
 class jd(Mineral):
     def __init__(self):
+        formula = {"Na": 1.0, "Al": 1.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Jadeite",
-            "formula": {"Na": 1.0, "Al": 1.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2855160.68,
             "V_0": 6.0508e-05,
@@ -1309,7 +1354,7 @@ class jd(Mineral):
             "eta_s_0": 1.91023,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.2021387,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1317,9 +1362,10 @@ class jd(Mineral):
 
 class knor(Mineral):
     def __init__(self):
+        formula = {"Mg": 3.0, "Cr": 2.0, "Si": 3.0, "O": 12.0}
         self.params = {
             "name": "Knorringite",
-            "formula": {"Mg": 3.0, "Cr": 2.0, "Si": 3.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -5523022.38,
             "V_0": 0.000118716,
@@ -1333,7 +1379,7 @@ class knor(Mineral):
             "eta_s_0": 2.11433,
             "n": 20.0,
             "Z": 4.0,
-            "molar_mass": 0.45316,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1345,9 +1391,10 @@ class knor(Mineral):
 
 class ky(Mineral):
     def __init__(self):
+        formula = {"Al": 2.0, "Si": 1.0, "O": 5.0}
         self.params = {
             "name": "Kyanite",
-            "formula": {"Al": 2.0, "Si": 1.0, "O": 5.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2443738.48,
             "V_0": 4.4227e-05,
@@ -1361,7 +1408,7 @@ class ky(Mineral):
             "eta_s_0": 2.89863,
             "n": 8.0,
             "Z": 4.0,
-            "molar_mass": 0.1620456,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1369,9 +1416,10 @@ class ky(Mineral):
 
 class lppv(Mineral):
     def __init__(self):
+        formula = {"Fe": 2.0, "O": 3.0}
         self.params = {
             "name": "LS_Fe2O3-Post-Perovski",
-            "formula": {"Fe": 2.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -405645.45,
             "V_0": 2.62534e-05,
@@ -1385,7 +1433,7 @@ class lppv(Mineral):
             "eta_s_0": 3.79074,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.15968852,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1397,9 +1445,10 @@ class lppv(Mineral):
 
 class mag(Mineral):
     def __init__(self):
+        formula = {"Fe": 3.0, "O": 4.0}
         self.params = {
             "name": "Magnetite",
-            "formula": {"Fe": 3.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1016009.99,
             "V_0": 4.4528e-05,
@@ -1413,7 +1462,7 @@ class mag(Mineral):
             "eta_s_0": 1.12258,
             "n": 7.0,
             "Z": 1.0,
-            "molar_mass": 0.23153307,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1436,9 +1485,10 @@ class mag(Mineral):
 
 class mgc2(Mineral):
     def __init__(self):
+        formula = {"Mg": 2.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "HP-Clinoenstatite",
-            "formula": {"Mg": 2.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2904465.49,
             "V_0": 6.076e-05,
@@ -1452,7 +1502,7 @@ class mgc2(Mineral):
             "eta_s_0": 2.14193,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.2007774,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1460,9 +1510,10 @@ class mgc2(Mineral):
 
 class mgcf(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Al": 2.0, "O": 4.0}
         self.params = {
             "name": "Mg-Ca-Ferrite",
-            "formula": {"Mg": 1.0, "Al": 2.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2122885.3600000003,
             "V_0": 3.6135e-05,
@@ -1476,7 +1527,7 @@ class mgcf(Mineral):
             "eta_s_0": 1.30292,
             "n": 7.0,
             "Z": 4.0,
-            "molar_mass": 0.142266,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1484,9 +1535,10 @@ class mgcf(Mineral):
 
 class mgil(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Mg-Akimotoite",
-            "formula": {"Mg": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1409229.53,
             "V_0": 2.6354e-05,
@@ -1500,7 +1552,7 @@ class mgil(Mineral):
             "eta_s_0": 3.3993,
             "n": 5.0,
             "Z": 2.0,
-            "molar_mass": 0.100389,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1508,9 +1560,10 @@ class mgil(Mineral):
 
 class mgmj(Mineral):
     def __init__(self):
+        formula = {"Mg": 4.0, "Si": 4.0, "O": 12.0}
         self.params = {
             "name": "Mg-Majorite",
-            "formula": {"Mg": 4.0, "Si": 4.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -5690008.32,
             "V_0": 0.000114324,
@@ -1524,7 +1577,7 @@ class mgmj(Mineral):
             "eta_s_0": 1.01779,
             "n": 20.0,
             "Z": 4.0,
-            "molar_mass": 0.40156,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1532,9 +1585,10 @@ class mgmj(Mineral):
 
 class mgpv(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Mg-Perovskite",
-            "formula": {"Mg": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1365338.1199999999,
             "V_0": 2.4445e-05,
@@ -1548,7 +1602,7 @@ class mgpv(Mineral):
             "eta_s_0": 1.65233,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.100389,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1556,9 +1610,10 @@ class mgpv(Mineral):
 
 class mgri(Mineral):
     def __init__(self):
+        formula = {"Mg": 2.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Mg-Ringwoodite",
-            "formula": {"Mg": 2.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2018381.1,
             "V_0": 3.9493e-05,
@@ -1572,7 +1627,7 @@ class mgri(Mineral):
             "eta_s_0": 2.30588,
             "n": 7.0,
             "Z": 2.0,
-            "molar_mass": 0.140693,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1580,9 +1635,10 @@ class mgri(Mineral):
 
 class mgts(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Al": 2.0, "Si": 1.0, "O": 6.0}
         self.params = {
             "name": "Mg-Tschermak's",
-            "formula": {"Mg": 1.0, "Al": 2.0, "Si": 1.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -3000959.4699999997,
             "V_0": 5.914e-05,
@@ -1596,7 +1652,7 @@ class mgts(Mineral):
             "eta_s_0": 2.39272,
             "n": 10.0,
             "Z": 4.0,
-            "molar_mass": 0.20235,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1604,9 +1660,10 @@ class mgts(Mineral):
 
 class mgwa(Mineral):
     def __init__(self):
+        formula = {"Mg": 2.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Mg-Wadsleyite",
-            "formula": {"Mg": 2.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2029078.6,
             "V_0": 4.0515e-05,
@@ -1620,7 +1677,7 @@ class mgwa(Mineral):
             "eta_s_0": 2.56411,
             "n": 7.0,
             "Z": 8.0,
-            "molar_mass": 0.140695,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1628,9 +1685,10 @@ class mgwa(Mineral):
 
 class mnal(Mineral):
     def __init__(self):
+        formula = {"Na": 1.0, "Mg": 2.0, "Al": 5.0, "Si": 1.0, "O": 12.0}
         self.params = {
             "name": "Mg-NAL_Phase",
-            "formula": {"Na": 1.0, "Mg": 2.0, "Al": 5.0, "Si": 1.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -6172514.21,
             "V_0": 0.000109883,
@@ -1644,7 +1702,7 @@ class mnal(Mineral):
             "eta_s_0": 1.9384,
             "n": 21.0,
             "Z": 1.0,
-            "molar_mass": 0.42658581,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1652,9 +1710,10 @@ class mnal(Mineral):
 
 class mppv(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Mg-PostPerovskite",
-            "formula": {"Mg": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1332544.16,
             "V_0": 2.41108e-05,
@@ -1668,7 +1727,7 @@ class mppv(Mineral):
             "eta_s_0": 1.43815,
             "n": 5.0,
             "Z": 4.0,
-            "molar_mass": 0.100389,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1676,9 +1735,10 @@ class mppv(Mineral):
 
 class nacf(Mineral):
     def __init__(self):
+        formula = {"Na": 1.0, "Al": 1.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Na-Ca-Ferrite",
-            "formula": {"Na": 1.0, "Al": 1.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1848182.13,
             "V_0": 3.627e-05,
@@ -1692,7 +1752,7 @@ class nacf(Mineral):
             "eta_s_0": 1.67725,
             "n": 7.0,
             "Z": 4.0,
-            "molar_mass": 0.142054,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1700,9 +1760,10 @@ class nacf(Mineral):
 
 class namj(Mineral):
     def __init__(self):
+        formula = {"Na": 2.0, "Mg": 1.0, "Si": 5.0, "O": 12.0}
         self.params = {
             "name": "Na-Majorite",
-            "formula": {"Na": 2.0, "Mg": 1.0, "Si": 5.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -5309561.23,
             "V_0": 0.000110842,
@@ -1716,7 +1777,7 @@ class namj(Mineral):
             "eta_s_0": 2.48526,
             "n": 20.0,
             "Z": 4.0,
-            "molar_mass": 0.40270437,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1724,9 +1785,10 @@ class namj(Mineral):
 
 class neph(Mineral):
     def __init__(self):
+        formula = {"Na": 1.0, "Al": 1.0, "Si": 1.0, "O": 4.0}
         self.params = {
             "name": "Nepheline",
-            "formula": {"Na": 1.0, "Al": 1.0, "Si": 1.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1996488.39,
             "V_0": 5.38684e-05,
@@ -1740,7 +1802,7 @@ class neph(Mineral):
             "eta_s_0": 0.6241,
             "n": 7.0,
             "Z": 2.0,
-            "molar_mass": 0.14205431,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1755,9 +1817,10 @@ class neph(Mineral):
 
 class nnal(Mineral):
     def __init__(self):
+        formula = {"Na": 3.0, "Al": 3.0, "Si": 3.0, "O": 12.0}
         self.params = {
             "name": "Na-NAL_Phase",
-            "formula": {"Na": 3.0, "Al": 3.0, "Si": 3.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -5570853.449999999,
             "V_0": 0.000109401,
@@ -1771,7 +1834,7 @@ class nnal(Mineral):
             "eta_s_0": 2.40665,
             "n": 21.0,
             "Z": 1.0,
-            "molar_mass": 0.42616294,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1779,9 +1842,10 @@ class nnal(Mineral):
 
 class odi(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Mg": 1.0, "Si": 2.0, "O": 6.0}
         self.params = {
             "name": "Ortho-Diopside",
-            "formula": {"Ca": 1.0, "Mg": 1.0, "Si": 2.0, "O": 6.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -3015701.23,
             "V_0": 6.8054e-05,
@@ -1795,7 +1859,7 @@ class odi(Mineral):
             "eta_s_0": 1.35202,
             "n": 10.0,
             "Z": 1.0,
-            "molar_mass": 0.2165504,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1803,9 +1867,10 @@ class odi(Mineral):
 
 class pe(Mineral):
     def __init__(self):
+        formula = {"Mg": 4.0, "O": 4.0}
         self.params = {
             "name": "Periclase",
-            "formula": {"Mg": 4.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2278119.6300000004,
             "V_0": 4.4976e-05,
@@ -1819,7 +1884,7 @@ class pe(Mineral):
             "eta_s_0": 2.56123,
             "n": 8.0,
             "Z": 1.0,
-            "molar_mass": 0.16121782,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1827,9 +1892,10 @@ class pe(Mineral):
 
 class picr(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Cr": 2.0, "O": 4.0}
         self.params = {
             "name": "Pircochromite",
-            "formula": {"Mg": 1.0, "Cr": 2.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1808028.0,
             "V_0": 4.3564e-05,
@@ -1843,7 +1909,7 @@ class picr(Mineral):
             "eta_s_0": 3.07014,
             "n": 7.0,
             "Z": 8.0,
-            "molar_mass": 0.19229,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1855,9 +1921,10 @@ class picr(Mineral):
 
 class pwo(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Pseudo-Wollastonite",
-            "formula": {"Ca": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1547095.09,
             "V_0": 4.0272e-05,
@@ -1871,7 +1938,7 @@ class pwo(Mineral):
             "eta_s_0": 0.76187,
             "n": 5.0,
             "Z": 1.0,
-            "molar_mass": 0.116164,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1879,9 +1946,10 @@ class pwo(Mineral):
 
 class py(Mineral):
     def __init__(self):
+        formula = {"Mg": 3.0, "Al": 2.0, "Si": 3.0, "O": 12.0}
         self.params = {
             "name": "Pyrope",
-            "formula": {"Mg": 3.0, "Al": 2.0, "Si": 3.0, "O": 12.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -5932095.930000001,
             "V_0": 0.00011308,
@@ -1895,7 +1963,7 @@ class py(Mineral):
             "eta_s_0": 0.98186,
             "n": 20.0,
             "Z": 4.0,
-            "molar_mass": 0.40313,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -1903,9 +1971,10 @@ class py(Mineral):
 
 class qtz(Mineral):
     def __init__(self):
+        formula = {"Si": 1.0, "O": 2.0}
         self.params = {
             "name": "Quartz",
-            "formula": {"Si": 1.0, "O": 2.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -858043.33,
             "V_0": 2.24211e-05,
@@ -1919,7 +1988,7 @@ class qtz(Mineral):
             "eta_s_0": 2.40464,
             "n": 3.0,
             "Z": 16.0,
-            "molar_mass": 0.060085,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1934,9 +2003,10 @@ class qtz(Mineral):
 
 class smag(Mineral):
     def __init__(self):
+        formula = {"Fe": 3.0, "O": 4.0}
         self.params = {
             "name": "Magnetite",
-            "formula": {"Fe": 3.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1016009.99,
             "V_0": 4.4528e-05,
@@ -1950,7 +2020,7 @@ class smag(Mineral):
             "eta_s_0": 1.12258,
             "n": 7.0,
             "Z": 1.0,
-            "molar_mass": 0.23153307,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -1973,9 +2043,10 @@ class smag(Mineral):
 
 class sp(Mineral):
     def __init__(self):
+        formula = {"Mg": 1.0, "Al": 2.0, "O": 4.0}
         self.params = {
             "name": "Spinel",
-            "formula": {"Mg": 1.0, "Al": 2.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -2171789.32,
             "V_0": 3.9762e-05,
@@ -1989,7 +2060,7 @@ class sp(Mineral):
             "eta_s_0": 2.4035,
             "n": 7.0,
             "Z": 8.0,
-            "molar_mass": 0.142278,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -2036,9 +2107,10 @@ class SLB3Stishovite(SLB3):
 
 class st(Mineral):
     def __init__(self):
+        formula = {"Si": 1.0, "O": 2.0}
         self.params = {
             "name": "Stishovite",
-            "formula": {"Si": 1.0, "O": 2.0},
+            "formula": formula,
             "equation_of_state": SLB3Stishovite(),
             "F_0": -817124.2,
             "V_0": 1.4017e-05,
@@ -2052,7 +2124,7 @@ class st(Mineral):
             "eta_s_0": 5.39736,
             "n": 3.0,
             "Z": 2.0,
-            "molar_mass": 0.060085,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -2060,9 +2132,10 @@ class st(Mineral):
 
 class wo(Mineral):
     def __init__(self):
+        formula = {"Ca": 1.0, "Si": 1.0, "O": 3.0}
         self.params = {
             "name": "Wollastonite",
-            "formula": {"Ca": 1.0, "Si": 1.0, "O": 3.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -1548541.46,
             "V_0": 3.9901e-05,
@@ -2076,7 +2149,7 @@ class wo(Mineral):
             "eta_s_0": 1.2711,
             "n": 5.0,
             "Z": 1.0,
-            "molar_mass": 0.116164,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
@@ -2084,9 +2157,10 @@ class wo(Mineral):
 
 class wu(Mineral):
     def __init__(self):
+        formula = {"Fe": 4.0, "O": 4.0}
         self.params = {
             "name": 'W\\"ustite',
-            "formula": {"Fe": 4.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -962050.35,
             "V_0": 4.9024e-05,
@@ -2100,7 +2174,7 @@ class wu(Mineral):
             "eta_s_0": 0.0596,
             "n": 8.0,
             "Z": 1.0,
-            "molar_mass": 0.28737822,
+            "molar_mass": formula_mass(formula),
         }
 
         self.property_modifiers = [
@@ -2112,9 +2186,10 @@ class wu(Mineral):
 
 class wuls(Mineral):
     def __init__(self):
+        formula = {"Fe": 4.0, "O": 4.0}
         self.params = {
             "name": 'W\\"ustite_Low_Spin',
-            "formula": {"Fe": 4.0, "O": 4.0},
+            "formula": formula,
             "equation_of_state": "slb3",
             "F_0": -609335.18,
             "V_0": 4.33997e-05,
@@ -2128,7 +2203,7 @@ class wuls(Mineral):
             "eta_s_0": -0.14773,
             "n": 8.0,
             "Z": 1.0,
-            "molar_mass": 0.28737822,
+            "molar_mass": formula_mass(formula),
         }
 
         Mineral.__init__(self)
