@@ -482,6 +482,89 @@ class ppv_function(burnman.Solution):
 
 
 class test_solidsolution(BurnManTest):
+    def test_number_of_moles_solution(self):
+        olivine = burnman.minerals.SLB_2011.mg_fe_olivine([0.3, 0.7])
+        opx = burnman.minerals.JH_2015.orthopyroxene()
+        relaxed = burnman.RelaxedSolution(
+            opx, opx.reaction_basis, opx.compositional_basis
+        )
+        relaxed.set_composition([0.2, 0.2, 0.1, 0.1, 0.2, 0.2])
+        extensive = [
+            "mass",
+            "volume",
+            "entropy",
+            "enthalpy",
+            "gibbs",
+            "helmholtz",
+            "internal_energy",
+            "heat_capacity_p",
+            "heat_capacity_v",
+        ]
+        intensive = ["molar_" + name for name in extensive] + [
+            "density",
+            "thermal_expansivity",
+            "isothermal_bulk_modulus_reuss",
+            "isentropic_bulk_modulus_reuss",
+            "isothermal_compressibility_reuss",
+            "isentropic_compressibility_reuss",
+            "grueneisen_parameter",
+        ]
+        for solution in (olivine, relaxed):
+            solution.set_state(4.0e9, 900.0)
+            expected = {name: getattr(solution, name) for name in intensive + extensive}
+            for amount in (0.1, 2.5, 1.0):
+                with self.subTest(solution=solution.name, amount=amount):
+                    if isinstance(solution, burnman.RelaxedSolution):
+                        solution.unrelaxed.number_of_moles = amount
+                    solution.number_of_moles = amount
+                    for name in intensive:
+                        self.assertFloatEqual(getattr(solution, name), expected[name])
+                    for name in extensive:
+                        self.assertFloatEqual(
+                            getattr(solution, name), amount * expected[name]
+                        )
+
+    def test_solution_response_at_nonunit_amount_matches_volume_derivatives(self):
+        solution = burnman.minerals.SLB_2011.mg_fe_olivine([0.3, 0.7])
+        solution.number_of_moles = 2.5
+        p, t, dp, dt = 4.0e9, 900.0, 1.0e4, 0.01
+        solution.set_state(p, t)
+        v, s = solution.evaluate(
+            ["molar_volume", "entropy"],
+            [p, p, p - dp, p + dp],
+            [t - dt, t + dt, t, t],
+        )
+        self.assertFloatEqual(
+            solution.thermal_expansivity,
+            (v[1] - v[0]) / (2.0 * dt * solution.molar_volume),
+        )
+        self.assertFloatEqual(
+            solution.isothermal_bulk_modulus_reuss,
+            -solution.molar_volume * 2.0 * dp / (v[3] - v[2]),
+        )
+        self.assertFloatEqual(solution.heat_capacity_p, t * (s[1] - s[0]) / (2.0 * dt))
+
+    def test_solution_properties_are_independent_of_endmember_amounts(self):
+        solution = burnman.minerals.SLB_2011.mg_fe_olivine([0.3, 0.7])
+        solution.set_state(4.0e9, 900.0)
+        names = [
+            "molar_gibbs",
+            "molar_entropy",
+            "molar_enthalpy",
+            "molar_heat_capacity_v",
+            "thermal_expansivity",
+            "isothermal_bulk_modulus_reuss",
+        ]
+        expected = [getattr(solution, name) for name in names]
+        partial_gibbs = solution.partial_gibbs.copy()
+        for (endmember, _), amount in zip(solution.endmembers, (3.0, 0.2)):
+            endmember.number_of_moles = amount
+        solution.reset()
+        self.assertArraysAlmostEqual(
+            [getattr(solution, name) for name in names], expected
+        )
+        self.assertArraysAlmostEqual(solution.partial_gibbs, partial_gibbs)
+
     def setup_1min_ss(self):
         P = 1.0e5
         T = 1000.0
@@ -1538,6 +1621,48 @@ class test_solidsolution(BurnManTest):
         np.testing.assert_allclose(gammas, ones)
         np.testing.assert_allclose(alphas, ones)
         np.testing.assert_almost_equal(H_xs, 0.0)
+
+    def test_intensive_and_extensive_solution_models(self):
+        from burnman.classes.solutionmodel import MechanicalSolution
+
+        for factory in (
+            olivine_ideal_ss,
+            olivine_ss,
+            two_site_ss_asymmetric,
+            two_site_ss_subregular,
+            polynomial_mbr_mixing,
+        ):
+            solution = factory()
+            solution.set_composition(
+                [0.2, 0.3, 0.5] if solution.n_endmembers == 3 else [0.3, 0.7]
+            )
+            with self.subTest(model=factory.__name__):
+                self.assertMaterialAmountScaling(solution)
+        self.assertMaterialAmountScaling(
+            ppv_function(excess_gibbs_function_ppv_PT_dependent, [0.2, 0.3, 0.5])
+        )
+        dataset = burnman.minerals.SLB_2011
+        mechanical = burnman.Solution(
+            solution_model=MechanicalSolution(
+                [[dataset.enstatite(), ""], [dataset.periclase(), ""]]
+            ),
+            molar_fractions=[0.5, 1.0],
+        )
+        self.assertMaterialAmountScaling(mechanical)
+        opx = burnman.minerals.JH_2015.orthopyroxene()
+        relaxed = burnman.RelaxedSolution(
+            opx, opx.reaction_basis, opx.compositional_basis
+        )
+        relaxed.set_composition([0.2, 0.2, 0.1, 0.1, 0.2, 0.2])
+        self.assertMaterialAmountScaling(relaxed)
+
+    def test_polynomial_interactions_ignore_reference_amounts(self):
+        solution = polynomial_mbr_mixing()
+        solution.set_composition([0.3, 0.7])
+        references = [m for m, _ in solution.endmembers] + list(
+            solution.solution_model.interaction_endmembers
+        )
+        self.assertReferenceAmountIndependence(solution, references)
 
 
 if __name__ == "__main__":

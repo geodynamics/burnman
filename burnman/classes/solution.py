@@ -232,7 +232,7 @@ class Solution(Mineral):
     def molar_internal_energy(self):
         """
         Returns molar internal energy of the mineral [J/mol].
-        Aliased with self.energy
+        The corresponding total is available as ``self.internal_energy``.
         """
         return self.molar_helmholtz + self.temperature * self.molar_entropy
 
@@ -273,7 +273,7 @@ class Solution(Mineral):
         Property specific to solutions.
         """
         return (
-            np.array([mbr[0].gibbs for mbr in self.solution_model.endmembers])
+            np.array([mbr[0].molar_gibbs for mbr in self.solution_model.endmembers])
             + self.excess_partial_gibbs
         )
 
@@ -343,13 +343,13 @@ class Solution(Mineral):
     def molar_gibbs(self):
         """
         Returns molar Gibbs free energy of the solution [J/mol].
-        Aliased with self.gibbs.
+        The corresponding total is available as ``self.gibbs``.
         """
         f = self.molar_fractions
         return (
             sum(
                 [
-                    self.solution_model.endmembers[i][0].gibbs * f[i]
+                    self.solution_model.endmembers[i][0].molar_gibbs * f[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -360,7 +360,7 @@ class Solution(Mineral):
     def molar_helmholtz(self):
         """
         Returns molar Helmholtz free energy of the solution [J/mol].
-        Aliased with self.helmholtz.
+        The corresponding total is available as ``self.helmholtz``.
         """
         return self.molar_gibbs - self.pressure * self.molar_volume
 
@@ -391,7 +391,7 @@ class Solution(Mineral):
     def molar_volume(self):
         """
         Returns molar volume of the solution [m^3/mol].
-        Aliased with self.V.
+        The corresponding total is available as ``self.volume``.
         """
         return (
             sum(
@@ -426,13 +426,13 @@ class Solution(Mineral):
     def molar_entropy(self):
         """
         Returns molar entropy of the solution [J/K/mol].
-        Aliased with self.S.
+        The corresponding total is available as ``self.entropy``.
         """
         f = self.molar_fractions
         return (
             sum(
                 [
-                    self.solution_model.endmembers[i][0].S * f[i]
+                    self.solution_model.endmembers[i][0].molar_entropy * f[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -453,13 +453,13 @@ class Solution(Mineral):
     def molar_enthalpy(self):
         """
         Returns molar enthalpy of the solution [J/mol].
-        Aliased with self.H.
+        The corresponding total is available as ``self.enthalpy``.
         """
         f = self.molar_fractions
         return (
             sum(
                 [
-                    self.solution_model.endmembers[i][0].H * f[i]
+                    self.solution_model.endmembers[i][0].molar_enthalpy * f[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -473,12 +473,12 @@ class Solution(Mineral):
         Aliased with self.K_T.
         """
         return (
-            self.V
+            self.molar_volume
             * 1.0
             / (
                 sum(
                     [
-                        self.solution_model.endmembers[i][0].V
+                        self.solution_model.endmembers[i][0].molar_volume
                         / (
                             self.solution_model.endmembers[i][
                                 0
@@ -590,11 +590,11 @@ class Solution(Mineral):
         of the solution [1/K].
         Aliased with self.alpha.
         """
-        return (1.0 / self.V) * (
+        return (1.0 / self.molar_volume) * (
             sum(
                 [
                     self.solution_model.endmembers[i][0].alpha
-                    * self.solution_model.endmembers[i][0].V
+                    * self.solution_model.endmembers[i][0].molar_volume
                     * self.molar_fractions[i]
                     for i in range(self.n_endmembers)
                 ]
@@ -609,7 +609,7 @@ class Solution(Mineral):
         """
         Returns molar heat capacity at constant volume of the
         solution [J/K/mol].
-        Aliased with self.C_v.
+        The corresponding total is available as ``self.heat_capacity_v``.
         """
         return (
             self.molar_heat_capacity_p
@@ -625,7 +625,7 @@ class Solution(Mineral):
         """
         Returns molar heat capacity at constant pressure
         of the solution [J/K/mol].
-        Aliased with self.C_p.
+        The corresponding total is available as ``self.heat_capacity_p``.
         """
         return sum(
             [
@@ -1080,12 +1080,12 @@ class RelaxedSolution(Solution):
     @material_property
     @copy_documentation(Solution.isothermal_compressibility_reuss)
     def isothermal_compressibility_reuss(self):
-        return -self._d2Gdzdz[0, 0] / self.V
+        return -self._d2Gdzdz[0, 0] / self.molar_volume
 
     @material_property
     @copy_documentation(Solution.thermal_expansivity)
     def thermal_expansivity(self):
-        return self._d2Gdzdz[0, 1] / self.V
+        return self._d2Gdzdz[0, 1] / self.molar_volume
 
     @material_property
     @copy_documentation(Solution.molar_heat_capacity_p)

@@ -386,13 +386,11 @@ class MechanicalSolution(SolutionModel):
     An extremely simple class representing a mechanical solution model.
     A mechanical solution experiences no interaction between endmembers.
     Therefore, unlike ideal solutions there is no entropy of mixing;
-    the total gibbs free energy of the solution is equal to the
-    dot product of the molar gibbs free energies and molar fractions
-    of the constituent materials.
-
-    The shared name ``molar_fractions`` is retained for compatibility. For this
-    model the entries are linear mixing coefficients: they may be signed and
-    need not sum to one. No normalization is applied automatically.
+    the molar Gibbs energy is the dot product of the endmember
+    molar Gibbs energies and the specified molar amounts. These amounts
+    need not sum to one, allowing stoichiometric combinations to define
+    new endmembers. The material's ``number_of_moles`` separately sets
+    the sample amount.
     """
 
     def __init__(self, endmembers):
@@ -1611,7 +1609,7 @@ class PolynomialSolution(IdealSolution):
     def _non_ideal_excess_partial_gibbs(self, pressure, temperature, molar_fractions):
         dEdn, dSdn, dVdn = self._ESV_gradient_list
         mbr_gradients = self._mbr_gradient_list
-        mbr_gibbs = np.array([mbr.gibbs for mbr in self.interaction_endmembers])
+        mbr_gibbs = np.array([mbr.molar_gibbs for mbr in self.interaction_endmembers])
         gibbs = dEdn - temperature * dSdn + pressure * dVdn
         gibbs += np.einsum("i, ij->j", mbr_gibbs, mbr_gradients)
         return gibbs
@@ -1632,7 +1630,9 @@ class PolynomialSolution(IdealSolution):
 
         dSdn = self._ESV_gradient_list[1]
         mbr_gradients = self._mbr_gradient_list
-        mbr_entropies = np.array([mbr.S for mbr in self.interaction_endmembers])
+        mbr_entropies = np.array(
+            [mbr.molar_entropy for mbr in self.interaction_endmembers]
+        )
 
         non_ideal_entropies = dSdn + np.einsum("i, ij->j", mbr_entropies, mbr_gradients)
         return ideal_entropies + non_ideal_entropies
@@ -1640,7 +1640,9 @@ class PolynomialSolution(IdealSolution):
     def excess_partial_volumes(self, pressure, temperature, molar_fractions):
         dVdn = self._ESV_gradient_list[2]
         mbr_gradients = self._mbr_gradient_list
-        mbr_volumes = np.array([mbr.V for mbr in self.interaction_endmembers])
+        mbr_volumes = np.array(
+            [mbr.molar_volume for mbr in self.interaction_endmembers]
+        )
 
         return dVdn + np.einsum("i, ij->j", mbr_volumes, mbr_gradients)
 
@@ -1651,7 +1653,7 @@ class PolynomialSolution(IdealSolution):
 
         d2Edndn, d2Sdndn, d2Vdndn = self._ESV_hessian_list
         mbr_hessian = self._mbr_hessian_list
-        mbr_gibbs = np.array([mbr.gibbs for mbr in self.interaction_endmembers])
+        mbr_gibbs = np.array([mbr.molar_gibbs for mbr in self.interaction_endmembers])
 
         d2Gdndn = d2Edndn - temperature * d2Sdndn + pressure * d2Vdndn
         d2Gdndn += np.einsum("i, ijk->jk", mbr_gibbs, mbr_hessian)
@@ -1665,7 +1667,9 @@ class PolynomialSolution(IdealSolution):
 
         d2Sdndn = self._ESV_hessian_list[1]
         mbr_hessian = self._mbr_hessian_list
-        mbr_entropies = np.array([mbr.S for mbr in self.interaction_endmembers])
+        mbr_entropies = np.array(
+            [mbr.molar_entropy for mbr in self.interaction_endmembers]
+        )
 
         d2Sdndn += np.einsum("i, ijk->jk", mbr_entropies, mbr_hessian)
 
@@ -1674,7 +1678,9 @@ class PolynomialSolution(IdealSolution):
     def volume_hessian(self, pressure, temperature, molar_fractions):
         d2Vdndn = self._ESV_hessian_list[2]
         mbr_hessian = self._mbr_hessian_list
-        mbr_volumes = np.array([mbr.V for mbr in self.interaction_endmembers])
+        mbr_volumes = np.array(
+            [mbr.molar_volume for mbr in self.interaction_endmembers]
+        )
 
         d2Vdndn += np.einsum("i, ijk->jk", mbr_volumes, mbr_hessian)
 
@@ -1690,7 +1696,7 @@ class PolynomialSolution(IdealSolution):
     def alphaV_excess(self, pressure, temperature, molar_fractions):
         mbr_scalar = self.mbr_scalar_list
         mbr_d2gibbsdpdt = np.array(
-            [mbr.alpha * mbr.V for mbr in self.interaction_endmembers]
+            [mbr.alpha * mbr.molar_volume for mbr in self.interaction_endmembers]
         )
         return np.einsum("i, i", mbr_scalar, mbr_d2gibbsdpdt)
 
@@ -1698,7 +1704,7 @@ class PolynomialSolution(IdealSolution):
         mbr_scalar = self.mbr_scalar_list
         mbr_d2gibbsdpdp = np.array(
             [
-                mbr.V / mbr.isothermal_bulk_modulus_reuss
+                mbr.molar_volume / mbr.isothermal_bulk_modulus_reuss
                 for mbr in self.interaction_endmembers
             ]
         )
