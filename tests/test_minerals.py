@@ -4,6 +4,7 @@ import inspect
 
 import burnman
 from burnman import minerals
+from burnman.eos.equation_of_state import EquationOfState
 
 
 # Instantiate every mineral in the mineral library
@@ -94,6 +95,32 @@ class SLB2022LandauVolumes(BurnManTest):
 
 
 class VolumeStateModifiers(BurnManTest):
+    def test_volume_state_without_pressure_function(self):
+        class VolumeOnlyEOS(EquationOfState):
+            def volume(self, pressure, temperature, params):
+                return 1.0e-5 * (1.0 - pressure / 1.0e11)
+
+        mineral = burnman.Mineral()
+        mineral.method = VolumeOnlyEOS()
+        mineral.set_state_with_volume(9.0e-6, 700.0)
+        self.assertAlmostEqual(mineral.pressure / 1.0e10, 1.0, places=12)
+        self.assertAlmostEqual(mineral.molar_volume / 9.0e-6, 1.0, places=12)
+
+    def test_volume_state_rejects_discontinuous_root(self):
+        class DiscontinuousEOS(EquationOfState):
+            def volume(self, pressure, temperature, params):
+                if pressure < 3.0e9:
+                    raise ValueError("Pressure outside the EOS domain")
+                return 8.0e-6
+
+        mineral = burnman.Mineral()
+        mineral.method = DiscontinuousEOS()
+        mineral.property_modifiers = [
+            ["linear", {"delta_E": 0.0, "delta_S": 1.0, "delta_V": 0.0}]
+        ]
+        with self.assertRaisesRegex(ValueError, "volume"):
+            mineral.set_state_with_volume(9.0e-6, 700.0)
+
     def test_volume_state_does_not_add_modifier_volume_twice(self):
         mineral = minerals.SLB_2011.forsterite()
         mineral.property_modifiers = [
