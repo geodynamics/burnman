@@ -35,6 +35,62 @@ class min2(min1):
 
 
 class test_layer(BurnManTest):
+    def test_extensive_profiles_follow_material_amount(self):
+        material = burnman.minerals.SLB_2011.forsterite()
+        material.number_of_moles = 2.5
+        layer = Layer("sample", np.linspace(1e6, 2e6, 5))
+        layer.set_material(material)
+        layer.set_temperature_mode(
+            "user-defined", temperatures=np.linspace(1000.0, 1500.0, 5)
+        )
+        layer.set_pressure_mode(
+            "user-defined", pressures=np.linspace(6e9, 4e9, 5), gravity_bottom=10.0
+        )
+        layer.make()
+        physical_mass, physical_volume = layer.mass, layer.volume
+        self.assertEqual(np.ndim(physical_mass), 0)
+        self.assertEqual(np.ndim(physical_volume), 0)
+        self.assertFloatEqual(physical_volume, 4.0 * np.pi / 3.0 * (2e6**3 - 1e6**3))
+        totals = {
+            "energy": "molar_internal_energy",
+            "internal_energy": "molar_internal_energy",
+            "gibbs": "molar_gibbs",
+            "helmholtz": "molar_helmholtz",
+            "V": "molar_volume",
+            "material_volume": "molar_volume",
+            "material_mass": "molar_mass",
+            "S": "molar_entropy",
+            "H": "molar_enthalpy",
+            "C_p": "molar_heat_capacity_p",
+            "C_v": "molar_heat_capacity_v",
+        }
+        for name, molar in totals.items():
+            with self.subTest(property=name):
+                expected = 2.5 * getattr(layer, molar)
+                self.assertArraysAlmostEqual(getattr(layer, name), expected)
+                self.assertArraysAlmostEqual(layer.evaluate([name]), expected)
+                radii = np.array([1.2e6, 1.8e6])
+                self.assertArraysAlmostEqual(
+                    layer.evaluate([name], radii),
+                    material.evaluate(
+                        [molar],
+                        np.interp(radii, layer.radii, layer.pressures),
+                        np.interp(radii, layer.radii, layer.temperatures),
+                    )[0]
+                    * 2.5,
+                )
+        for name, value in (("mass", physical_mass), ("volume", physical_volume)):
+            self.assertArraysAlmostEqual(
+                layer.evaluate([name]), np.full(len(layer.radii), value)
+            )
+            self.assertArraysAlmostEqual(
+                layer.evaluate([name], radii), np.full(len(radii), value)
+            )
+        material.number_of_moles = 1.0
+        layer.make()
+        self.assertFloatEqual(layer.mass, physical_mass)
+        self.assertEqual(layer.volume, physical_volume)
+
     def layer1(self):
         rock = min1()
         rock.set_method("slb3")

@@ -83,6 +83,12 @@ def _spline_integrals(radii, *splines, power=0):
 class Layer(object):
     """
     The base class for a planetary layer.
+    Thermodynamic profiles use the amount of material at each radius.
+    ``molar_*`` properties are per mole; ``V``, ``S``, ``H``, ``C_p``,
+    ``C_v`` and energies are sample totals. ``material_mass`` and
+    ``material_volume`` expose sample mass and volume profiles, while
+    ``mass`` and ``volume`` describe the entire physical layer.
+
     The user needs to set the following before properties can be computed:
 
     - set_material(), which sets the material of the layer,
@@ -371,6 +377,10 @@ class Layer(object):
         layer material evaluated at those pressures and
         temperatures.
 
+        ``mass`` and ``volume`` return the whole layer's physical totals,
+        repeated at each requested radius. Material-sample profiles are
+        ``material_mass`` and ``material_volume`` (or ``V`` for volume).
+
         :param properties: List of properties to evaluate.
         :type properties: list of strings
         :param radlist: Radii to evaluate properties at. If left empty,
@@ -408,10 +418,17 @@ class Layer(object):
             for i, prop in enumerate(properties):
                 if prop == "depth":
                     values[i] = radius_planet - radlist
+                elif prop in ("mass", "volume"):
+                    values[i] = getattr(self, prop)
                 else:
                     try:
+                        name = {
+                            "material_mass": "mass",
+                            "material_volume": "volume",
+                            "energy": "internal_energy",
+                        }.get(prop, prop)
                         values[i] = self.material.evaluate(
-                            [prop], pressures, temperatures
+                            [name], pressures, temperatures
                         )
                     except:
                         func_prop = interp1d(self.radii, getattr(self, prop))
@@ -484,6 +501,11 @@ class Layer(object):
         return 4.0 * np.pi * np.sum(_spline_integrals(self.radii, rho, power=2))
 
     @property
+    def volume(self):
+        """Geometric volume of the entire spherical layer [m^3]."""
+        return 4.0 * np.pi / 3.0 * (self.outer_radius**3 - self.inner_radius**3)
+
+    @property
     def moment_of_inertia(self):
         """Axial moment of inertia of the layer [kg m^2]."""
         rho = _radial_spline(self.radii, self.density)
@@ -543,10 +565,9 @@ class Layer(object):
     @property
     def pressure(self):
         """
-        Returns current pressures across the layer that was set
-        with :func:`~burnman.Material.set_state`.
+        Returns the pressure profile across the layer at the predefined radii.
 
-        Aliased with :func:`~burnman.Material.P`.
+        Aliased with :func:`~burnman.Layer.P`.
 
         :returns: Pressures in [Pa] at the predefined radii.
         :rtype: numpy.array
@@ -556,10 +577,9 @@ class Layer(object):
     @property
     def temperature(self):
         """
-        Returns current temperature  across the layer that was set with
-        :func:`~burnman.Material.set_state`.
+        Returns the temperature profile across the layer at the predefined radii.
 
-        - Aliased with :func:`~burnman.Material.T`.
+        - Aliased with :func:`~burnman.Layer.T`.
 
         :returns: Temperatures in [K] at the predefined radii.
         :rtype: numpy.array
@@ -574,7 +594,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.energy`.
+        The corresponding sample total is ``self.internal_energy``.
 
         :returns: The internal energies in [J/mol] at the predefined radii.
         :rtype: numpy.array
@@ -592,7 +612,7 @@ class Layer(object):
         Returns the molar Gibbs free energies across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.gibbs`.
+        The corresponding sample total is ``self.gibbs``.
 
         :returns: Gibbs energies in [J/mol] at the predefined radii.
         :rtype: numpy.array
@@ -607,7 +627,7 @@ class Layer(object):
         Returns the molar Helmholtz free energies across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.helmholtz`.
+        The corresponding sample total is ``self.helmholtz``.
 
         :returns: Helmholtz energies in [J/mol] at the predefined radii.
         :rtype: numpy.array
@@ -636,7 +656,7 @@ class Layer(object):
         Returns molar volumes across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.V`.
+        The corresponding sample total is ``self.material_volume``.
 
         :returns: Molar volumes in [m^3/mol] at the predefined radii.
         :rtype: numpy.array
@@ -651,7 +671,7 @@ class Layer(object):
         Returns the densities across this layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.rho`.
+        Aliased with :func:`~burnman.Layer.rho`.
 
         :returns: The densities of this material in [kg/m^3] at the predefined radii.
         :rtype: numpy.array
@@ -664,7 +684,7 @@ class Layer(object):
         Returns molar entropies acroos the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.S`.
+        The corresponding sample total is ``self.entropy``.
 
         :returns: Entropies in [J/K/mol] at the predefined radii.
         :rtype: numpy.array
@@ -679,7 +699,7 @@ class Layer(object):
         Returns molar enthalpies across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.H`.
+        The corresponding sample total is ``self.enthalpy``.
 
         :returns: Enthalpies in [J/mol] at the predefined radii.
         :rtype: numpy.array
@@ -696,7 +716,7 @@ class Layer(object):
         Notes
         -----
         - Needs to be implemented in derived classes.
-        - Aliased with :func:`~burnman.Material.K_T`.
+        - Aliased with :func:`~burnman.Layer.K_T`.
 
         :returns: Bulk moduli in [Pa] at the predefined radii.
         :rtype: numpy.array
@@ -714,7 +734,7 @@ class Layer(object):
         Returns the adiabatic bulk moduli across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.K_S`.
+        Aliased with :func:`~burnman.Layer.K_S`.
 
         :returns: Adiabatic bulk modulus in [Pa] at the predefined radii.
         :rtype: numpy.array
@@ -733,7 +753,7 @@ class Layer(object):
         (or inverse isothermal bulk moduli).
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.beta_T`.
+        Aliased with :func:`~burnman.Layer.beta_T`.
 
         :returns: Isothermal compressibilities in [1/Pa] at the predefined radii.
         :rtype: numpy.array
@@ -752,7 +772,7 @@ class Layer(object):
         (or inverse adiabatic bulk moduli).
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.beta_S`.
+        Aliased with :func:`~burnman.Layer.beta_S`.
 
         :returns: Adiabatic compressibilities in [1/Pa] at the predefined radii.
         :rtype: numpy.array
@@ -770,7 +790,7 @@ class Layer(object):
         Returns shear moduli across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.beta_G`.
+        Aliased with :func:`~burnman.Layer.G`.
 
         :returns: Shear moduli in [Pa] at the predefined radii.
         :rtype: numpy.array
@@ -785,7 +805,7 @@ class Layer(object):
         Returns P wave speeds across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.v_p`.
+        Aliased with :func:`~burnman.Layer.v_p`.
 
         :returns: P wave speeds in [m/s] at the predefined radii.
         :rtype: numpy.array
@@ -800,7 +820,7 @@ class Layer(object):
         Returns bulk sound speeds across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.v_phi`.
+        Aliased with :func:`~burnman.Layer.v_phi`.
 
         :returns: Bulk sound velocities in [m/s] at the predefined radii.
         :rtype: numpy.array
@@ -815,7 +835,7 @@ class Layer(object):
         Returns shear wave speeds across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.v_s`.
+        Aliased with :func:`~burnman.Layer.v_s`.
 
         :returns: Shear wave speeds in [m/s] at the predefined radii.
         :rtype: numpy.array
@@ -830,7 +850,7 @@ class Layer(object):
         Returns the grueneisen parameters across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.gr`.
+        Aliased with :func:`~burnman.Layer.gr`.
 
         :returns: Grueneisen parameters [unitless] at the predefined radii.
         :rtype: numpy.array
@@ -845,7 +865,7 @@ class Layer(object):
         Returns thermal expansion coefficients across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.alpha`.
+        Aliased with :func:`~burnman.Layer.alpha`.
 
         :returns: Thermal expansivities in [1/K] at the predefined radii.
         :rtype: numpy.array
@@ -860,7 +880,7 @@ class Layer(object):
         Returns molar heat capacity at constant volumes across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.C_v`.
+        The corresponding sample total is ``self.heat_capacity_v``.
 
         :returns: Heat capacities in [J/K/mol] at the predefined radii.
         :rtype: numpy.array
@@ -878,7 +898,7 @@ class Layer(object):
         Returns molar_heat capacity at constant pressures across the layer.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.C_p`.
+        The corresponding sample total is ``self.heat_capacity_p``.
 
         :returns: Heat capacities in [J/K/mol] at the predefined radii.
         :rtype: numpy.array
@@ -889,6 +909,47 @@ class Layer(object):
                 for i in range(len(self.sublayers))
             ]
         )
+
+    @property
+    def internal_energy(self):
+        """Material-sample internal energy profile [J]."""
+        return np.array(
+            [getattr(material, "internal_energy") for material in self.sublayers]
+        )
+
+    @property
+    def enthalpy(self):
+        """Material-sample enthalpy profile [J]."""
+        return np.array([getattr(material, "enthalpy") for material in self.sublayers])
+
+    @property
+    def entropy(self):
+        """Material-sample entropy profile [J/K]."""
+        return np.array([getattr(material, "entropy") for material in self.sublayers])
+
+    @property
+    def heat_capacity_p(self):
+        """Material-sample heat capacity p profile [J/K]."""
+        return np.array(
+            [getattr(material, "heat_capacity_p") for material in self.sublayers]
+        )
+
+    @property
+    def heat_capacity_v(self):
+        """Material-sample heat capacity v profile [J/K]."""
+        return np.array(
+            [getattr(material, "heat_capacity_v") for material in self.sublayers]
+        )
+
+    @property
+    def material_volume(self):
+        """Material-sample material volume profile [m^3]."""
+        return np.array([getattr(material, "volume") for material in self.sublayers])
+
+    @property
+    def material_mass(self):
+        """Material-sample material mass profile [kg]."""
+        return np.array([getattr(material, "mass") for material in self.sublayers])
 
     # Aliased properties
     @property
@@ -903,23 +964,23 @@ class Layer(object):
 
     @property
     def energy(self):
-        """Alias for :func:`~burnman.Layer.molar_internal_energy`"""
-        return self.molar_internal_energy
+        """Alias for the extensive ``internal_energy`` profile."""
+        return self.internal_energy
 
     @property
     def helmholtz(self):
-        """Alias for :func:`~burnman.Layer.molar_helmholtz`"""
-        return self.molar_helmholtz
+        """Material-sample helmholtz energy profile [J]."""
+        return np.array([getattr(material, "helmholtz") for material in self.sublayers])
 
     @property
     def gibbs(self):
-        """Alias for :func:`~burnman.Layer.molar_gibbs`"""
-        return self.molar_gibbs
+        """Material-sample gibbs energy profile [J]."""
+        return np.array([getattr(material, "gibbs") for material in self.sublayers])
 
     @property
     def V(self):
-        """Alias for :func:`~burnman.Layer.molar_volume`"""
-        return self.molar_volume
+        """Alias for the extensive ``material_volume`` profile."""
+        return self.material_volume
 
     @property
     def rho(self):
@@ -928,13 +989,13 @@ class Layer(object):
 
     @property
     def S(self):
-        """Alias for :func:`~burnman.Layer.molar_entropy`"""
-        return self.molar_entropy
+        """Alias for the extensive ``entropy`` profile."""
+        return self.entropy
 
     @property
     def H(self):
-        """Alias for :func:`~burnman.Layer.molar_enthalpy`"""
-        return self.molar_enthalpy
+        """Alias for the extensive ``enthalpy`` profile."""
+        return self.enthalpy
 
     @property
     def K_T(self):
@@ -988,13 +1049,13 @@ class Layer(object):
 
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.Material.molar_heat_capacity_v`"""
-        return self.molar_heat_capacity_v
+        """Alias for the extensive ``heat_capacity_v`` profile."""
+        return self.heat_capacity_v
 
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.Material.molar_heat_capacity_p`"""
-        return self.molar_heat_capacity_p
+        """Alias for the extensive ``heat_capacity_p`` profile."""
+        return self.heat_capacity_p
 
 
 class BoundaryLayerPerturbation(object):
