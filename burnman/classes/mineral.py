@@ -153,13 +153,11 @@ class Mineral(Material):
         This function acts similarly to set_state, but takes volume and
         temperature as input to find the pressure.
 
-        If the mineral is an endmember that has a pressure(T, V)
-        function and does not have property modifiers,
-        this function evaluates the pressure directly.
-        Otherwise, it finds the pressure using the brentq root-finding
-        method on the molar_volume attribute of the mineral.
-        This ensures self-consistency even if the mineral has a
-        pressure-dependent volume modifier.
+        Where the equation of state provides pressure(T, V), solve
+        P_base(T, V - dG_mod/dP(P, T)) = P. This accounts for volume
+        modifiers without nesting a volume inversion inside the pressure
+        solve. Without modifiers, pressure is evaluated directly.
+        Other materials use the volume-based solve in Material.
 
         :param volume: The desired molar volume of the mineral [m^3].
         :type volume: float
@@ -176,42 +174,42 @@ class Mineral(Material):
         :type pressure_guesses: list
         """
 
-        def _delta_volume(pressure, volume, temperature):
-            # Try to set the state with this pressure,
-            # but if the pressure is too low most equations of state
-            # fail. In this case, treat the molar_volume as infinite
-            # and brentq will try a larger pressure.
-            try:
-                self.set_state(pressure, temperature)
-                return volume - self.molar_volume
-            except Exception:
-                return -np.inf
+        if not np.isfinite(volume) or volume <= 0.0:
+            raise ValueError("The requested volume must be finite and positive.")
 
-        if (
-            type(self.method) == str  # require an endmember method
-            or not self.method.pressure  # that has a P(V, T) function
-            or self.property_modifiers  # and that doesn't have modifiers
-        ):
-            # we need to have a sign change in [a,b] to find a zero.
-            args = (volume, temperature)
-            try:
-                sol = bracket(
-                    _delta_volume, pressure_guesses[0], pressure_guesses[1], args
-                )
-            except ValueError:
-                try:  # Try again with 0 Pa lower bound on the pressure
-                    sol = bracket(_delta_volume, 0.0e9, pressure_guesses[1], args)
-                except ValueError:
-                    raise Exception(
-                        "Cannot find a pressure, perhaps the volume or starting pressures "
-                        "are outside the range of validity for the equation of state?"
-                    )
-            pressure = brentq(_delta_volume, sol[0], sol[1], args=args)
+        def _delta_pressure(pressure):
             self.set_state(pressure, temperature)
-        else:
-            self.set_state(
-                self.method.pressure(temperature, volume, self.params), temperature
+            base_volume = volume - self._property_modifiers["dGdP"]
+            return (
+                self.method.pressure(temperature, base_volume, self.params) - pressure
             )
+
+        try:
+            if isinstance(self.method, str) or self.method.pressure is None:
+                raise NotImplementedError
+            if self.property_modifiers:
+                sol = bracket(
+                    _delta_pressure,
+                    pressure_guesses[0],
+                    pressure_guesses[1] - pressure_guesses[0],
+                )
+                pressure = brentq(_delta_pressure, sol[0], sol[1])
+            else:
+                pressure = self.method.pressure(temperature, volume, self.params)
+        except NotImplementedError:
+            Material.set_state_with_volume(self, volume, temperature, pressure_guesses)
+            # A sign change at an EOS failure is not necessarily a volume root.
+            if not np.isclose(self.molar_volume, volume, rtol=1.0e-7, atol=0.0):
+                raise ValueError(
+                    "Cannot find a pressure matching the requested volume."
+                )
+            return
+
+        # Check the residual before caching the requested volume.
+        if not np.isclose(
+            _delta_pressure(pressure), 0.0, atol=max(1.0e-3, abs(pressure) * 1.0e-10)
+        ):
+            raise ValueError("Cannot find a pressure matching the requested volume.")
         self._cached["_molar_volume_unmodified"] = (
             volume - self._property_modifiers["dGdP"]
         )

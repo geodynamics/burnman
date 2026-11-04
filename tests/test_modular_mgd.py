@@ -3,6 +3,7 @@ from util import BurnManTest
 
 from burnman import Mineral, Composite
 from burnman.minerals.SLB_2011 import forsterite as forsterite_slb
+from burnman.minerals.SLB_2011 import fayalite as fayalite_slb
 from burnman.minerals.SLB_2024 import fea as alpha_iron_slb
 from burnman.utils.chemistry import dictionarize_formula, formula_mass
 from burnman.eos.helper import create
@@ -28,6 +29,52 @@ mineral_params = {
 
 
 class ModularMGD(BurnManTest):
+    def test_pressure_at_hot_expanded_volume(self):
+        source = fayalite_slb()
+        params = source.params.copy()
+        params.update(
+            equation_of_state="modular_mgd",
+            reference_eos=create("bm3"),
+            debye_temperature_model=debye_temperature_models.SLB(),
+            anharmonic_prefactor_model=anharmonic_prefactor_models.PowerLaw(),
+            anharmonic_thermal_model=anharmonic_thermal_models.LogNormal(),
+            a_anh=1.0,
+            m_anh=10.0,
+            mu_anh=0.0,
+            sigma_anh=1.0,
+        )
+        modifiers = (
+            [],
+            source.property_modifiers,
+            [["linear", {"delta_E": 100.0, "delta_S": 0.5, "delta_V": 2.0e-7}]],
+            [["landau", {"Tc_0": 6000.0, "S_D": 5.0, "V_D": 2.0e-7}]],
+        )
+        for modifier in modifiers:
+            mineral = Mineral(params.copy(), property_modifiers=modifier)
+            for temperature in (4000.0, 4950.1, 5000.0):
+                with self.subTest(modifiers=modifier, temperature=temperature):
+                    base_volume = 1.2 * params["V_0"]
+                    pressure = mineral.method.pressure(
+                        temperature, base_volume, mineral.params
+                    )
+                    mineral.set_state(pressure, temperature)
+                    volume = base_volume + mineral._property_modifiers["dGdP"]
+                    mineral.set_state_with_volume(volume, temperature)
+                    self.assertAlmostEqual(mineral.pressure / pressure, 1.0, places=10)
+                    self.assertAlmostEqual(
+                        mineral.molar_volume / volume, 1.0, places=12
+                    )
+                    self.assertAlmostEqual(
+                        mineral.method.pressure(
+                            temperature,
+                            volume - mineral._property_modifiers["dGdP"],
+                            mineral.params,
+                        )
+                        / mineral.pressure,
+                        1.0,
+                        places=10,
+                    )
+
     def test_setup(self):
         params = mineral_params.copy()
         params["reference_eos"] = create("bm3")

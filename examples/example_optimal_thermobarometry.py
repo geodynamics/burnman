@@ -60,7 +60,7 @@ if __name__ == "__main__":
     ky = HP_2011_ds62.ky()
     assemblage = Composite([sill, ky])
 
-    temperatures = np.linspace(600, 800, 5)
+    temperatures = np.linspace(605, 800, 5)
     equality_constraints = [["T", temperatures], ["phase_fraction", (sill, 0.0)]]
     sols, prm = equilibrate(
         ky.formula, assemblage, equality_constraints=equality_constraints
