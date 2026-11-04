@@ -277,7 +277,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         # relatively large dP needed for accurate estimate of dPthdf
 
         self.isotropic_mineral.set_state(pressure, temperature)
-        V2 = self.isotropic_mineral.V
+        V2 = self.isotropic_mineral.molar_volume
         KT2 = self.isotropic_mineral.isothermal_bulk_modulus_reuss
         self.isotropic_mineral.set_state_with_volume(V2, self.params["T_0"])
         P1 = self.isotropic_mineral.pressure
@@ -289,7 +289,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         Mineral.set_state(self, pressure, temperature)
 
         # 2) Compute other properties needed for anisotropic equation of state
-        V = self.V
+        V = self.molar_volume
         V_0 = self.params["V_0"]
         Vrel = V / V_0
         f = np.log(Vrel)
@@ -622,9 +622,9 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
                 self.thermal_expansivity_tensor,
                 self.thermal_expansivity_tensor,
             )
-            * self.V
+            * self.molar_volume
             * self.temperature
-            / self.C_p
+            / self.molar_heat_capacity_p
         )
 
     @material_property
@@ -697,7 +697,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         """
         return (
             self.thermal_expansivity
-            * self.V
+            * self.molar_volume
             / (self.isentropic_compressibility_reuss * self.molar_heat_capacity_p)
         )
 
@@ -744,7 +744,7 @@ class AnisotropicMineral(Mineral, AnisotropicMaterial):
         pi = self.thermal_stress_tensor
         C_isometric = (
             self.molar_heat_capacity_p
-            + self.V * self.temperature * np.einsum("ij, ij", alpha, pi)
+            + self.molar_volume * self.temperature * np.einsum("ij, ij", alpha, pi)
         )
         return C_isometric
 

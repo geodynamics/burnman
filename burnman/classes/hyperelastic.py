@@ -55,6 +55,9 @@ class HyperelasticMineral(AnisotropicMineral):
     Setting the state of a HyperelasticMineral instance requires
     specifying the cell vectors and temperature via
     the set_state_with_molar_cell_vectors method.
+    These cell vectors define one formula-unit mole. Molar energies include
+    the elastic correction; extensive energies and entropy scale with
+    ``number_of_moles`` as in other materials.
 
     Properties of the mineral can be reported in
     either the current configuration defined by the cell vectors, or in the
@@ -296,7 +299,7 @@ class HyperelasticMineral(AnisotropicMineral):
     @material_property
     def _helmholtz_elastic(self):
         """
-        :returns: The elastic correction to the Helmholtz free energy.
+        :returns: The molar elastic Helmholtz energy correction [J/mol].
         :rtype: float
         """
         H = self.hencky_strain
@@ -305,18 +308,23 @@ class HyperelasticMineral(AnisotropicMineral):
         )
 
         helmholtz_elastic = (
-            0.5 * self.hydrostatic.V * np.einsum("ij, ijkl, kl", H, CT, H)
+            0.5 * self.hydrostatic.molar_volume * np.einsum("ij, ijkl, kl", H, CT, H)
         )
         return helmholtz_elastic
 
     @material_property
-    def helmholtz(self):
+    def molar_helmholtz(self):
         """
-        :returns: The total Helmholtz free energy of the deformed mineral,
+        :returns: The molar Helmholtz free energy of the deformed mineral,
         including the nonhydrostatic isochoric elastic component.
         :rtype: float
         """
-        return self.hydrostatic.helmholtz + self._helmholtz_elastic
+        return self.hydrostatic.molar_helmholtz + self._helmholtz_elastic
+
+    @material_property
+    def molar_gibbs(self):
+        """Molar Gibbs energy F + PV at the mean Cauchy pressure [J/mol]."""
+        return self.molar_helmholtz + self.pressure * self.molar_volume
 
     @material_property
     def _cauchy_stress_unrotated(self):
@@ -332,7 +340,7 @@ class HyperelasticMineral(AnisotropicMineral):
         cell_vectors_current = self._cell_vectors_current.copy()
         M_0 = self._M_unrotated.copy()
         T_0 = self.T
-        V = self.hydrostatic.V
+        V = self.hydrostatic.molar_volume
         pressure = self.hydrostatic.pressure
 
         # Apply a small perturbation to the cell vectors
@@ -397,7 +405,7 @@ class HyperelasticMineral(AnisotropicMineral):
         cell_vectors_current = self._cell_vectors_current.copy()
         M_0 = self._M_unrotated.copy()
         T_0 = self.T
-        V = self.hydrostatic.V
+        V = self.hydrostatic.molar_volume
         pressure = self.hydrostatic.pressure
         bulk_modulus = self.hydrostatic.isothermal_bulk_modulus_reuss
 
@@ -502,7 +510,7 @@ class HyperelasticMineral(AnisotropicMineral):
         return stiffness_voigt
 
     @material_property
-    def entropy(self):
+    def molar_entropy(self):
         """
         :returns: The molar entropy of the mineral.
         :rtype: float
@@ -511,7 +519,7 @@ class HyperelasticMineral(AnisotropicMineral):
         # First, store the current cell vectors and temperature by explicit copy
         cell_vectors_current = self._cell_vectors_current.copy()
         T_0 = self.T
-        hydrostatic_entropy = self.hydrostatic.entropy
+        hydrostatic_entropy = self.hydrostatic.molar_entropy
 
         dT = 0.1  # K
         self.set_state_with_molar_cell_vectors(cell_vectors_current, T_0 + dT)
@@ -564,7 +572,7 @@ class HyperelasticMineral(AnisotropicMineral):
         cell_vectors_current = self._cell_vectors_current.copy()
         M_0 = self._M_unrotated.copy()
         T_0 = self.T
-        V = self.hydrostatic.V
+        V = self.hydrostatic.molar_volume
         aK = (
             self.hydrostatic.thermal_expansivity
             * self.hydrostatic.isothermal_bulk_modulus_reuss
@@ -653,7 +661,7 @@ class HyperelasticMineral(AnisotropicMineral):
         alpha = self.thermal_expansivity_tensor
         pi = self.thermal_stress
         Ceps = self.molar_isometric_heat_capacity
-        Csigma = Ceps - self.V * self.T * np.einsum("ij, ij", alpha, pi)
+        Csigma = Ceps - self.molar_volume * self.T * np.einsum("ij, ij", alpha, pi)
         return Csigma
 
     @material_property
@@ -684,7 +692,7 @@ class HyperelasticMineral(AnisotropicMineral):
         alpha_right = -np.einsum(
             "ij,ijkl->kl", self.thermal_stress, full_isothermal_compliance
         )
-        V = self.V
+        V = self.molar_volume
         C_sigma = self.molar_isostress_heat_capacity
         T = self.T
 
@@ -771,12 +779,12 @@ class HyperelasticMineral(AnisotropicMineral):
         return 1.0 / self.isentropic_compressibility_reuss
 
     @material_property
-    def internal_energy(self):
+    def molar_internal_energy(self):
         """
         :returns: The molar internal energy of the mineral.
         :rtype: float
         """
-        helmholtz = self.helmholtz
-        entropy = self.entropy
+        helmholtz = self.molar_helmholtz
+        entropy = self.molar_entropy
         internal_energy = helmholtz + self.T * entropy
         return internal_energy

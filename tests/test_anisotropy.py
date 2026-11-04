@@ -417,6 +417,43 @@ class test_anisotropy(BurnManTest):
         # check that H = logm(U)
         self.assertArraysAlmostEqual(logm(U).flatten(), H.flatten(), tol_zero=1e-12)
 
+    def test_tensor_only_materials_keep_intensive_elastic_properties(self):
+        matrix = np.full((6, 6), 0.0)
+        matrix[:3, :3] = 100e9
+        np.fill_diagonal(matrix[:3, :3], 300e9)
+        np.fill_diagonal(matrix[3:, 3:], 100e9)
+        cases = [
+            anisotropy.AnisotropicMaterial(3300.0, matrix),
+            anisotropy.IsotropicMaterial(3300.0, [100e9, 100e9]),
+            anisotropy.CubicMaterial(3300.0, [300e9, 100e9, 100e9]),
+            anisotropy.HexagonalMaterial(
+                3300.0, np.array([300, 100, 100, 300, 100]) * 1e9
+            ),
+            anisotropy.TetragonalMaterial(
+                3300.0, np.array([300, 100, 100, 300, 100, 100]) * 1e9
+            ),
+            anisotropy.RhombohedralMaterial(
+                3300.0, np.array([300, 100, 100, 0, 300, 100, 100]) * 1e9
+            ),
+            anisotropy.OrthorhombicMaterial(
+                3300.0, np.array([300, 100, 100, 300, 100, 300, 100, 100, 100]) * 1e9
+            ),
+            anisotropy.MonoclinicMaterial(
+                3300.0,
+                np.array([300, 100, 100, 0, 300, 100, 0, 300, 0, 100, 0, 100, 100])
+                * 1e9,
+            ),
+            anisotropy.TriclinicMaterial(3300.0, matrix[np.triu_indices(6)]),
+        ]
+        for material in cases:
+            with self.subTest(material=type(material).__name__):
+                expected, _ = material.wave_velocities([1.0, 2.0, 3.0])
+                material.number_of_moles = 2.5
+                self.assertEqual(material.density, 3300.0)
+                np.testing.assert_allclose(material.isentropic_stiffness_tensor, matrix)
+                values, _ = material.wave_velocities([1.0, 2.0, 3.0])
+                self.assertArraysAlmostEqual(values, expected)
+
 
 if __name__ == "__main__":
     unittest.main()

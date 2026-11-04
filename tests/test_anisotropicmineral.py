@@ -299,6 +299,13 @@ class test_anisotropic_mineral(BurnManTest):
         self.assertFloatEqual(p[3], 90.0)
         self.assertFloatEqual(p[5], 90.0)
 
+    def test_intensive_and_extensive_anisotropic_mineral(self):
+        from util import TENSORS
+
+        material = make_mineral("triclinic")
+        self.assertMaterialAmountScaling(material, extra_properties=TENSORS)
+        self.assertReferenceAmountIndependence(material, [material.isotropic_mineral])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -313,6 +313,23 @@ class test_two_member_solution(BurnManTest):
             self.assertFloatEqual(CS[i, j], 0.0)
             self.assertFloatEqual(CT_unrotated[i, j], 0.0)
 
+    def test_intensive_and_extensive_anisotropic_solutions(self):
+        from util import TENSORS
+
+        ordinary = make_nonorthotropic_solution()
+        ordinary.set_composition([0.8, 0.2])
+        base = make_nonorthotropic_solution(two_fos=True)
+        relaxed = RelaxedAnisotropicSolution(
+            base, [[1.0, -1.0, 0.0]], [[0.5, 0.5, 0.0], [0.0, 0.0, 1.0]]
+        )
+        relaxed.set_composition([0.8, 0.2], relaxed=False)
+        for material in (ordinary, relaxed):
+            self.assertMaterialAmountScaling(material, extra_properties=TENSORS)
+            references = [material._scalar_solution] + [
+                m for m, _ in material.endmembers
+            ]
+            self.assertReferenceAmountIndependence(material, references)
+
 
 if __name__ == "__main__":
     unittest.main()
