@@ -96,6 +96,24 @@ class RockSwitcher(BurnManTest):
         ref = np.concatenate((output1, output2), axis=1)
         assert np.array_equal(output, ref)
 
+    def test_intensive_and_extensive_helpers(self):
+        dataset = burnman.minerals.SLB_2011
+        selected = dataset.forsterite()
+        switcher = mineral_helpers.HelperRockSwitcher()
+        switcher.select_rock = lambda: selected
+        cases = (
+            switcher,
+            mineral_helpers.HelperLowHighPressureRockTransition(
+                25e9, dataset.forsterite(), dataset.mg_bridgmanite()
+            ),
+            mineral_helpers.HelperSpinTransition(
+                25e9, dataset.forsterite(), dataset.fayalite()
+            ),
+        )
+        for material in cases:
+            with self.subTest(material=type(material).__name__):
+                self.assertMaterialAmountScaling(material)
+
 
 if __name__ == "__main__":
     unittest.main()
