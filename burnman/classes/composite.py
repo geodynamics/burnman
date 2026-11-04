@@ -265,7 +265,7 @@ class Composite(Material):
     @material_property
     def phase_volumes(self):
         """
-        Returns each phase's total volume [m^3] on the composite's mole scale.
+        Returns the total volume [m^3] of each phase in the composite.
         """
         volumes = np.array(
             [
@@ -278,7 +278,7 @@ class Composite(Material):
     @material_property
     def phase_masses(self):
         """
-        Returns each phase's total mass [kg] on the composite's mole scale.
+        Returns the total mass [kg] of each phase in the composite.
         """
         masses = np.array(
             [

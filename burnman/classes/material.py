@@ -54,7 +54,7 @@ class Material(object):
     before querying the material with unroll() or density().
 
     ``number_of_moles`` sets the sample amount and defaults to 1.0.
-    ``molar_*`` properties are per formula-unit mole. Energies, ``mass``,
+    ``molar_*`` properties are per mole of formula-units. Energies, ``mass``,
     ``volume``, ``entropy`` and ``heat_capacity_p/v`` are totals for that amount.
     The aliases ``V``, ``S``, ``H``, ``C_p`` and ``C_v`` also return totals.
     Intensive properties such as density, expansivity and elastic moduli
@@ -205,7 +205,7 @@ class Material(object):
     @property
     def number_of_moles(self):
         """
-        Returns the sample amount in formula-unit moles, defaulting to 1.0.
+        Returns the sample amount in moles of formula-units.
 
         :returns: Number of moles.
         :rtype: float
@@ -215,9 +215,10 @@ class Material(object):
     @number_of_moles.setter
     def number_of_moles(self, value):
         """
-        Sets the sample amount in formula-unit moles and clears cached properties.
-        Composition fractions are unchanged. Molar and intensive properties
-        are independent of this amount; extensive properties scale with it.
+        Sets the sample amount in moles of formula-units
+        and clears cached properties. Composition fractions are unchanged.
+        Molar and intensive properties are independent of this amount;
+        extensive properties scale with it.
 
         :param value: Number of moles.
         :type value: float

@@ -55,7 +55,8 @@ class HyperelasticMineral(AnisotropicMineral):
     Setting the state of a HyperelasticMineral instance requires
     specifying the cell vectors and temperature via
     the set_state_with_molar_cell_vectors method.
-    These cell vectors define one formula-unit mole. Molar energies include
+    These cell vectors have units of [m] and represent
+    one mole of formula-units. Molar energies include
     the elastic correction; extensive energies and entropy scale with
     ``number_of_moles`` as in other materials.
 
