@@ -647,6 +647,26 @@ class test_hyperelastic(BurnManTest):
             m.set_output_frame("invalid")
         self.assertEqual(m.output_frame, "crystal")
 
+    def test_intensive_and_extensive_hyperelastic_mineral(self):
+        from util import TENSORS
+
+        material = self._get_hyperelastic_mineral(thermal_shear=True)
+        self._set_finite_strain_state(material)
+        cells = material.cell_vectors.copy()
+        temperature = material.temperature
+
+        def set_state():
+            material.set_state_with_molar_cell_vectors(cells, temperature)
+
+        self.assertMaterialAmountScaling(
+            material, state_setter=set_state, extra_properties=TENSORS
+        )
+        self.assertReferenceAmountIndependence(
+            material,
+            [material.hydrostatic, material.hydrostatic.isotropic_mineral],
+            state_setter=set_state,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

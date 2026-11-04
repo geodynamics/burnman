@@ -644,6 +644,14 @@ class test_ElasticSolution(BurnManTest):
         G0 = ss.gibbs
         self.assertFloatEqual(S, -(G1 - G0) / dT)
 
+    def test_intensive_and_extensive_elastic_solution(self):
+        solution = garnet_ss()
+        solution.set_composition([0.3, 0.7])
+        self.assertMaterialAmountScaling(solution)
+        self.assertReferenceAmountIndependence(
+            solution, [m for m, _ in solution.solution_model.endmembers]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

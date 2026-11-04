@@ -70,8 +70,8 @@ class CombinedMineral(Mineral):
     @material_property
     def molar_gibbs(self):
         """
-        Returns Gibbs free energy of the mineral [J]
-        Aliased with self.gibbs
+        Returns molar Gibbs free energy of the mineral [J/mol].
+        The corresponding total is available as ``self.gibbs``.
         """
         return self.mixture.molar_gibbs + self._property_modifiers["G"]
 
@@ -83,15 +83,15 @@ class CombinedMineral(Mineral):
     def molar_volume(self):
         """
         Returns molar volume of the mineral [m^3/mol]
-        Aliased with self.V
+        The corresponding total is available as ``self.volume``.
         """
         return self.mixture.molar_volume + self._property_modifiers["dGdP"]
 
     @material_property
     def molar_entropy(self):
         """
-        Returns entropy of the mineral [J]
-        Aliased with self.S
+        Returns molar entropy of the mineral [J/(mol K)].
+        The corresponding total is available as ``self.entropy``.
         """
         return self.mixture.molar_entropy - self._property_modifiers["dGdT"]
 
@@ -131,7 +131,7 @@ class CombinedMineral(Mineral):
     def molar_heat_capacity_p(self):
         """
         Returns heat capacity at constant pressure of the mineral [J/K/mol]
-        Aliased with self.C_p
+        The corresponding total is available as ``self.heat_capacity_p``.
         """
         return (
             self.mixture.molar_heat_capacity_p
@@ -170,7 +170,7 @@ class CombinedMineral(Mineral):
     def molar_internal_energy(self):
         """
         Returns molar internal energy of the mineral [J/mol]
-        Aliased with self.energy
+        The corresponding total is available as ``self.internal_energy``.
         """
         return (
             self.molar_gibbs
@@ -182,7 +182,7 @@ class CombinedMineral(Mineral):
     def molar_helmholtz(self):
         """
         Returns molar Helmholtz free energy of the mineral [J/mol]
-        Aliased with self.helmholtz
+        The corresponding total is available as ``self.helmholtz``.
         """
         return self.molar_gibbs - self.pressure * self.molar_volume
 
@@ -190,7 +190,7 @@ class CombinedMineral(Mineral):
     def molar_enthalpy(self):
         """
         Returns molar enthalpy of the mineral [J/mol]
-        Aliased with self.H
+        The corresponding total is available as ``self.enthalpy``.
         """
         return self.molar_gibbs + self.temperature * self.molar_entropy
 
@@ -274,7 +274,7 @@ class CombinedMineral(Mineral):
     def molar_heat_capacity_v(self):
         """
         Returns molar heat capacity at constant volume of the mineral [J/K/mol]
-        Aliased with self.C_v
+        The corresponding total is available as ``self.heat_capacity_v``.
         """
         return (
             self.molar_heat_capacity_p

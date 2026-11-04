@@ -24,6 +24,65 @@ def make_simple_planet():
 
 
 class test_planet(BurnManTest):
+    def test_extensive_profiles_follow_each_layer_material_amount(self):
+        core = Layer("core", np.linspace(0.0, 5e5, 4))
+        mantle = Layer("mantle", np.linspace(5e5, 1e6, 4))
+        for layer, material, amount in (
+            (core, burnman.minerals.SLB_2011.forsterite(), 0.4),
+            (mantle, burnman.minerals.SLB_2011.periclase(), 2.5),
+        ):
+            material.number_of_moles = amount
+            layer.set_material(material)
+            layer.set_temperature_mode("user-defined", temperatures=np.full(4, 1500.0))
+        planet = Planet("scaled samples", [core, mantle])
+        planet.make()
+        physical_mass, physical_volume = planet.mass, planet.volume
+        self.assertEqual(np.ndim(physical_mass), 0)
+        self.assertEqual(np.ndim(physical_volume), 0)
+        self.assertFloatEqual(physical_mass, sum(layer.mass for layer in planet.layers))
+        self.assertFloatEqual(
+            physical_volume, sum(layer.volume for layer in planet.layers)
+        )
+        amounts = np.r_[np.full(4, 0.4), np.full(4, 2.5)]
+        totals = {
+            "energy": "molar_internal_energy",
+            "internal_energy": "molar_internal_energy",
+            "gibbs": "molar_gibbs",
+            "helmholtz": "molar_helmholtz",
+            "V": "molar_volume",
+            "material_volume": "molar_volume",
+            "material_mass": "molar_mass",
+            "S": "molar_entropy",
+            "H": "molar_enthalpy",
+            "C_p": "molar_heat_capacity_p",
+            "C_v": "molar_heat_capacity_v",
+        }
+        for name, molar in totals.items():
+            with self.subTest(property=name):
+                expected = amounts * getattr(planet, molar)
+                self.assertArraysAlmostEqual(getattr(planet, name), expected)
+                self.assertArraysAlmostEqual(planet.evaluate([name]), expected)
+                radii = np.array([2e5, 8e5])
+                self.assertArraysAlmostEqual(
+                    planet.evaluate([name], radii),
+                    np.array([0.4, 2.5]) * planet.evaluate([molar], radii),
+                )
+        for name, value in (("mass", physical_mass), ("volume", physical_volume)):
+            self.assertArraysAlmostEqual(
+                planet.evaluate([name]), np.full(len(planet.radii), value)
+            )
+            self.assertArraysAlmostEqual(
+                planet.evaluate([name], radii), np.full(len(radii), value)
+            )
+        self.assertFloatEqual(
+            planet.volume, 4.0 * np.pi * planet.radius_planet**3 / 3.0
+        )
+        for layer in planet.layers:
+            layer.material.number_of_moles = 1.0
+        planet.make()
+        self.assertFloatEqual(planet.mass, physical_mass)
+        self.assertEqual(planet.volume, physical_volume)
+
     def test_planet_1(self):
         myplanet, core, mantle = make_simple_planet()
         assert myplanet.get_layer("core") == core

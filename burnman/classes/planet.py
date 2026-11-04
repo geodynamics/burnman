@@ -17,6 +17,12 @@ class Planet(object):
     Pressure_modes defined in the individual layers will be ignored.
     If temperature modes are already set for each of the layers, when the
     planet is initialized, the planet will be built immediately.
+
+    Thermodynamic profiles use each layer material's ``number_of_moles``.
+    ``molar_*`` properties remain per mole; energies, ``V``, ``S``, ``H``,
+    ``C_p`` and ``C_v`` are sample totals at each radius. ``material_mass``
+    and ``material_volume`` expose sample profiles. ``mass`` and ``volume``
+    retain the planet's integrated physical mass and geometric volume.
     """
 
     def __init__(
@@ -123,6 +129,10 @@ class Planet(object):
         layer material evaluated at those pressures and
         temperatures.
 
+        ``mass`` and ``volume`` return the whole planet's physical totals,
+        repeated at each requested radius. Material-sample profiles are
+        ``material_mass`` and ``material_volume`` (or ``V`` for volume).
+
         :param properties: List of properties to evaluate
         :type properties: list of strings
         :param radlist: Radii to evaluate properties at. If left empty,
@@ -149,7 +159,7 @@ class Planet(object):
                 else:
                     j = 0
                     for layer in self.layers:
-                        vals = getattr(layer, prop)
+                        vals = layer.evaluate([prop])
                         values[i, j : j + len(vals)] = vals
                         j += len(vals)
         else:
@@ -159,6 +169,10 @@ class Planet(object):
                 values[:, j] = np.asarray(
                     layer.evaluate(properties, [r], self.radius_planet)
                 ).reshape(-1)
+
+        for i, prop in enumerate(properties):
+            if prop in ("mass", "volume"):
+                values[i] = getattr(self, prop)
 
         if values.shape[0] == 1:
             values = values[0]
@@ -431,10 +445,9 @@ class Planet(object):
     @property
     def pressure(self):
         """
-        Returns current pressure that was set with
-        :func:`~burnman.Material.set_state`.
+        Returns the pressure profile at the predefined radii.
 
-        Aliased with :func:`~burnman.Material.P`.
+        Aliased with :func:`~burnman.Planet.P`.
 
         :returns: Pressure in [Pa].
         :rtype: array of floats
@@ -444,10 +457,9 @@ class Planet(object):
     @property
     def temperature(self):
         """
-        Returns current temperature that was set with
-        :func:`~burnman.Material.set_state`.
+        Returns the temperature profile at the predefined radii.
 
-        Aliased with :func:`~burnman.Material.T`.
+        Aliased with :func:`~burnman.Planet.T`.
 
         :returns: Temperature in [K].
         :rtype: array of floats
@@ -460,7 +472,7 @@ class Planet(object):
         Returns the molar internal energy of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.energy`.
+        The corresponding sample total is ``self.internal_energy``.
 
         :returns: The internal energy in [J/mol].
         :rtype: array of floats
@@ -473,7 +485,7 @@ class Planet(object):
         Returns the molar Gibbs free energy of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.gibbs`.
+        The corresponding sample total is ``self.gibbs``.
 
         :returns: Gibbs energy in [J/mol].
         :rtype: array of floats
@@ -486,7 +498,7 @@ class Planet(object):
         Returns the molar Helmholtz free energy of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.helmholtz`.
+        The corresponding sample total is ``self.helmholtz``.
 
         :returns: Helmholtz energy in [J/mol].
         :rtype: array of floats
@@ -511,7 +523,7 @@ class Planet(object):
         Returns molar volume of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.V`.
+        The corresponding sample total is ``self.material_volume``.
 
         :returns: Molar volume in [m^3/mol].
         :rtype: array of floats
@@ -524,7 +536,7 @@ class Planet(object):
         Returns the density of this planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.rho`.
+        Aliased with :func:`~burnman.Planet.rho`.
 
         :returns: The density of this material in [kg/m^3].
         :rtype: array of floats
@@ -537,7 +549,7 @@ class Planet(object):
         Returns molar entropy of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.S`.
+        The corresponding sample total is ``self.entropy``.
 
         :returns: Entropy in [J/K/mol].
         :rtype: array of floats
@@ -550,7 +562,7 @@ class Planet(object):
         Returns molar enthalpy of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.H`.
+        The corresponding sample total is ``self.enthalpy``.
 
         :returns: Enthalpy in [J/mol].
         :rtype: array of floats
@@ -563,7 +575,7 @@ class Planet(object):
         Returns isothermal bulk modulus of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.K_T`.
+        Aliased with :func:`~burnman.Planet.K_T`.
 
         :returns: Isothermal bulk modulus in [Pa].
         :rtype: array of floats
@@ -576,7 +588,7 @@ class Planet(object):
         Returns the adiabatic bulk modulus of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.K_S`.
+        Aliased with :func:`~burnman.Planet.K_S`.
 
         :returns: Adiabatic bulk modulus in [Pa].
         :rtype: array of floats
@@ -590,7 +602,7 @@ class Planet(object):
         (or inverse isothermal bulk modulus).
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.beta_T`.
+        Aliased with :func:`~burnman.Planet.beta_T`.
 
         :returns: Isothermal compressibility in [1/Pa].
         :rtype: array of floats
@@ -604,7 +616,7 @@ class Planet(object):
         (or inverse adiabatic bulk modulus).
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.beta_S`.
+        Aliased with :func:`~burnman.Planet.beta_S`.
 
         :returns: Adiabatic compressibility in [1/Pa].
         :rtype: array of floats
@@ -617,7 +629,7 @@ class Planet(object):
         Returns shear modulus of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.beta_G`.
+        Aliased with :func:`~burnman.Planet.G`.
 
         :returns: Shear modulus in [Pa].
         :rtype: array of floats
@@ -630,7 +642,7 @@ class Planet(object):
         Returns P wave speed of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.v_p`.
+        Aliased with :func:`~burnman.Planet.v_p`.
 
         :returns: P wave speed in [m/s].
         :rtype: array of floats
@@ -643,7 +655,7 @@ class Planet(object):
         Returns bulk sound speed of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.v_phi`.
+        Aliased with :func:`~burnman.Planet.v_phi`.
 
         :returns: Bulk sound velocity in [m/s].
         :rtype: array of floats
@@ -656,7 +668,7 @@ class Planet(object):
         Returns shear wave speed of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.v_s`.
+        Aliased with :func:`~burnman.Planet.v_s`.
 
         :returns: Shear wave speed in [m/s].
         :rtype: array of floats
@@ -669,7 +681,7 @@ class Planet(object):
         Returns the grueneisen parameter of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.gr`.
+        Aliased with :func:`~burnman.Planet.gr`.
 
         :returns: Grueneisen parameters [unitless].
         :rtype: array of floats
@@ -682,7 +694,7 @@ class Planet(object):
         Returns thermal expansion coefficient of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.alpha`.
+        Aliased with :func:`~burnman.Planet.alpha`.
 
         :returns: Thermal expansivity in [1/K].
         :rtype: array of floats
@@ -695,7 +707,7 @@ class Planet(object):
         Returns molar heat capacity at constant volume of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.C_v`.
+        The corresponding sample total is ``self.heat_capacity_v``.
 
         :returns: Isochoric heat capacity in [J/K/mol].
         :rtype: array of floats
@@ -708,7 +720,7 @@ class Planet(object):
         Returns molar heat capacity at constant pressure of the planet.
 
         Needs to be implemented in derived classes.
-        Aliased with :func:`~burnman.Material.C_p`.
+        The corresponding sample total is ``self.heat_capacity_p``.
 
         :returns: Isobaric heat capacity in [J/K/mol].
         :rtype: array of floats
@@ -716,108 +728,143 @@ class Planet(object):
         return self.evaluate(["molar_heat_capacity_p"])
 
     #
+    @property
+    def internal_energy(self):
+        """Material-sample internal energy profile [J]."""
+        return self.evaluate(["internal_energy"])
+
+    @property
+    def enthalpy(self):
+        """Material-sample enthalpy profile [J]."""
+        return self.evaluate(["enthalpy"])
+
+    @property
+    def entropy(self):
+        """Material-sample entropy profile [J/K]."""
+        return self.evaluate(["entropy"])
+
+    @property
+    def heat_capacity_p(self):
+        """Material-sample heat capacity p profile [J/K]."""
+        return self.evaluate(["heat_capacity_p"])
+
+    @property
+    def heat_capacity_v(self):
+        """Material-sample heat capacity v profile [J/K]."""
+        return self.evaluate(["heat_capacity_v"])
+
+    @property
+    def material_volume(self):
+        """Material-sample material volume profile [m^3]."""
+        return self.evaluate(["material_volume"])
+
+    @property
+    def material_mass(self):
+        """Material-sample material mass profile [kg]."""
+        return self.evaluate(["material_mass"])
+
     # Aliased properties
     @property
     def P(self):
-        """Alias for :func:`~burnman.Material.pressure`"""
+        """Alias for :func:`~burnman.Planet.pressure`"""
         return self.pressure
 
     @property
     def T(self):
-        """Alias for :func:`~burnman.Material.temperature`"""
+        """Alias for :func:`~burnman.Planet.temperature`"""
         return self.temperature
 
     @property
     def energy(self):
-        """Alias for :func:`~burnman.Material.molar_internal_energy`"""
-        return self.molar_internal_energy
+        """Alias for the extensive ``internal_energy`` profile."""
+        return self.internal_energy
 
     @property
     def helmholtz(self):
-        """Alias for :func:`~burnman.Material.molar_helmholtz`"""
-        return self.molar_helmholtz
+        """Material-sample helmholtz energy profile [J]."""
+        return self.evaluate(["helmholtz"])
 
     @property
     def gibbs(self):
-        """Alias for :func:`~burnman.Material.molar_gibbs`"""
-        return self.molar_gibbs
+        """Material-sample gibbs energy profile [J]."""
+        return self.evaluate(["gibbs"])
 
     @property
     def V(self):
-        """Alias for :func:`~burnman.Material.molar_volume`"""
-        return self.molar_volume
+        """Alias for the extensive ``material_volume`` profile."""
+        return self.material_volume
 
     @property
     def rho(self):
-        """Alias for :func:`~burnman.Material.density`"""
+        """Alias for :func:`~burnman.Planet.density`"""
         return self.density
 
     @property
     def S(self):
-        """Alias for :func:`~burnman.Material.molar_entropy`"""
-        return self.molar_entropy
+        """Alias for the extensive ``entropy`` profile."""
+        return self.entropy
 
     @property
     def H(self):
-        """Alias for :func:`~burnman.Material.molar_enthalpy`"""
-        return self.molar_enthalpy
+        """Alias for the extensive ``enthalpy`` profile."""
+        return self.enthalpy
 
     @property
     def K_T(self):
-        """Alias for :func:`~burnman.Material.isothermal_bulk_modulus_reuss`"""
+        """Alias for :func:`~burnman.Planet.isothermal_bulk_modulus_reuss`"""
         return self.isothermal_bulk_modulus_reuss
 
     @property
     def K_S(self):
-        """Alias for :func:`~burnman.Material.isentropic_bulk_modulus_reuss`"""
+        """Alias for :func:`~burnman.Planet.isentropic_bulk_modulus_reuss`"""
         return self.isentropic_bulk_modulus_reuss
 
     @property
     def beta_T(self):
-        """Alias for :func:`~burnman.Material.isothermal_compressibility_reuss`"""
+        """Alias for :func:`~burnman.Planet.isothermal_compressibility_reuss`"""
         return self.isothermal_compressibility_reuss
 
     @property
     def beta_S(self):
-        """Alias for :func:`~burnman.Material.isentropic_compressibility_reuss`"""
+        """Alias for :func:`~burnman.Planet.isentropic_compressibility_reuss`"""
         return self.isentropic_compressibility_reuss
 
     @property
     def G(self):
-        """Alias for :func:`~burnman.Material.shear_modulus`"""
+        """Alias for :func:`~burnman.Planet.shear_modulus`"""
         return self.shear_modulus
 
     @property
     def v_p(self):
-        """Alias for :func:`~burnman.Material.p_wave_velocity`"""
+        """Alias for :func:`~burnman.Planet.p_wave_velocity`"""
         return self.p_wave_velocity
 
     @property
     def v_phi(self):
-        """Alias for :func:`~burnman.Material.bulk_sound_velocity`"""
+        """Alias for :func:`~burnman.Planet.bulk_sound_velocity`"""
         return self.bulk_sound_velocity
 
     @property
     def v_s(self):
-        """Alias for :func:`~burnman.Material.shear_wave_velocity`"""
+        """Alias for :func:`~burnman.Planet.shear_wave_velocity`"""
         return self.shear_wave_velocity
 
     @property
     def gr(self):
-        """Alias for :func:`~burnman.Material.grueneisen_parameter`"""
+        """Alias for :func:`~burnman.Planet.grueneisen_parameter`"""
         return self.grueneisen_parameter
 
     @property
     def alpha(self):
-        """Alias for :func:`~burnman.Material.thermal_expansivity`"""
+        """Alias for :func:`~burnman.Planet.thermal_expansivity`"""
         return self.thermal_expansivity
 
     @property
     def C_v(self):
-        """Alias for :func:`~burnman.Material.molar_heat_capacity_v`"""
-        return self.molar_heat_capacity_v
+        """Alias for the extensive ``heat_capacity_v`` profile."""
+        return self.heat_capacity_v
 
     @property
     def C_p(self):
-        """Alias for :func:`~burnman.Material.molar_heat_capacity_p`"""
-        return self.molar_heat_capacity_p
+        """Alias for the extensive ``heat_capacity_p`` profile."""
+        return self.heat_capacity_p

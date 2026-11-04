@@ -541,7 +541,7 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
         """
         dPdn = (
             self._scalar_solution.isothermal_bulk_modulus_reuss
-            / self._scalar_solution.V
+            / self._scalar_solution.molar_volume
             * self._scalar_solution.partial_volumes
         )
         return np.einsum("i, ij->j", dPdn, self.dndq)
@@ -567,7 +567,7 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
                 self._scalar_solution.partial_volumes,
             )
             * self._scalar_solution.isothermal_bulk_modulus_reuss
-            / self._scalar_solution.V
+            / self._scalar_solution.molar_volume
         )
         return np.einsum("ij, ik, jl->kl", d2Fdndn, self.dndq, self.dndq)
 
@@ -578,7 +578,7 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
         at constant strain and temperature.
         """
         C_T = self.unrelaxed.full_isothermal_stiffness_tensor
-        return self._d2Fdqdq_fixed_VT + self.V * np.einsum(
+        return self._d2Fdqdq_fixed_VT + self.molar_volume * np.einsum(
             "kli, klmn, mnj->ij", self._depsdq_fixed_VT, C_T, self._depsdq_fixed_VT
         )
 
@@ -589,11 +589,11 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
         respect to composition and z (strain or temperature).
         """
         C_T = self.unrelaxed.full_isothermal_stiffness_tensor
-        d2FdqdT = -self._dSdq + self.V * np.einsum(
+        d2FdqdT = -self._dSdq + self.molar_volume * np.einsum(
             "kli, klmn, mn->i", self._depsdq_fixed_VT, C_T, self._depsdT_fixed_volume
         )
 
-        d2Fdqdeps = -self.V * (
+        d2Fdqdeps = -self.molar_volume * (
             np.einsum("i, mn->imn", self._dPdq, np.eye(3))
             + np.einsum(
                 "kli, klpq, pqmn->imn", self._depsdq_fixed_VT, C_T, self._dbarepsdeps
@@ -651,12 +651,12 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
     @material_property
     @copy_documentation(AnisotropicMineral.isothermal_stiffness_tensor)
     def isothermal_stiffness_tensor(self):
-        return self._d2Fdzdz[:6, :6] / self.V
+        return self._d2Fdzdz[:6, :6] / self.molar_volume
 
     @material_property
     @copy_documentation(AnisotropicMineral.thermal_stress_tensor)
     def thermal_stress_tensor(self):
-        return expand_stresses(self._d2Fdzdz[6, :6] / self.V)
+        return expand_stresses(self._d2Fdzdz[6, :6] / self.molar_volume)
 
     @material_property
     @copy_documentation(AnisotropicMineral.molar_isometric_heat_capacity)
@@ -736,6 +736,6 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
         pi = self.thermal_stress_tensor
         C_p = (
             self.molar_isometric_heat_capacity
-            - self.V * self.temperature * np.einsum("ij, ij", alpha, pi)
+            - self.molar_volume * self.temperature * np.einsum("ij, ij", alpha, pi)
         )
         return C_p

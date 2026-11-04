@@ -142,6 +142,24 @@ class test_material_name(BurnManTest):
         with self.assertRaises(AttributeError):
             _ = m.V
 
+    def test_intensive_and_extensive_minerals(self):
+        dataset = burnman.minerals.SLB_2011
+        combined = burnman.CombinedMineral(
+            [dataset.enstatite(), dataset.periclase()], [0.5, 1.0]
+        )
+        for material in (dataset.forsterite(), combined):
+            with self.subTest(material=type(material).__name__):
+                self.assertMaterialAmountScaling(material)
+
+    def test_molar_volume_inversion_at_a_nonunit_amount(self):
+        material = burnman.Composite([burnman.minerals.SLB_2011.forsterite()], [1.0])
+        material.number_of_moles = 2.5
+        material.set_state(4e9, 900.0)
+        volume = material.molar_volume
+        material.set_state(2e9, 900.0)
+        material.set_state_with_volume(volume, 900.0)
+        self.assertFloatEqual(material.pressure, 4e9)
+
 
 if __name__ == "__main__":
     unittest.main()

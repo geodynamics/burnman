@@ -52,6 +52,13 @@ class Material(object):
 
     The user needs to call set_method() (once in the beginning) and set_state()
     before querying the material with unroll() or density().
+
+    ``number_of_moles`` sets the sample amount and defaults to 1.0.
+    ``molar_*`` properties are per mole of formula-units. Energies, ``mass``,
+    ``volume``, ``entropy`` and ``heat_capacity_p/v`` are totals for that amount.
+    The aliases ``V``, ``S``, ``H``, ``C_p`` and ``C_v`` also return totals.
+    Intensive properties such as density, expansivity and elastic moduli
+    are independent of the sample amount.
     """
 
     def __init__(self):
@@ -176,7 +183,7 @@ class Material(object):
             # and brentq will try a larger pressure.
             try:
                 self.set_state(pressure, temperature)
-                return volume - self.volume
+                return volume - self.molar_volume
             except Exception:
                 return -np.inf
 
@@ -198,7 +205,7 @@ class Material(object):
     @property
     def number_of_moles(self):
         """
-        Returns the number of moles in this material.
+        Returns the sample amount in moles of formula-units.
 
         :returns: Number of moles.
         :rtype: float
@@ -208,7 +215,10 @@ class Material(object):
     @number_of_moles.setter
     def number_of_moles(self, value):
         """
-        Sets the number of moles in this material.
+        Sets the sample amount in moles of formula-units
+        and clears cached properties. Composition fractions are unchanged.
+        Molar and intensive properties are independent of this amount;
+        extensive properties scale with it.
 
         :param value: Number of moles.
         :type value: float
@@ -275,7 +285,9 @@ class Material(object):
             old_temperature = None
 
         try:
-            old_molar_fractions = self.molar_fractions
+            old_molar_fractions = getattr(
+                self, "unrelaxed_vectors", self.molar_fractions
+            )
         except AttributeError:
             old_molar_fractions = None
 
@@ -360,7 +372,9 @@ class Material(object):
             old_temperature = None
 
         try:
-            old_molar_fractions = self.molar_fractions
+            old_molar_fractions = getattr(
+                self, "unrelaxed_vectors", self.molar_fractions
+            )
         except AttributeError:
             old_molar_fractions = None
 
@@ -452,7 +466,7 @@ class Material(object):
         Returns the molar internal energy of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.energy`.
+            The corresponding total is available as ``self.internal_energy``.
 
         :returns: The internal energy in [J/mol].
         :rtype: float
@@ -467,7 +481,7 @@ class Material(object):
         Returns the molar Gibbs free energy of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.gibbs`.
+            The corresponding total is available as ``self.gibbs``.
 
         :returns: Gibbs free energy in [J/mol].
         :rtype: float
@@ -480,7 +494,7 @@ class Material(object):
         Returns the molar Helmholtz free energy of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.helmholtz`.
+            The corresponding total is available as ``self.helmholtz``.
 
         :returns: Helmholtz free energy in [J/mol].
         :rtype: float
@@ -517,7 +531,7 @@ class Material(object):
         Returns molar volume of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.V`.
+            The corresponding total is available as ``self.volume``.
 
         :returns: Molar volume in [m^3/mol].
         :rtype: float
@@ -543,7 +557,7 @@ class Material(object):
         Returns molar entropy of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.S`.
+            The corresponding total is available as ``self.entropy``.
 
         :returns: Entropy in [J/K/mol].
         :rtype: float
@@ -556,7 +570,7 @@ class Material(object):
         Returns molar enthalpy of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.H`.
+            The corresponding total is available as ``self.enthalpy``.
 
         :returns: Enthalpy in [J/mol].
         :rtype: float
@@ -634,7 +648,7 @@ class Material(object):
         Returns shear modulus of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.beta_G`.
+            Aliased with :func:`~burnman.Material.G`.
 
         :returns: Shear modulus in [Pa].
         :rtype: float
@@ -754,7 +768,7 @@ class Material(object):
         Returns molar heat capacity at constant volume of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.C_v`.
+            The corresponding total is available as ``self.heat_capacity_v``.
 
         :returns: Isochoric heat capacity in [J/K/mol].
         :rtype: float
@@ -769,7 +783,7 @@ class Material(object):
         Returns molar heat capacity at constant pressure of the mineral.
 
         .. note:: Needs to be implemented in derived classes.
-            Aliased with :func:`~burnman.Material.C_p`.
+            The corresponding total is available as ``self.heat_capacity_p``.
 
         :returns: Isobaric heat capacity in [J/K/mol].
         :rtype: float

@@ -184,7 +184,7 @@ class ElasticSolution(Mineral):
     def molar_internal_energy(self):
         """
         Returns molar internal energy of the mineral [J/mol].
-        Aliased with self.energy
+        The corresponding total is available as ``self.internal_energy``.
         """
         return self.molar_helmholtz + self.temperature * self.molar_entropy
 
@@ -228,7 +228,7 @@ class ElasticSolution(Mineral):
         return (
             np.array(
                 [
-                    self.solution_model.endmembers[i][0].helmholtz
+                    self.solution_model.endmembers[i][0].molar_helmholtz
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -379,7 +379,7 @@ class ElasticSolution(Mineral):
     def molar_helmholtz(self):
         """
         Returns molar Helmholtz energy of the solution [J/mol].
-        Aliased with self.helmholtz.
+        The corresponding total is available as ``self.helmholtz``.
         """
         return (
             sum(
@@ -396,7 +396,7 @@ class ElasticSolution(Mineral):
     def molar_gibbs(self):
         """
         Returns molar Gibbs free energy of the solution [J/mol].
-        Aliased with self.gibbs.
+        The corresponding total is available as ``self.gibbs``.
         """
         return self.molar_helmholtz + self.pressure * self.molar_volume
 
@@ -427,7 +427,7 @@ class ElasticSolution(Mineral):
     def molar_volume(self):
         """
         Returns molar volume of the solution [m^3/mol].
-        Aliased with self.V.
+        The corresponding total is available as ``self.volume``.
         """
 
         def _delta_pressure(volume):
@@ -536,12 +536,13 @@ class ElasticSolution(Mineral):
     def molar_entropy(self):
         """
         Returns molar entropy of the solution [J/K/mol].
-        Aliased with self.S.
+        The corresponding total is available as ``self.entropy``.
         """
         return (
             sum(
                 [
-                    self.solution_model.endmembers[i][0].S * self.molar_fractions[i]
+                    self.solution_model.endmembers[i][0].molar_entropy
+                    * self.molar_fractions[i]
                     for i in range(self.n_endmembers)
                 ]
             )
@@ -560,7 +561,7 @@ class ElasticSolution(Mineral):
     def molar_enthalpy(self):
         """
         Returns molar enthalpy of the solution [J/mol].
-        Aliased with self.H.
+        The corresponding total is available as ``self.enthalpy``.
         """
         return self.molar_gibbs + self.temperature * self.molar_entropy
 
@@ -689,7 +690,7 @@ class ElasticSolution(Mineral):
         """
         Returns molar heat capacity at constant volume of the
         solution [J/K/mol].
-        Aliased with self.C_v.
+        The corresponding total is available as ``self.heat_capacity_v``.
         """
         return sum(
             [
@@ -704,7 +705,7 @@ class ElasticSolution(Mineral):
         """
         Returns molar heat capacity at constant pressure
         of the solution [J/K/mol].
-        Aliased with self.C_p.
+        The corresponding total is available as ``self.heat_capacity_p``.
         """
         return (
             self.molar_heat_capacity_v

@@ -43,6 +43,11 @@ class Composite(Material):
     The composite class calculates the bulk properties of the assemblage
     based on the properties and proportions of the individual phases.
 
+    Phase fractions describe composition and sum to one. The independent
+    ``number_of_moles`` sets the total sample amount, defaulting to 1.0.
+    ``molar_*`` properties are per mole of the composite; ``volume``, ``mass``,
+    energies, entropy and heat capacities are totals for the sample.
+
     All of the **thermodynamic** properties (Gibbs free energy, enthalpy,
     entropy, volume, heat capacity etc.) are calculated by assuming that
     any changes in pressure or temperature of the composite as a whole
@@ -260,11 +265,11 @@ class Composite(Material):
     @material_property
     def phase_volumes(self):
         """
-        Returns total volumes of each phase in the composite
+        Returns the total volume [m^3] of each phase in the composite.
         """
         volumes = np.array(
             [
-                phase.volume * molar_fraction * self.number_of_moles
+                phase.molar_volume * molar_fraction * self.number_of_moles
                 for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
             ]
         )
@@ -273,11 +278,11 @@ class Composite(Material):
     @material_property
     def phase_masses(self):
         """
-        Returns total masses of each phase in the composite
+        Returns the total mass [kg] of each phase in the composite.
         """
         masses = np.array(
             [
-                phase.mass * molar_fraction * self.number_of_moles
+                phase.molar_mass * molar_fraction * self.number_of_moles
                 for (phase, molar_fraction) in zip(self.phases, self.molar_fractions)
             ]
         )
@@ -295,7 +300,7 @@ class Composite(Material):
     def molar_internal_energy(self):
         """
         Returns molar internal energy of the mineral [J/mol]
-        Aliased with self.energy
+        The corresponding total is available as ``self.internal_energy``.
         """
         U = sum(
             phase.molar_internal_energy * molar_fraction
@@ -307,7 +312,7 @@ class Composite(Material):
     def molar_gibbs(self):
         """
         Returns molar Gibbs free energy of the composite [J/mol]
-        Aliased with self.gibbs
+        The corresponding total is available as ``self.gibbs``.
         """
         G = sum(
             phase.molar_gibbs * molar_fraction
@@ -319,7 +324,7 @@ class Composite(Material):
     def molar_helmholtz(self):
         """
         Returns molar Helmholtz free energy of the mineral [J/mol]
-        Aliased with self.helmholtz
+        The corresponding total is available as ``self.helmholtz``.
         """
         F = sum(
             phase.molar_helmholtz * molar_fraction
@@ -331,16 +336,22 @@ class Composite(Material):
     def molar_volume(self):
         """
         Returns molar volume of the composite [m^3/mol]
-        Aliased with self.V
+        The corresponding total is available as ``self.volume``.
         """
-        return np.sum(self.phase_volumes) / self.number_of_moles
+        return sum(
+            phase.molar_volume * fraction
+            for phase, fraction in zip(self.phases, self.molar_fractions)
+        )
 
     @material_property
     def molar_mass(self):
         """
         Returns molar mass of the composite [kg/mol]
         """
-        return sum(self.phase_masses) / self.number_of_moles
+        return sum(
+            phase.molar_mass * fraction
+            for phase, fraction in zip(self.phases, self.molar_fractions)
+        )
 
     @material_property
     def density(self):
@@ -353,8 +364,8 @@ class Composite(Material):
     @material_property
     def molar_entropy(self):
         """
-        Returns enthalpy of the mineral [J]
-        Aliased with self.S
+        Returns molar entropy of the composite [J/(mol K)].
+        The corresponding total is available as ``self.entropy``.
         """
         S = sum(
             phase.molar_entropy * molar_fraction
@@ -365,8 +376,8 @@ class Composite(Material):
     @material_property
     def molar_enthalpy(self):
         """
-        Returns enthalpy of the mineral [J]
-        Aliased with self.H
+        Returns molar enthalpy of the composite [J/mol].
+        The corresponding total is available as ``self.enthalpy``.
         """
         H = sum(
             phase.molar_enthalpy * molar_fraction
@@ -401,7 +412,7 @@ class Composite(Material):
     def molar_heat_capacity_p(self):
         """
         Returns molar heat capacity at constant pressure of the composite [J/K/mol]
-        Aliased with self.C_p
+        The corresponding total is available as ``self.heat_capacity_p``.
         """
         # Note: d2G/dT2 = -C_p/T, and we sum d2G/dT2 arithmetically:
         c_p = np.array([phase.molar_heat_capacity_p for phase in self.phases])
@@ -458,7 +469,7 @@ class Composite(Material):
         since differential expansion between phases may be required
         to maintain the same pressure in all phases.
 
-        Aliased with self.C_v
+        The corresponding total is available as ``self.heat_capacity_v``.
         """
         C_p = self.molar_heat_capacity_p
         K_T = self.isothermal_bulk_modulus_reuss
@@ -547,7 +558,7 @@ class Composite(Material):
         j = 0
         for i, n_endmembers in enumerate(self.endmembers_per_phase):
             if n_endmembers == 1:
-                partial_gibbs[j] = self.phases[i].gibbs
+                partial_gibbs[j] = self.phases[i].molar_gibbs
             else:
                 partial_gibbs[j : j + n_endmembers] = self.phases[i].partial_gibbs
             j += n_endmembers

@@ -50,6 +50,9 @@ class PerpleX(BurnManTest):
             self.assertRaises(Exception, fnLT)
             self.assertRaises(Exception, fnHT)
 
+    def test_intensive_and_extensive_perplex_material(self):
+        self.assertMaterialAmountScaling(rock.copy())
+
 
 if __name__ == "__main__":
     unittest.main()
