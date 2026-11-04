@@ -768,6 +768,25 @@ class composite(BurnManTest):
 
         self.assertArraysAlmostEqual(f1, f2)
 
+    def test_intensive_and_extensive_composites(self):
+        dataset = minerals.SLB_2011
+        child = Composite([dataset.forsterite(), dataset.fayalite()], [0.3, 0.7])
+        child.number_of_moles = 3.0
+        nested = Composite([child, dataset.periclase()], [0.6, 0.4])
+        for material in (child, nested):
+            with self.subTest(material=material.name):
+                self.assertMaterialAmountScaling(material)
+                self.assertReferenceAmountIndependence(material, material.phases)
+        base = Composite([dataset.mg_fe_olivine([0.3, 0.7])], [1.0])
+        relaxed = RelaxedComposite(base, base.reaction_basis)
+        relaxed.set_state(10e9, 1500.0)
+
+        def synchronize():
+            base.number_of_moles = relaxed.number_of_moles
+            relaxed.copy_state_from_unrelaxed()
+
+        self.assertMaterialAmountScaling(relaxed, state_setter=synchronize)
+
 
 if __name__ == "__main__":
     unittest.main()

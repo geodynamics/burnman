@@ -398,6 +398,22 @@ class equilibration(BurnManTest):
             # In other cases the solver fails due to the singular Jacobian
             self.assertEqual(sol.code, TerminationCode.SINGULAR_FAIL)
 
+    def test_equilibrate_preserves_a_nonunit_bulk(self):
+        solution = burnman.minerals.SLB_2011.mg_fe_olivine([0.8, 0.2])
+        assemblage = burnman.Composite([solution], [1.0])
+        bulk = {"Mg": 1.5, "Fe": 3.5, "Si": 2.5, "O": 10.0}
+        result, _ = burnman.equilibrate(bulk, assemblage, [["P", 4e9], ["T", 900.0]])
+        self.assertTrue(result.success)
+        self.assertFloatEqual(assemblage.number_of_moles, 2.5)
+        self.assertFloatEqual(sum(assemblage.molar_fractions), 1.0)
+        self.assertArraysAlmostEqual(solution.molar_fractions, [0.3, 0.7])
+        for element, amount in bulk.items():
+            self.assertFloatEqual(assemblage.formula[element], amount)
+        self.assertFloatEqual(assemblage.mass, 2.5 * solution.molar_mass)
+        self.assertFloatEqual(
+            assemblage.heat_capacity_p, 2.5 * solution.molar_heat_capacity_p
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
