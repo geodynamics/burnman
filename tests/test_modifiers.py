@@ -141,6 +141,12 @@ class Modifiers(BurnManTest):
 
         self.assertArraysAlmostEqual(gibbs_excesses_output, gibbs_excesses)
 
+    def test_volume_ww_consistency_with_reference_pressure(self):
+        per = SLB_2011.periclase()
+        params = {**volume_ww_params, "P0": 2.0e9}
+        per.property_modifiers = [["volume_ww", params]]
+        self.assertTrue(check_eos_consistency(per, params["P0"], 1000.0))
+
     def test_modifier_with_pvt_eos(self):
         qtz = SLB_2011.quartz()
         assert check_eos_consistency(qtz, 1.0e5, 600.0)

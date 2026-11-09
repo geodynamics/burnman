@@ -905,8 +905,8 @@ def einstein_delta_excesses(pressure, temperature, params):
 def volume_ww_excesses(pressure, temperature, params):
     """
     Exponential (WW) volume-based correction expressed in Gibbs space.
-    The pressure-dependent volume correction follows Wu et al. (2008)
-    [JGR Solid Earth, doi:10.1029/2007JB005275], where
+    The pressure-dependent volume correction follows equation (3) of Wu et al.
+    (2008) [JGR Solid Earth, doi:10.1029/2007JB005275], where
     delta V = delta V0 * exp(-P / Pc) was introduced for the MgO
     pressure scale. Marcondes and Wentzcovitch (2015)
     [J. Appl. Phys., doi:10.1063/1.4921904] refer to this as the
@@ -919,11 +919,15 @@ def volume_ww_excesses(pressure, temperature, params):
     Pc
         Characteristic pressure in Pa.
     P0
-        Reference pressure in Pa. Defaults to zero.
+        Reference pressure in Pa. Defaults to zero and may differ from the
+        reference pressure of the underlying unmodified EoS.
 
     The model is:
         delta V(P) = dV0 * exp(-(P - P0) / Pc)
         delta G(P) = dV0 * Pc * (1 - exp(-(P - P0) / Pc))
+
+    The Gibbs energy correction is zero at P = P0. The correction has no
+    temperature dependence.
     """
     dV0 = params["dV0"]
     Pc = params["Pc"]
