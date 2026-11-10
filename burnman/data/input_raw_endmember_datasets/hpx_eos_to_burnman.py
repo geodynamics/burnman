@@ -290,11 +290,21 @@ class UniqueNames:
         return identifier
 
 
-def convert_dataset(solution_file, mbr_dataset):
-    """Return the Python source for one HPx-eos solution dataset."""
+def convert_dataset(solution_file, mbr_dataset, *, endmember_module=None, inline=False):
+    """Return Python source for one HPx-eos solution dataset.
+
+    ``endmember_module`` permits generation from freshly converted endmembers.
+    ``inline=True`` emits definitions without a preamble, using unqualified
+    endmember factories. Their names are reserved to prevent collisions with
+    solution and make definitions emitted into the same module.
+    """
     logging.debug(f"{solution_file}, {mbr_dataset}")
 
-    dataset = importlib.import_module(f"burnman.minerals.{mbr_dataset}")
+    dataset = (
+        importlib.import_module(f"burnman.minerals.{mbr_dataset}")
+        if endmember_module is None
+        else endmember_module
+    )
     extra_datasets = set()
 
     def endmember_reference(label):
@@ -303,7 +313,7 @@ def convert_dataset(solution_file, mbr_dataset):
             return "HP_2011_fluids.H2O()"
         if label == "and":
             label = "andalusite"
-        return f"{mbr_dataset}.{label}()"
+        return f"{label}()" if inline else f"{mbr_dataset}.{label}()"
 
     out_ss = ""
     out_make = ""
@@ -359,7 +369,8 @@ def convert_dataset(solution_file, mbr_dataset):
             "SymmetricRegularSolution",
             "AsymmetricRegularSolution",
             "CombinedMineral",
-        ],
+        ]
+        + (list(dataset.__dict__) if inline else []),
         [line[0] for line in data],
     )
     # Allocate classes first so that endmembers cannot shadow solution names.
@@ -572,8 +583,10 @@ def convert_dataset(solution_file, mbr_dataset):
                 # rename for insertion into string
                 if site_sp[0] == "x":
                     site_sp = site_sp[1:]
-                    site_sp = re.sub(r"\d+(\.\d+)?", replace_numbers, site_sp)
-                    site_sp = "".join(filter(str.isalpha, site_sp)).title()
+                # BurnMan's site parser recognises uppercase species initials.
+                # Legacy files also use lowercase labels such as pfo/pfa.
+                site_sp = re.sub(r"\d+(\.\d+)?", replace_numbers, site_sp)
+                site_sp = "".join(filter(str.isalpha, site_sp)).title()
 
                 ss[i_site].append(site_sp)
                 site_amounts[i_site].append(parse_expr(site_occ_list[2 * j + 1]))
@@ -653,6 +666,13 @@ def convert_dataset(solution_file, mbr_dataset):
         mineral = getattr(dataset, nood)()
         params = mineral.params
         out_noods += f"{noods[nood]} = Mineral({params})\n\n"
+
+    if inline:
+        if extra_datasets:
+            raise ValueError(
+                "Inline solution output requires all endmembers in the supplied module."
+            )
+        return f"{out_noods}\n{out_make}\n{out_ss}"
 
     # Preamble
     underline = "^" * len(solution_dataset)
