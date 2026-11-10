@@ -40,11 +40,27 @@ def get_reaction_matrix(assemblage, small_fraction_tol=0.0):
         for phase in assemblage.phases:
             if isinstance(phase, Solution):
                 occs = phase.solution_model.endmember_occupancies
-                poly = solution_polytope_from_endmember_occupancies(occs)
+                poly = solution_polytope_from_endmember_occupancies(
+                    occs, endmember_constraints=phase.endmember_constraints
+                )
                 S = poly.endmember_occupancies
                 T = poly.endmembers_as_independent_endmember_amounts
                 f = phase.molar_fractions
                 v = f.dot(occs)
+                if phase.endmember_constraints is not None:
+                    slacks = phase.evaluate_endmember_constraints(f)
+                    if np.any(slacks < -1.0e-10):
+                        raise ValueError(
+                            f"Composition of {phase.name} violates its inequalities."
+                        )
+                    # Active constraints can leave tiny positive round-off
+                    # residuals, which would forbid a valid boundary vertex
+                    # when the greedy decomposition divides by its slack.
+                    vertex_slacks = T @ phase.endmember_constraints.T
+                    vertex_slacks[np.abs(vertex_slacks) < 1.0e-12] = 0.0
+                    slacks[np.abs(slacks) < 1.0e-12] = 0.0
+                    S = np.hstack((S, np.maximum(vertex_slacks, 0.0)))
+                    v = np.r_[v, np.maximum(slacks, 0.0)]
                 mbrs = greedy_independent_endmember_selection(
                     S, v, small_fraction_tol=small_fraction_tol, norm_tol=1e-12
                 )
@@ -427,15 +443,26 @@ def estimate_conditions(
 
     # Count the number of free compositional vectors across all phases
     n_free_vectors = 0
-    occupancy_baseline = []
-    occupancy_blocks = []
+    composition_bound_baseline = []
+    composition_bound_blocks = []
     for phase in assemblage.phases:
         if hasattr(phase, "free_compositional_vectors"):
             n_free_vectors += phase.free_compositional_vectors.shape[0]
             phase.baseline_composition = phase.molar_fractions.copy()
-            occs = phase.solution_model.endmember_occupancies
-            occupancy_baseline.extend(phase.baseline_composition.dot(occs))
-            occupancy_blocks.append(occs.T.dot(phase.free_compositional_vectors.T))
+            phase_bounds = phase.composition_bounds
+            composition_bound_baseline.extend(
+                phase.baseline_composition.dot(phase_bounds)
+            )
+            composition_bound_blocks.append(
+                phase_bounds.T.dot(phase.free_compositional_vectors.T)
+            )
+        elif isinstance(phase, Solution) and phase.endmember_constraints is not None:
+            if np.any(
+                phase.evaluate_endmember_constraints(phase.molar_fractions) < -1.0e-10
+            ):
+                raise ValueError(
+                    f"Fixed composition of {phase.name} violates its inequalities."
+                )
 
     # Equal bounds fix a state variable in the optimizer.
     P_fixed = pressure_bounds[0] == pressure_bounds[1]
@@ -497,11 +524,11 @@ def estimate_conditions(
     bounds += [(None, None)] * n_free_vectors
     options = {"maxiter": max_it}
 
-    # Site occupancies are b + A @ x, including zero columns for P and T.
+    # Composition bounds are b + A @ x, including zero columns for P and T.
     constraints = []
     if n_free_vectors > 0:
-        b = np.array(occupancy_baseline)
-        A = np.hstack((np.zeros((len(b), 2)), block_diag(*occupancy_blocks)))
+        b = np.array(composition_bound_baseline)
+        A = np.hstack((np.zeros((len(b), 2)), block_diag(*composition_bound_blocks)))
         constraints = [LinearConstraint(A, -b, np.inf)]
 
         # Nelder-Mead cannot enforce linear constraints itself.
@@ -526,7 +553,10 @@ def estimate_conditions(
         options=options,
     )
     if n_free_vectors > 0 and not np.all(A.dot(res.x) + b >= -1.0e-10):
-        raise ValueError("Optimization returned infeasible site occupancies.")
+        raise ValueError(
+            "Optimization returned infeasible site occupancies "
+            "or violated composition inequalities."
+        )
 
     # Restore SI units for the solution and objective gradient.
     res.x *= scales

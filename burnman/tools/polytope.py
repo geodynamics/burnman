@@ -80,7 +80,7 @@ def solution_polytope_from_charge_balance(
 
 
 def solution_polytope_from_endmember_occupancies(
-    endmember_occupancies, return_fractions=False
+    endmember_occupancies, return_fractions=False, endmember_constraints=None
 ):
     """
     Creates a polytope object from a list of independent endmember occupancies.
@@ -100,6 +100,11 @@ def solution_polytope_from_endmember_occupancies(
         returns its attributes (such as endmember occupancies) as fractions
         or as floats.
     :type return_fractions: bool
+
+    :param endmember_constraints: Optional rows C defining C @ p >= 0 in
+        the supplied endmember basis. Constraints must be expressible in site
+        occupancies; linearly independent endmember occupancies ensure this.
+    :type endmember_constraints: 2D numpy.array or None
 
     :returns: A polytope object corresponding to the parameters provided.
     :rtype: :class:`burnman.polytope.MaterialPolytope` object
@@ -123,6 +128,23 @@ def solution_polytope_from_endmember_occupancies(
         (np.zeros((len(equalities[0]) - 1, 1)), np.identity(len(equalities[0]) - 1)),
         axis=1,
     )
+
+    if endmember_constraints is not None:
+        constraints = np.asarray(endmember_constraints, dtype=float)
+        occupancies = np.asarray(endmember_occupancies, dtype=float)
+        if constraints.ndim != 2 or constraints.shape[1] != len(occupancies):
+            raise ValueError(
+                "Endmember constraints must have one column per endmember."
+            )
+        if not np.all(np.isfinite(constraints)):
+            raise ValueError("Endmember constraints must contain finite values.")
+        site_constraints = constraints @ np.linalg.pinv(occupancies.T)
+        if not np.allclose(site_constraints @ occupancies.T, constraints, atol=1.0e-12):
+            raise ValueError(
+                "Endmember constraints cannot be expressed in site occupancies."
+            )
+        extra = np.column_stack((np.zeros(len(constraints)), site_constraints))
+        pos_constraints = np.vstack((pos_constraints, extra))
 
     return MaterialPolytope(
         equalities,
@@ -161,15 +183,17 @@ def composite_polytope_at_constrained_composition(
 
     equalities = np.concatenate((c_array, composite.stoichiometric_array.T), axis=1)
 
-    eoccs = []
-    for i, ph in enumerate(composite.phases):
+    phase_bounds = []
+    for ph in composite.phases:
         if isinstance(ph, Solution):
-            eoccs.append(ph.solution_model.endmember_occupancies.T)
+            phase_bounds.append(ph.composition_bounds.T)
         else:
-            eoccs.append(np.ones((1, 1)))
+            phase_bounds.append(np.ones((1, 1)))
 
-    eoccs = block_diag(*eoccs)
-    inequalities = np.concatenate((np.zeros((len(eoccs), 1)), eoccs), axis=1)
+    bound_matrix = block_diag(*phase_bounds)
+    inequalities = np.concatenate(
+        (np.zeros((len(bound_matrix), 1)), bound_matrix), axis=1
+    )
 
     return MaterialPolytope(equalities, inequalities, return_fractions=return_fractions)
 
@@ -234,7 +258,8 @@ def simplify_composite_with_composition(composite, composition):
                     c_mean = amounts[0]
 
                 poly = solution_polytope_from_endmember_occupancies(
-                    ph.solution_model.endmember_occupancies
+                    ph.solution_model.endmember_occupancies,
+                    endmember_constraints=ph.endmember_constraints,
                 )
                 dmbrs = poly.endmembers_as_independent_endmember_amounts
 
@@ -294,6 +319,7 @@ def simplify_composite_with_composition(composite, composition):
                             soln.endmember_names[h] = new_name
                     new_phases.append(soln)
                 else:
+                    new_phases.append(ph)
                     logging.info(
                         "This solution is rank-deficient "
                         f"({rank} < {n_mbrs}), "
