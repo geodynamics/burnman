@@ -291,12 +291,24 @@ class UniqueNames:
 
 
 def convert_dataset(solution_file, mbr_dataset, *, endmember_module=None, inline=False):
-    """Return Python source for one HPx-eos solution dataset.
+    """
+    Generate BurnMan Python code from an HPx-eos solution file.
+    The generated code refers to endmembers by their local names
+    and avoids reusing those names for solutions or combined endmembers.
 
-    ``endmember_module`` permits generation from freshly converted endmembers.
-    ``inline=True`` emits definitions without a preamble, using unqualified
-    endmember factories. Their names are reserved to prevent collisions with
-    solution and make definitions emitted into the same module.
+    :param solution_file: Path to the HPx-eos solution file.
+    :type solution_file: str
+    :param mbr_dataset: Name of the endmember dataset to use in the generated code.
+    :type mbr_dataset: str
+    :param endmember_module: Optional module containing the endmembers.
+        If not provided, the endmembers are assumed
+        to be in burnman.minerals.<mbr_dataset>.
+    :type endmember_module: module or None
+    :param inline: If True, return definitions that can go in the same Python file
+        as the endmembers, without a separate header or imports.
+    :type inline: bool
+    :return: The generated Python code for the solution.
+    :rtype: str
     """
     logging.debug(f"{solution_file}, {mbr_dataset}")
 
