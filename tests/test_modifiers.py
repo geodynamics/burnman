@@ -43,6 +43,7 @@ magnetic_params_2 = {
 }
 thermal_params = {"Theta_0": 1200.0, "Cv_inf": 1.0}
 thermal_delta_params = {"Theta_0": 1200.0, "S_inf": 1.0}
+volume_ww_params = {"dV0": 1.0e-7, "Pc": 1.0e10}
 
 
 fn_params = [
@@ -58,6 +59,7 @@ fn_params = [
     [pm.debye_delta_excesses, "debye_delta", thermal_delta_params],
     [pm.einstein_excesses, "einstein", thermal_params],
     [pm.einstein_delta_excesses, "einstein_delta", thermal_delta_params],
+    [pm.volume_ww_excesses, "volume_ww", volume_ww_params],
 ]
 
 
@@ -130,6 +132,7 @@ class Modifiers(BurnManTest):
             -620.7977,
             -358.3824,
             -517.2153,
+            999.9546,
         ]
         gibbs_excesses_output = []
         for fn, name, params in fn_params:
@@ -137,6 +140,12 @@ class Modifiers(BurnManTest):
             gibbs_excesses_output.append(round(excesses[0]["G"], 4))
 
         self.assertArraysAlmostEqual(gibbs_excesses_output, gibbs_excesses)
+
+    def test_volume_ww_consistency_with_reference_pressure(self):
+        per = SLB_2011.periclase()
+        params = {**volume_ww_params, "P0": 2.0e9}
+        per.property_modifiers = [["volume_ww", params]]
+        self.assertTrue(check_eos_consistency(per, params["P0"], 1000.0))
 
     def test_modifier_with_pvt_eos(self):
         qtz = SLB_2011.quartz()
