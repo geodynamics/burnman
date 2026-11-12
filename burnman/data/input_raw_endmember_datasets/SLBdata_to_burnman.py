@@ -20,19 +20,14 @@ if os.path.isfile("stx11ver.dat") == False:
 
 
 def read_dataset(datafile):
-    f = open(datafile, "r")
-    ds = []
-    for line in f:
-        ds.append(line.split())
-    return ds
+    # Perple_X distributes stx11ver.dat with Windows-1252 punctuation.
+    with open(datafile, "r", encoding="cp1252") as f:
+        return [line.split() for line in f]
 
 
 def read_dataset_utf8(datafile):
-    f = open(datafile, "r")
-    ds = []
-    for line in f:
-        ds.append(line.decode("utf-8").split())
-    return ds
+    with open(datafile, "r", encoding="utf-8") as f:
+        return [line.split() for line in f]
 
 
 def process_stixrude():
@@ -103,6 +98,32 @@ def process_stixrude():
 
 accurate_values, configurational_entropies = process_stixrude()
 
+# Write the fixed site entropies as occupancy expressions. Perple_X supplies
+# rounded entropy offsets for spinel, hercynite and Ca-Tschermaks; the
+# jadeite-majorite offset is absent there. The hercynite expression also
+# retains the magnetic entropy included in the Perple_X offset.
+configurational_entropies.update(
+    {
+        # [Mg3/4Al1/4]4[Al7/8Mg1/8]8O16
+        "spinel": (
+            "-_R * (3.0 * np.log(3.0 / 4.0) + 1.0 * np.log(1.0 / 4.0) "
+            "+ 7.0 * np.log(7.0 / 8.0) + 1.0 * np.log(1.0 / 8.0))"
+        ),
+        # Same site occupancies as spinel ([Fe3/4Al1/4]4[Al7/8Fe1/8]8O16),
+        # plus the Perple_X Fe2+ magnetic entropy: 4 high-spin Fe2+ ions
+        # (S=2, 2S+1=5 spin states) per formula unit (Fe4Al8O16).
+        "hercynite": (
+            "-_R * (3.0 * np.log(3.0 / 4.0) + 1.0 * np.log(1.0 / 4.0) "
+            "+ 7.0 * np.log(7.0 / 8.0) + 1.0 * np.log(1.0 / 8.0)) "
+            "+ 4.0 * _R * np.log(5.0)"
+        ),
+        # [Ca][Al][Si1/2Al1/2]2O6
+        "ca_tschermaks": "-_R * (1.0 * np.log(1.0 / 2.0) + 1.0 * np.log(1.0 / 2.0))",
+        # [Na2/3Al1/3]3[Al][Si]Si3O12
+        "jd_majorite": "-_R * (2.0 * np.log(2.0 / 3.0) + 1.0 * np.log(1.0 / 3.0))",
+    }
+)
+
 
 ds = read_dataset_utf8("slb_2011.txt")
 landau = read_dataset_utf8("slb_2011_landau.txt")
@@ -128,10 +149,17 @@ print('"""')
 print("")
 print("")
 print("")
+print("import numpy as np")
+print("")
 print("from ..mineral import Mineral")
 print("from ..solution import Solution")
 print("from ..solutionmodel import *")
 print("from ..tools.chemistry import dictionarize_formula, formula_mass")
+print("")
+print("# Gas constant (J/mol/K) used by HeFESTo (CODATA 2006) to compute the fixed")
+print("# mixed-site configurational entropies below; differs negligibly from the")
+print("# current exact SI value in burnman.constants.gas_constant.")
+print("_R = 8.314472")
 print("")
 
 param_scales = [
@@ -191,14 +219,16 @@ for idx, m in enumerate(ds):
         print("            'n': sum(formula.values()),")
         print("            'molar_mass': formula_mass(formula)}")
         print("")
-        if (
-            landau_params.has_key(m[0].lower())
-            or configurational_entropies[m[0].lower()] != "None"
-        ):
+        # The SLB2011 HeFESTo Landau term uses the disordered reference state.
+        # The generic BurnMan modifier uses the ordered state; an extra linear
+        # term cancels that reference offset for the published SLB2011 phases.
+        # Stishovite's negative Tc_0 encodes the high-pressure CaCl2 transition.
+        has_landau = m[0].lower() in landau_params
+        if has_landau or configurational_entropies[m[0].lower()] != "None":
             print(
                 "        self.property_modifiers = [",
             )
-            if landau_params.has_key(m[0].lower()):
+            if has_landau:
                 print(
                     "['landau', {'Tc_0':",
                     landau_params[m[0].lower()][0],
@@ -206,8 +236,19 @@ for idx, m in enumerate(ds):
                     landau_params[m[0].lower()][2],
                     ", 'V_D':",
                     landau_params[m[0].lower()][1],
-                    "}]",
+                    "}],",
                 )
+                if m[0].lower() in ("quartz", "nepheline", "stishovite"):
+                    tc0, vd, sd = landau_params[m[0].lower()]
+                    print(
+                        "['linear', {'delta_E':",
+                        f"-2.0 * {sd} * {tc0} / 3.0",
+                        ", 'delta_S':",
+                        f"-{sd}",
+                        ", 'delta_V':",
+                        f"-{vd}",
+                        "}],",
+                    )
             if configurational_entropies[m[0].lower()] != "None":
                 print(
                     "['linear', {'delta_E':",
@@ -216,7 +257,7 @@ for idx, m in enumerate(ds):
                     configurational_entropies[m[0].lower()],
                     ", 'delta_V':",
                     0.0,
-                    "}]",
+                    "}],",
                 )
             print("]")
             print("")
