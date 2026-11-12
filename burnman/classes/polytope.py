@@ -138,7 +138,7 @@ class MaterialPolytope(object):
             equalities defining the polytope. Each row should evaluate to 0.
         :type equalities: numpy.array (2D) of floats or Fractions
         :param inequalities: A numpy array containing all the inequalities
-            defining the polytope. Each row should evaluate to <= 0.
+            defining the polytope. Each row b + A*x should evaluate to >= 0.
         :type inequalities: numpy.array (2D) of the same type as equalities
         :param return_fractions: Whether or not to return fractions.
         :type return_fractions: bool
@@ -322,6 +322,10 @@ class MaterialPolytope(object):
         """
         ind_poly = self.independent_endmember_polytope
         modified_limits = cdd_fraction.copy_inequalities(ind_poly)
+        limits = [
+            [Fraction(value).limit_denominator(1000000) for value in row]
+            for row in limits
+        ]
         cdd_fraction.matrix_append_to(
             modified_limits, cdd_fraction.matrix_from_array(limits)
         )
@@ -385,8 +389,8 @@ class MaterialPolytope(object):
             )
         else:
             if grid_type == "independent endmember proportions":
-                plims = self.subpolytope_from_site_occupancy_limits(limits)
-                ppns = np.array(self.cdd.copy_generators(plims).array)[:, 1:]
+                plims = self.subpolytope_from_independent_endmember_limits(limits)
+                ppns = np.array(cdd_fraction.copy_generators(plims).array)[:, 1:]
                 last_ppn = np.array([1.0 - sum(p) for p in ppns]).reshape(
                     (len(ppns), 1)
                 )
@@ -424,6 +428,9 @@ class MaterialPolytope(object):
             simplices = self._decompose_vertices_into_simplices(
                 vertices_as_independent_endmember_proportions
             )
+
+        if len(f_occ) == 1:
+            return f_occ * (points_per_edge - 1)
 
         n_ind = f_occ.shape[1]
         n_simplices = len(simplices)

@@ -256,6 +256,16 @@ DQF 1 0 0
             excess - ideal, 0.25 * (1000.0 - 10.0 * temperature + 1.0e-6 * pressure)
         )
 
+    def test_legacy_lowercase_activity_labels(self):
+        block = solution_block("olivine")
+        block = block.replace("xMg", "pfo").replace("xFe", "pfa")
+        block = block.replace("pfo 1\ncheck", "pfo 2\ncheck")
+        block = block.replace("pfa 1\ncheck", "pfa 2\ncheck")
+        model = self.convert(block)["olivine"]().solution_model
+        activities = IdealSolution.activities(model, 1.0e9, 1400.0, [0.7, 0.3])
+        for actual, expected in zip(activities, [0.49, 0.09]):
+            self.assertAlmostEqual(actual, expected)
+
     def test_multiple_energy_corrections_are_added(self):
         block = solution_block("first", adjustment="1 0 0")
         block = block.replace("delG(make) 1 0 0", "delG(make) 1 0 0\nDQF 2 0 0")

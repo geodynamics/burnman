@@ -54,7 +54,8 @@ def fit_composition_to_solution(
     observed compositional variables (in a least-squares sense).
 
     The fitting applies appropriate non-negativity constraints
-    (i.e. no species can have a negative occupancy on a site).
+    (i.e. no species can have a negative occupancy on a site), together with
+    any additional inequalities in solution.endmember_constraints.
 
     :param solution: The solution to use in the fitting procedure.
     :type solution: :class:`burnman.Solution`
@@ -151,14 +152,11 @@ def fit_composition_to_solution(
     S = S[np.any(np.abs(S) > 1.0e-10, axis=1)]
     equality_constraints = [S, np.zeros(len(S))]
 
-    # Ensure all site occupancies are non-negative
-    T = np.array(
-        [
-            -t
-            for t in np.unique(solution.solution_model.endmember_occupancies.T, axis=0)
-            if any(np.abs(t) > 1.0e-10)
-        ]
+    # Enforce site-occupancy and optional composition bounds.
+    bounds = getattr(
+        solution, "composition_bounds", solution.solution_model.endmember_occupancies
     )
+    T = np.array([-t for t in np.unique(bounds.T, axis=0) if any(np.abs(t) > 1.0e-10)])
     inequality_constraints = [T, np.zeros(len(T))]
 
     popt, pcov, res = weighted_constrained_least_squares(

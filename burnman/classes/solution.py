@@ -19,6 +19,7 @@ from ..utils.misc import copy_documentation
 from ..utils.math import complete_basis
 
 import copy
+import warnings
 from scipy.optimize import minimize
 
 
@@ -72,9 +73,28 @@ class Solution(Mineral):
     :param molar_fractions: The initial molar fractions of each endmember
         in the solution. Can be reset using the set_composition() method.
     :type molar_fractions: numpy.array
+    :param endmember_constraints: Optional matrix C with one linear inequality
+        per row, satisfied when C @ molar_fractions >= 0. Since fractions sum
+        to one, this can be used to limit the maximum fraction
+        of one or more endmembers,
+        or the maximum amount of a particular site occupancy.
+        For example, the amount of the second endmember in a solution
+        can be limited to 0.2 by setting every element of a row of C to 0.2,
+        except for the second column which is set to -0.8 (i.e., 0.2 - 1.0).
+        The set_composition() method permits direct thermodynamic evaluation
+        outside the search domain, but warns when an
+        optional inequality is violated.
+
+    :type endmember_constraints: 2D numpy.array or None
     """
 
-    def __init__(self, name=None, solution_model=None, molar_fractions=None):
+    def __init__(
+        self,
+        name=None,
+        solution_model=None,
+        molar_fractions=None,
+        endmember_constraints=None,
+    ):
         """
         Set up matrices to speed up calculations for when P, T, X is defined.
         """
@@ -89,6 +109,11 @@ class Solution(Mineral):
         if solution_model is not None:
             self.solution_model = solution_model
 
+        if endmember_constraints is not None or not hasattr(
+            self, "_endmember_constraints"
+        ):
+            self.endmember_constraints = endmember_constraints
+
         # Equation of state
         for mbr in self.solution_model.endmembers:
             mbr[0].set_method(mbr[0].params["equation_of_state"])
@@ -100,6 +125,81 @@ class Solution(Mineral):
     @cached_property
     def endmembers(self):
         return self.solution_model.endmembers
+
+    @property
+    def endmember_constraints(self):
+        """
+        Additional inequalities C @ p >= 0 in this endmember basis, or None.
+
+        For example, p[i] <= c can be expressed as a row in the
+        constraint matrix which is filled with c except for column i,
+        which contains c - 1. Signed endmember fractions remain permitted
+        wherever the site occupancies and these inequalities are non-negative.
+        """
+        return getattr(self, "_endmember_constraints", None)
+
+    @endmember_constraints.setter
+    def endmember_constraints(self, constraints):
+        if constraints is None:
+            self._endmember_constraints = None
+            self.reset()
+            return
+        matrix = np.array(constraints, dtype=float, copy=True)
+        if matrix.ndim != 2 or matrix.shape[1] != self.n_endmembers:
+            raise ValueError(
+                "endmember_constraints must have shape "
+                f"(n_constraints, {self.n_endmembers})."
+            )
+        if not np.all(np.isfinite(matrix)):
+            raise ValueError("endmember_constraints must contain finite values.")
+        self._endmember_constraints = matrix
+        self.reset()
+        if hasattr(self, "molar_fractions"):
+            self._warn_if_outside_endmember_constraints(self.molar_fractions)
+
+    def _warn_if_outside_endmember_constraints(self, molar_fractions):
+        constraints = self.endmember_constraints
+        if constraints is None or constraints.size == 0:
+            return
+        tolerance = 1.0e-10 * np.linalg.norm(constraints, axis=1)
+        if np.any(self.evaluate_endmember_constraints(molar_fractions) < -tolerance):
+            warnings.warn(
+                f"The composition of {getattr(self, 'name', 'solution')} violates its "
+                "endmember_constraints; thermodynamic properties are still "
+                "evaluated.",
+                stacklevel=3,
+            )
+
+    def evaluate_endmember_constraints(self, molar_fractions):
+        """
+        Evaluate the endmember constraints for the given molar fractions.
+
+        :param molar_fractions: Molar abundance for each endmember.
+        :type molar_fractions: list of float
+
+        :return: The result of C @ molar_fractions, or an empty array when C is unset.
+        :rtype: numpy.ndarray
+        """
+        fractions = np.asarray(molar_fractions, dtype=float)
+        if fractions.shape != (self.n_endmembers,):
+            raise ValueError(f"molar_fractions must have shape ({self.n_endmembers},).")
+        if self.endmember_constraints is None:
+            return np.empty(0)
+        return self.endmember_constraints @ fractions
+
+    @property
+    def composition_bounds(self):
+        """
+        Columns bound compositions p through p @ composition_bounds >= 0.
+
+        Includes the physical site-species bounds and any additional rows
+        supplied through endmember_constraints. Not cached, so
+        changing the optional inequalities takes effect immediately.
+        """
+        occupancies = self.solution_model.endmember_occupancies
+        if self.endmember_constraints is None:
+            return occupancies
+        return np.hstack((occupancies, self.endmember_constraints.T))
 
     def set_composition(self, molar_fractions):
         """
@@ -125,6 +225,7 @@ class Solution(Mineral):
 
         self.reset()
         self.molar_fractions = np.array(molar_fractions)
+        self._warn_if_outside_endmember_constraints(self.molar_fractions)
 
     def set_method(self, method):
         for i in range(self.n_endmembers):
@@ -866,6 +967,7 @@ class RelaxedSolution(Solution):
             name=solution.name,
             solution_model=solution.solution_model,
             molar_fractions=molar_fractions,
+            endmember_constraints=solution.endmember_constraints,
         )
 
     def set_state(self, pressure, temperature, relaxed=True):
@@ -946,7 +1048,9 @@ class RelaxedSolution(Solution):
             self.unrelaxed.set_composition(n)
             return self.unrelaxed.molar_gibbs
 
-        sol = minimize(G_func, np.zeros(len(self.dndq[0])), method="Nelder-Mead")
+        sol = minimize(
+            G_func, np.zeros(self.n_relaxation_vectors), method="Nelder-Mead"
+        )
         assert sol.success
         n = n0 + np.einsum("ij, j", self.dndq, sol.x)
         self.unrelaxed.set_composition(n)
@@ -997,7 +1101,9 @@ class RelaxedSolution(Solution):
             pressure[0] = ss.pressure
             return ss.molar_helmholtz
 
-        sol = minimize(F_func, np.zeros(len(self.dndq[0])), method="Nelder-Mead")
+        sol = minimize(
+            F_func, np.zeros(self.n_relaxation_vectors), method="Nelder-Mead"
+        )
         assert sol.success
 
         # Run one more time with root
@@ -1030,7 +1136,7 @@ class RelaxedSolution(Solution):
     @material_property
     def _d2Gdqdq_fixed_PT_pinv(self):
         """
-        The second derivative of the Gibbs energy
+        The pseudoinverse of the second derivative of the Gibbs energy
         with respect to the structure parameters at constant
         pressure and temperature. Often referred to as the
         susceptibility matrix.

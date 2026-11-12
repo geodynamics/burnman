@@ -661,6 +661,43 @@ class test_tools(BurnManTest):
         for phase, composition in zip(assemblage.phases[:-1], compositions):
             self.assertArraysAlmostEqual(phase.molar_fractions, composition)
 
+    def test_estimate_conditions_applies_optional_composition_inequalities(self):
+        assemblage = setup_assemblage(scale=0.0)
+        phase = assemblage.phases[1]
+        phase.free_compositional_vectors = Composite([phase]).reaction_basis
+        direction = phase.free_compositional_vectors[0]
+        index = np.argmax(np.abs(direction))
+        cap = phase.molar_fractions[index] + 1.0e-5
+        constraints = np.full((1, phase.n_endmembers), cap)
+        constraints[0, index] -= 1.0
+        phase.endmember_constraints = constraints
+        original_minimize = thermobarometry.minimize
+
+        def check_minimize(fun, x0, method, **kwargs):
+            if method == "Nelder-Mead":
+                trial = np.array(x0)
+                trial[2] = 1.0e-4 / direction[index]
+                composition = phase.molar_fractions.copy()
+                candidate = composition + trial[2] * direction
+                self.assertTrue(
+                    np.all(candidate @ phase.solution_model.endmember_occupancies >= 0)
+                )
+                self.assertLess(constraints[0] @ candidate, 0.0)
+                self.assertEqual(fun(trial), np.inf)
+                self.assertArraysAlmostEqual(phase.molar_fractions, composition)
+            return original_minimize(fun, x0, method=method, **kwargs)
+
+        with patch.object(thermobarometry, "minimize", side_effect=check_minimize):
+            result = estimate_conditions(
+                assemblage,
+                HP_2011_ds62.cov(),
+                guessed_conditions=[0.4e9, 873.0],
+                pressure_bounds=[0.4e9, 0.4e9],
+                temperature_bounds=[873.0, 873.0],
+            )
+        self.assertTrue(result.success, result.message)
+        self.assertLessEqual(phase.molar_fractions[index], cap + 1.0e-10)
+
     def test_estimate_conditions_automatic_scaling(self):
         reference = None
         for guess in ([12.0e9, 1000.0], [14.0e9, 1400.0], [16.0e9, 1800.0]):

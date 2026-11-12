@@ -55,6 +55,7 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
         psi_excess_function,
         anisotropic_parameters,
         molar_fractions=None,
+        endmember_constraints=None,
     ):
         # Always set orthotropic as false to ensure correct
         # derivatives are taken.
@@ -65,14 +66,21 @@ class AnisotropicSolution(Solution, AnisotropicMineral):
 
         # Initialise as both Material and Solution object
         Material.__init__(self)
-        Solution.__init__(self, name, solution_model)
+        Solution.__init__(
+            self, name, solution_model, endmember_constraints=endmember_constraints
+        )
 
         # Store a scalar copy of the solution model to speed up set_state
         scalar_solution_model = copy.copy(solution_model)
         scalar_solution_model.endmembers = [
             [mbr.isotropic_mineral, formula] for mbr, formula in self.endmembers
         ]
-        self._scalar_solution = Solution(name, scalar_solution_model, molar_fractions)
+        self._scalar_solution = Solution(
+            name,
+            scalar_solution_model,
+            molar_fractions,
+            endmember_constraints=self.endmember_constraints,
+        )
 
         self._logm_M0_mbr = np.einsum(
             "kij->ijk", np.array([logm(m[0].cell_vectors_0.T) for m in self.endmembers])
@@ -335,6 +343,7 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
             psi_excess_function=anisotropic_solution.psi_excess_function,
             anisotropic_parameters=anisotropic_solution.anisotropic_params,
             molar_fractions=molar_fractions,
+            endmember_constraints=anisotropic_solution.endmember_constraints,
         )
 
     def set_state(self, pressure, temperature, relaxed=True):
@@ -417,7 +426,9 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
             self.unrelaxed._scalar_solution.set_composition(n)
             return self.unrelaxed._scalar_solution.molar_gibbs
 
-        sol = minimize(G_func, np.zeros(len(self.dndq[0])), method="Nelder-Mead")
+        sol = minimize(
+            G_func, np.zeros(self.n_relaxation_vectors), method="Nelder-Mead"
+        )
         assert sol.success
         n = n0 + np.einsum("ij, j", self.dndq, sol.x)
         self.unrelaxed.set_composition(n)
@@ -467,7 +478,9 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
             pressure[0] = ss.pressure
             return ss.molar_helmholtz
 
-        sol = minimize(F_func, np.zeros(len(self.dndq[0])), method="Nelder-Mead")
+        sol = minimize(
+            F_func, np.zeros(self.n_relaxation_vectors), method="Nelder-Mead"
+        )
         assert sol.success
 
         # Run one more time with root
@@ -606,7 +619,7 @@ class RelaxedAnisotropicSolution(AnisotropicSolution):
     @material_property
     def _d2Fdqdq_fixed_epsT_pinv(self):
         """
-        The inverse of the second derivative of the Helmholtz energy
+        The pseudoinverse of the second derivative of the Helmholtz energy
         with respect to the structure parameters at constant
         strain and temperature. Often referred to as the
         susceptibility matrix.

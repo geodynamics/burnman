@@ -143,6 +143,28 @@ class test_two_member_solution(BurnManTest):
         self.assertArraysAlmostEqual(ss.molar_fractions, unrelaxed.molar_fractions)
         self.assertFloatEqual(ss.molar_gibbs, unrelaxed.molar_gibbs)
 
+    def test_relaxed_composition_inequalities_warn_without_changing_properties(self):
+        unrelaxed = make_nonorthotropic_solution(two_fos=True)
+        unrelaxed.endmember_constraints = [[-0.8, 0.2, 0.2]]
+        unrelaxed.set_composition([0.2, 0.6, 0.2])
+        ss = RelaxedAnisotropicSolution(
+            unrelaxed, [[1.0, -1.0, 0.0]], [[0.5, 0.5, 0.0], [0.0, 0.0, 1.0]]
+        )
+        self.assertArraysAlmostEqual(ss.endmember_constraints.ravel(), [-0.8, 0.2, 0.2])
+        ss.set_composition([0.8, 0.2], q_initial=[-0.2])
+        with self.assertWarnsRegex(UserWarning, "violates.*endmember_constraints"):
+            ss.set_state(2.0e10, 1000.0)
+        self.assertAlmostEqual(ss.molar_fractions[0], 0.4, places=6)
+        np.testing.assert_allclose(
+            ss._d2Fdqdq_fixed_epsT_pinv,
+            np.linalg.pinv(ss._d2Fdqdq_fixed_epsT),
+            atol=1.0e-12,
+        )
+        volume = ss.molar_volume
+        with self.assertWarnsRegex(UserWarning, "violates.*endmember_constraints"):
+            ss.set_state_with_volume(volume, 1000.0)
+        self.assertAlmostEqual(ss.molar_fractions[0], 0.4, places=6)
+
     def test_composition_derivatives_at_fixed_volume(self):
         """Compare cell and deformation derivatives with composition changes."""
         ss = make_nonorthotropic_solution()

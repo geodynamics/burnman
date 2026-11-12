@@ -32,6 +32,7 @@ def calculate_constraints(assemblage, n_free_compositional_vectors):
       - Pressure and temperature must be positive
       - All phase fractions must be positive
       - All site-species occupancies must be positive
+      - Optional solution composition inequalities must be satisfied
 
     The constraints are stored in a vector (b) and matrix (A).
     The sign convention is chosen such that the constraint is satisfied
@@ -47,11 +48,11 @@ def calculate_constraints(assemblage, n_free_compositional_vectors):
     n_constraints = 0
     for i, n in enumerate(assemblage.endmembers_per_phase):
         n_constraints += 1
-        if n == 1:
-            bounds.append(np.array([[]]))
-        else:
-            bounds.append(assemblage.phases[i].solution_model.endmember_occupancies)
+        if isinstance(assemblage.phases[i], Solution):
+            bounds.append(assemblage.phases[i].composition_bounds)
             n_constraints += len(bounds[-1][0])
+        else:
+            bounds.append(np.array([[]]))
 
     c_vector = np.zeros((n_constraints + 2))
     c_matrix = np.zeros(

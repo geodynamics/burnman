@@ -152,6 +152,7 @@ def transform_solution_to_new_basis(
     """
     Transforms a solution model from one endmember basis to another.
     Returns a new Solution object.
+    A single-endmember transform returns a Mineral.
 
     :param solution: The original solution object.
     :type solution: :class:`burnman.Solution` object
@@ -180,6 +181,10 @@ def transform_solution_to_new_basis(
         n_mbrs, n_all_mbrs = new_basis.shape
     else:
         _, n_all_mbrs = new_basis.shape
+
+    endmember_constraints = solution.endmember_constraints
+    if endmember_constraints is not None:
+        endmember_constraints = endmember_constraints @ new_basis[:n_mbrs].T
 
     if solution_name is None:
         name = "child solution"
@@ -343,6 +348,7 @@ def transform_solution_to_new_basis(
             name=name,
             solution_model=new_solution_model,
             molar_fractions=molar_fractions,
+            endmember_constraints=endmember_constraints,
         )
         new_solution.parent = solution
         new_solution.basis = new_basis
