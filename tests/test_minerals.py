@@ -94,6 +94,25 @@ class SLB2022LandauVolumes(BurnManTest):
                 self.assertGreater(phase.shear_wave_velocity, 0.0)
 
 
+class SLB2011HeFESToLandau(BurnManTest):
+    def test_quartz_nepheline_and_stishovite_match_archive(self):
+        # HeFESTo inv251010, 26 GPa and 1000 K, fort.89. Its tabulated
+        # Gibbs energies and volumes include the original SLB2011 Landau term.
+        reference = {
+            "quartz": (-421702.9, 16.6340),
+            "nepheline": (-924920.7, 41.0287),
+            "stishovite": (-508263.4, 13.1622),
+        }
+        for name, (gibbs, volume_cm3) in reference.items():
+            with self.subTest(mineral=name):
+                mineral = getattr(minerals.SLB_2011, name)()
+                mineral.set_state(26.0e9, 1000.0)
+                self.assertAlmostEqual(mineral.gibbs, gibbs, delta=1.0)
+                self.assertAlmostEqual(
+                    mineral.molar_volume * 1.0e6, volume_cm3, delta=0.001
+                )
+
+
 class VolumeStateModifiers(BurnManTest):
     def test_volume_state_without_pressure_function(self):
         class VolumeOnlyEOS(EquationOfState):
