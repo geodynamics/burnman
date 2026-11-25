@@ -31,7 +31,7 @@ where :math:`\rho_i` is the density and :math:`\mu_i` is the molar mass of the :
 
 
 Unlike density and volume, there is no straightforward way to average the effective bulk and shear moduli of a multiphase rock, as it depends on the specific distribution and orientation of the constituent minerals.
-BurnMan allows several schemes for averaging the effective elastic moduli :math:`K_{eff}` and :math:`G_{eff}`: the Voigt and Reuss bounds, the Hashin-Shtrikman bounds, the Voigt-Reuss-Hill average, and the Hashin-Shtrikman average :cite:`Watt1976`.
+BurnMan allows several schemes for averaging the effective elastic moduli :math:`K_{eff}` and :math:`G_{eff}`: the Voigt and Reuss bounds, the Hashin-Shtrikman bounds, the Voigt-Reuss-Hill average, the Hashin-Shtrikman average :cite:`Watt1976`, and the spherical self-consistent estimate.
 
 
 The Voigt average, assuming constant strain across all phases, is defined as
@@ -53,6 +53,16 @@ The Voigt-Reuss-Hill average is the arithmetic mean of Voigt and Reuss bounds:
 The Hashin-Shtrikman bounds make an additional assumption that the distribution of the phases is statistically isotropic and are usually much narrower than the Voigt and Reuss bounds :cite:`Watt1976`.
 This may be a poor assumption in regions of Earth with high anisotropy, such as the lowermost mantle, however these bounds are more physically motivated than the commonly-used Voigt-Reuss-Hill average.
 In most instances, the Voigt-Reuss-Hill average and the arithmetic mean of the Hashin-Shtrikman bounds are quite similar with the pure arithmetic mean (linear averaging) being well outside of both.
+
+The spherical self-consistent estimate represents each phase as a spherical
+grain embedded in an effective isotropic medium, without selecting a matrix
+phase (`Budiansky, 1965 <https://doi.org/10.1016/0022-5096(65)90011-6>`_).
+Its coupled equations are
+
+.. math::
+    \sum_i \nu_i \frac{K_i-K_{eff}}{K_i+4G_{eff}/3}=0, \qquad
+    \sum_i \nu_i \frac{G_i-G_{eff}}{G_i+\zeta}=0, \qquad
+    \zeta=\frac{G_{eff}(9K_{eff}+8G_{eff})}{6(K_{eff}+2G_{eff})}.
 
 It is worth noting that each of the above bounding methods are derived from mechanical models of a linear elastic composite.
 It is thus only appropriate to apply them to elastic moduli, and not to other thermoelastic properties, such as wave speeds or density.

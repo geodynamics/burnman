@@ -1,11 +1,12 @@
 # This file is part of BurnMan - a thermoelastic and thermodynamic toolkit
 # for the Earth and Planetary Sciences
-# Copyright (C) 2012 - 2025 by the BurnMan team, released under the GNU
+# Copyright (C) 2012 - 2026 by the BurnMan team, released under the GNU
 # GPL v2 or later.
 
 
 import numpy as np
 import warnings
+from scipy.optimize import brentq
 
 
 class AveragingScheme(object):
@@ -134,6 +135,59 @@ class VoigtReussHill(AveragingScheme):
         :rtype: float
         """
         return voigt_reuss_hill_function(volumes, shear_moduli)
+
+
+class SelfConsistent(AveragingScheme):
+    """
+    Self-consistent elastic moduli for an aggregate of spherical grains.
+
+    The aggregate is isotropic, and it is assumed that no phase plays
+    a special role as an interconnected medium.
+
+    The spherical self-consistent equations of Budiansky (1965),
+    https://doi.org/10.1016/0022-5096(65)90011-6, are
+
+    .. math::
+
+        \\sum_i f_i\frac{K_i-K}{K_i+4G/3}=0, \\qquad
+        \\sum_i f_i\frac{G_i-G}{G_i+\\zeta}=0,
+
+        \\zeta=\frac{G(9K+8G)}{6(K+2G)}, \\qquad
+        f_i=\\frac{V_i}{\\sum_j V_j}.
+
+    Average bulk and shear moduli are computed by
+    :func:`self_consistent_function`.
+    """
+
+    def average_bulk_moduli(self, volumes, bulk_moduli, shear_moduli):
+        """
+        Average bulk moduli using spherical self-consistent homogenization.
+
+        :param volumes: Volumes of each phase. :math:`[m^3]`
+        :type volumes: list of floats
+        :param bulk_moduli: Bulk moduli of each phase. :math:`[Pa]`
+        :type bulk_moduli: list of floats
+        :param shear_moduli: Shear moduli of each phase. :math:`[Pa]`
+        :type shear_moduli: list of floats
+        :returns: Self-consistent bulk modulus. :math:`[Pa]`
+        :rtype: float
+        """
+        return self_consistent_function(volumes, bulk_moduli, shear_moduli)[0]
+
+    def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
+        """
+        Average shear moduli using spherical self-consistent homogenization.
+
+        :param volumes: Volumes of each phase. :math:`[m^3]`
+        :type volumes: list of floats
+        :param bulk_moduli: Bulk moduli of each phase. :math:`[Pa]`
+        :type bulk_moduli: list of floats
+        :param shear_moduli: Shear moduli of each phase. :math:`[Pa]`
+        :type shear_moduli: list of floats
+        :returns: Self-consistent shear modulus. :math:`[Pa]`
+        :rtype: float
+        """
+        return self_consistent_function(volumes, bulk_moduli, shear_moduli)[1]
 
 
 class Voigt(AveragingScheme):
@@ -466,7 +520,7 @@ class HashinShtrikmanAverage(AveragingScheme):
 
     def average_shear_moduli(self, volumes, bulk_moduli, shear_moduli):
         """
-        Average the bulk moduli of a composite with the arithmetic mean of the upper
+        Average the shear moduli of a composite with the arithmetic mean of the upper
         and lower Hashin-Shtrikman bounds.
 
         :param volumes: List of the volumes of each phase
@@ -487,6 +541,154 @@ class HashinShtrikmanAverage(AveragingScheme):
             self.upper.average_shear_moduli(volumes, bulk_moduli, shear_moduli)
             + self.lower.average_shear_moduli(volumes, bulk_moduli, shear_moduli)
         ) / 2.0
+
+
+def self_consistent_function(phase_volume, bulk_moduli, shear_moduli):
+    """
+    Estimate the effective bulk and shear moduli of a multiphase rock
+    using the spherical self-consistent method.
+
+    Each phase is described by its bulk and shear moduli and the volume it
+    occupies in the rock. Phase properties should be evaluated at the same
+    pressure and temperature. Volumes are converted internally to volume
+    fractions, so they do not need to sum to one.
+
+    The model represents each phase as spherical grains surrounded by a
+    uniform elastic medium with the unknown effective properties of the
+    whole rock. It is "self-consistent" because the combined response of
+    these grains must reproduce the properties assumed for the surrounding
+    medium. All phases are treated on an equal footing, and the resulting
+    aggregate is isotropic. The deformation of a grain depends on both its
+    own stiffness and that of its surroundings, which couples the effective
+    bulk and shear moduli.
+
+    The coupled equations are given in :class:`SelfConsistent`, following
+    Budiansky (1965). To solve them, the function first calculates the
+    effective bulk modulus :math:`K` for a trial effective shear modulus
+    :math:`G`:
+
+    .. math::
+
+        K(G) = \frac{\\sum_i f_i K_i/(K_i+4G/3)}
+                    {\\sum_i f_i/(K_i+4G/3)},
+        \\qquad f_i = \frac{V_i}{\\sum_j V_j}.
+
+    Here :math:`K_i`, :math:`G_i`, and :math:`f_i` are the moduli and
+    volume fraction of phase :math:`i`. Substituting :math:`K(G)` into
+    the shear equation leaves a single unknown:
+
+    .. math::
+
+        \\sum_i f_i\frac{G_i-G}{G_i+\\zeta}=0,
+        \\qquad \\zeta = \frac{G(9K+8G)}{6(K+2G)}.
+
+    A bracketed root finder adjusts :math:`G` between the smallest and
+    largest phase shear moduli until this equation is satisfied. The
+    corresponding :math:`K(G)` completes the solution.
+
+    Fluids can be represented by zero shear modulus, and empty pores by
+    zero bulk and shear moduli. If the model predicts that the mixture
+    cannot support shear, the function returns :math:`G=0` and the
+    corresponding limiting bulk modulus. For an elastic solid mixed with
+    empty spherical pores, this model predicts that both moduli vanish
+    at a porosity of 0.5. Zero-volume phases are ignored.
+
+    :param phase_volume: Volume occupied by each phase, or its volume
+        fraction. Entries must be finite and nonnegative, with at least
+        one positive entry. All volumes must use the same units.
+    :type phase_volume: list of floats or numpy.ndarray
+    :param bulk_moduli: Bulk moduli of the corresponding phases. Values
+        for phases with positive volume must be finite and nonnegative.
+        Use the same pressure unit for all bulk and shear moduli,
+        normally :math:`[Pa]`.
+    :type bulk_moduli: list of floats or numpy.ndarray
+    :param shear_moduli: Shear moduli of the corresponding phases, in
+        the same units as ``bulk_moduli``. Values for phases with positive
+        volume must be finite and nonnegative.
+    :type shear_moduli: list of floats or numpy.ndarray
+    :returns: Effective bulk and shear moduli, :math:`(K, G)`, in the same
+        units as the input moduli.
+    :rtype: tuple of floats
+    :raises ValueError: If the arrays have incompatible shapes, the volumes
+        are invalid, or an occupied phase has invalid elastic moduli.
+    """
+    volumes = np.asarray(phase_volume, dtype=float)
+    bulk = np.asarray(bulk_moduli, dtype=float)
+    shear = np.asarray(shear_moduli, dtype=float)
+    if (
+        volumes.ndim != 1
+        or volumes.size == 0
+        or bulk.shape != volumes.shape
+        or shear.shape != volumes.shape
+    ):
+        raise ValueError(
+            "Phase volumes and moduli must be nonempty 1D arrays of equal length."
+        )
+    if not np.all(np.isfinite(volumes)) or np.any(volumes < 0.0):
+        raise ValueError("Phase volumes must be finite and nonnegative.")
+    occupied = volumes > 0.0
+    if not np.any(occupied):
+        raise ValueError("At least one phase must have positive volume.")
+    # Ignore absent phases before inspecting their elastic properties.
+    volumes, bulk, shear = volumes[occupied], bulk[occupied], shear[occupied]
+    if (
+        not np.all(np.isfinite(bulk))
+        or not np.all(np.isfinite(shear))
+        or np.any(bulk < 0.0)
+        or np.any(shear < 0.0)
+    ):
+        raise ValueError(
+            "Occupied phases must have finite, nonnegative bulk and shear moduli."
+        )
+    if volumes.size == 1:
+        return float(bulk[0]), float(shear[0])
+    # Normalization makes the root tolerances scale-independent.
+    fractions = volumes / np.max(volumes)
+    fractions /= np.sum(fractions)
+    scale = max(np.max(bulk), np.max(shear))
+    if scale == 0.0:
+        return 0.0, 0.0
+    bulk, shear = bulk / scale, shear / scale
+    zero_bulk = np.sum(fractions[bulk == 0.0])
+    zero_shear = np.sum(fractions[shear == 0.0])
+
+    def effective_bulk(g):
+        if g == 0.0 and zero_bulk > 0.0:
+            return 0.0
+        denominators = bulk + 4.0 * g / 3.0
+        # Weighted form avoids subtracting nearly equal harmonic terms.
+        weights = fractions * (np.min(denominators) / denominators)
+        return np.dot(weights, bulk) / np.sum(weights)
+
+    # As G -> 0+, zeta/G -> (3-p)/(2+p), where p is the volume
+    # fraction of zero-bulk phases. Thus the limiting shear residual is
+    # 1-5*q/(3-p), with q the zero-shear fraction. This handles dry pores
+    # (critical porosity 1/2) and fluids with K>0 (critical fraction 3/5)
+    # without an arbitrary small stiffness or a spurious positive root.
+    zero_limit = 1.0 - 5.0 * zero_shear / (3.0 - zero_bulk)
+    if zero_shear > 0.0 and zero_limit <= 0.0:
+        return float(scale * effective_bulk(0.0)), 0.0
+
+    def shear_residual(g):
+        if g == 0.0:
+            return zero_limit
+        k = effective_bulk(g)
+        zeta = g * ((9.0 * k + 8.0 * g) / (6.0 * (k + 2.0 * g)))
+        return np.sum(fractions * ((shear - g) / (shear + zeta)))
+
+    lower, upper = np.min(shear), np.max(shear)
+    if lower == upper:
+        g = lower
+    else:
+        g = brentq(
+            shear_residual,
+            lower,
+            upper,
+            xtol=np.finfo(float).tiny,
+            rtol=1.0e-12,
+            maxiter=200,
+        )
+    return float(scale * effective_bulk(g)), float(scale * g)
 
 
 def voigt_average_function(phase_volume, X):
