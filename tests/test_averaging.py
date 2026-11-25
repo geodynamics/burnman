@@ -1,10 +1,12 @@
 import unittest
 from util import BurnManTest
 import warnings
+import numpy as np
 
 import burnman
 from burnman import minerals
 import burnman.classes.averaging_schemes as avg
+from burnman.tools.eos import check_eos_consistency
 
 
 class mypericlase(burnman.Mineral):
@@ -124,6 +126,220 @@ class VRH(BurnManTest):
         self.assertFloatEqual(7564.880, v_phi[0])
         self.assertFloatEqual(279.408, K_vrh[0] / 1.0e9)
         self.assertFloatEqual(153.461, G_vrh[0] / 1.0e9)
+
+
+class SelfConsistent(BurnManTest):
+    def average(self, volumes, bulk, shear):
+        scheme = avg.SelfConsistent()
+        return np.array(
+            [
+                scheme.average_bulk_moduli(volumes, bulk, shear),
+                scheme.average_shear_moduli(volumes, bulk, shear),
+            ]
+        )
+
+    def test_single_and_identical_phases(self):
+        for bulk, shear in [(160.0, 100.0), (10.0, 0.0), (0.0, 0.0)]:
+            for volumes in [[2.0], [1.0, 2.0, 3.0]]:
+                with self.subTest(bulk=bulk, shear=shear, volumes=volumes):
+                    self.assertArraysAlmostEqual(
+                        self.average(
+                            volumes, [bulk] * len(volumes), [shear] * len(volumes)
+                        ),
+                        [bulk, shear],
+                        tol=1.0e-12,
+                    )
+
+    def test_absent_phase(self):
+        self.assertArraysAlmostEqual(
+            self.average([0.0, 2.0, 0.0], [np.nan, 160.0, -1.0], [np.nan, 100.0, -1.0]),
+            [160.0, 100.0],
+        )
+
+    def test_analytic_two_phase_solution(self):
+        # At K_i = 4 G_i / 3, zeta = G and the equal-volume solution is
+        # G = sqrt(G_1 G_2), K = 4 G / 3 (not the VRH mean).
+        self.assertArraysAlmostEqual(
+            self.average([1.0, 1.0], [4.0 / 3.0, 16.0 / 3.0], [1.0, 4.0]),
+            [8.0 / 3.0, 2.0],
+            tol=1.0e-12,
+        )
+
+    def test_common_shear_modulus(self):
+        bulk = np.array([80.0, 240.0])
+        shift = 4.0 * 60.0 / 3.0
+        expected_bulk = 1.0 / np.sum(np.array([0.3, 0.7]) / (bulk + shift)) - shift
+        self.assertArraysAlmostEqual(
+            self.average([3.0, 7.0], bulk, [60.0, 60.0]),
+            [expected_bulk, 60.0],
+            tol=1.0e-12,
+        )
+
+    def test_multiphase_equations_and_bounds(self):
+        volumes = np.array([2.0, 3.0, 5.0])
+        fractions = volumes / sum(volumes)
+        bulk = np.array([160.0, 80.0, 240.0])
+        shear = np.array([100.0, 30.0, 60.0])
+        k, g = self.average(volumes, bulk, shear)
+        zeta = g * (9.0 * k + 8.0 * g) / (6.0 * (k + 2.0 * g))
+        self.assertFloatEqual(
+            np.sum(fractions * (bulk - k) / (bulk + 4.0 * g / 3.0)),
+            0.0,
+            tol_zero=1.0e-12,
+        )
+        self.assertFloatEqual(
+            np.sum(fractions * (shear - g) / (shear + zeta)), 0.0, tol_zero=1.0e-12
+        )
+        lower = avg.HashinShtrikmanLower()
+        upper = avg.HashinShtrikmanUpper()
+        self.assertLessEqual(lower.average_bulk_moduli(volumes, bulk, shear), k)
+        self.assertLessEqual(k, upper.average_bulk_moduli(volumes, bulk, shear))
+        self.assertLessEqual(lower.average_shear_moduli(volumes, bulk, shear), g)
+        self.assertLessEqual(g, upper.average_shear_moduli(volumes, bulk, shear))
+
+    def test_phase_order_units_and_volume_scaling(self):
+        volumes = np.array([2.0, 3.0, 5.0])
+        bulk = np.array([160.0, 80.0, 240.0])
+        shear = np.array([100.0, 30.0, 60.0])
+        expected = self.average(volumes, bulk, shear)
+        self.assertArraysAlmostEqual(
+            self.average(volumes[::-1], bulk[::-1], shear[::-1]), expected, tol=1.0e-12
+        )
+        for volume_scale in [1.0e-100, 1.0e100]:
+            for modulus_scale in [1.0e-9, 1.0e9]:
+                with self.subTest(
+                    volume_scale=volume_scale, modulus_scale=modulus_scale
+                ):
+                    actual = self.average(
+                        volumes * volume_scale,
+                        bulk * modulus_scale,
+                        shear * modulus_scale,
+                    )
+                    self.assertArraysAlmostEqual(
+                        actual / modulus_scale, expected, tol=1.0e-12
+                    )
+
+    def test_published_echoes_values(self):
+        # Independent printed SC outputs in Echoes chapter 12, for spherical
+        # pores with K_p = G_p = 1e-6 GPa in a K_s=72, G_s=32 GPa solid.
+        # https://jfbarthelemy.github.io/echoes/4_schemes/schemes.html
+        for porosity, reference, tolerance in [
+            (0.2, [37.156, 19.629], 5.1e-4),  # printed to three decimals
+            (0.3, [22.689245, 13.264364], 2.0e-5),  # iterative reference
+        ]:
+            with self.subTest(porosity=porosity):
+                actual = self.average(
+                    [1.0 - porosity, porosity], [72.0, 1.0e-6], [32.0, 1.0e-6]
+                )
+                for value, target in zip(actual, reference):
+                    self.assertAlmostEqual(value, target, delta=tolerance)
+
+    def test_all_fluids(self):
+        self.assertArraysAlmostEqual(
+            self.average([1.0, 3.0], [10.0, 20.0], [0.0, 0.0]),
+            [16.0, 0.0],
+            tol=1.0e-12,
+        )
+
+    def test_void_rigidity_threshold(self):
+        for porosity in [0.49, 0.4999, 0.5, 0.7, 1.0]:
+            with self.subTest(porosity=porosity):
+                actual = self.average(
+                    [1.0 - porosity, porosity], [72.0, 0.0], [32.0, 0.0]
+                )
+                if porosity < 0.5:
+                    self.assertTrue(np.all(actual > 0.0))
+                else:
+                    self.assertArraysAlmostEqual(actual, [0.0, 0.0])
+
+    def test_fluid_rigidity_threshold(self):
+        for fraction in [0.59, 0.6, 0.8, 1.0]:
+            with self.subTest(fraction=fraction):
+                k, g = self.average(
+                    [1.0 - fraction, fraction], [72.0, 2.0], [32.0, 0.0]
+                )
+                if fraction < 0.6:
+                    self.assertGreater(g, 0.0)
+                else:
+                    self.assertFloatEqual(g, 0.0)
+                    self.assertFloatEqual(
+                        k, 1.0 / ((1.0 - fraction) / 72.0 + fraction / 2.0)
+                    )
+
+    def test_soft_pores_retain_positive_stiffness(self):
+        k, g = self.average([0.4, 0.6], [72.0, 1.0e-6], [32.0, 1.0e-6])
+        self.assertGreater(k, 1.0e-6)
+        self.assertGreater(g, 1.0e-6)
+
+    def test_invalid_inputs(self):
+        for volumes, bulk, shear in [
+            ([], [], []),
+            ([1.0], [1.0, 2.0], [1.0]),
+            ([[1.0]], [[1.0]], [[1.0]]),
+            ([0.0, 0.0], [1.0, 2.0], [1.0, 2.0]),
+            ([-1.0, 2.0], [1.0, 2.0], [1.0, 2.0]),
+            ([np.nan], [1.0], [1.0]),
+            ([np.inf], [1.0], [1.0]),
+            ([1.0], [-1.0], [1.0]),
+            ([1.0], [1.0], [-1.0]),
+            ([1.0], [np.nan], [1.0]),
+            ([1.0], [1.0], [np.inf]),
+        ]:
+            with self.subTest(volumes=volumes, bulk=bulk, shear=shear):
+                with self.assertRaises(ValueError):
+                    self.average(volumes, bulk, shear)
+
+    def test_single_mineral_composite(self):
+        mineral = minerals.SLB_2024.periclase()
+        rock = burnman.Composite([mineral], [1.0])
+        rock.set_averaging_scheme(avg.SelfConsistent())
+        rock.set_state(10.0e9, 1500.0)
+        self.assertArraysAlmostEqual(
+            [rock.K_eff, rock.G_eff, rock.v_p, rock.v_s, rock.v_phi],
+            [mineral.K_S, mineral.G, mineral.v_p, mineral.v_s, mineral.v_phi],
+            tol=1.0e-12,
+        )
+        self.assertTrue(check_eos_consistency(mineral, P=10.0e9, T=1500.0))
+        self.assertTrue(
+            check_eos_consistency(
+                rock, P=10.0e9, T=1500.0, including_shear_properties=False
+            )
+        )
+
+    def test_slb_solution_composite(self):
+        phases = [
+            minerals.SLB_2024.bridgmanite([0.8, 0.1, 0.1, 0.0, 0.0, 0.0, 0.0]),
+            minerals.SLB_2024.periclase(),
+        ]
+        rock = burnman.Composite(phases, [0.7, 0.3])
+        rock.set_averaging_scheme("SelfConsistent")
+        for pressure, temperature in [(10.0e9, 1500.0), (120.0e9, 2500.0)]:
+            with self.subTest(P=pressure, T=temperature):
+                rho, vp, vs, k, g = rock.evaluate(
+                    ["rho", "v_p", "v_s", "K_eff", "G_eff"], [pressure], [temperature]
+                )[:, 0]
+                rock.set_state(pressure, temperature)
+                expected = self.average(
+                    rock.phase_volumes, [p.K_S for p in phases], [p.G for p in phases]
+                )
+                self.assertArraysAlmostEqual([k, g], expected, tol=1.0e-12)
+                self.assertFloatEqual(
+                    vp, np.sqrt((k + 4.0 * g / 3.0) / rho), tol=1.0e-12
+                )
+                self.assertFloatEqual(vs, np.sqrt(g / rho), tol=1.0e-12)
+                # The EOS tester checks thermodynamic Reuss derivatives;
+                # the seismic identities using effective moduli are above.
+                self.assertTrue(
+                    check_eos_consistency(
+                        rock,
+                        P=pressure,
+                        T=temperature,
+                        including_shear_properties=False,
+                    )
+                )
+        self.assertMaterialAmountScaling(
+            rock, extra_properties=("K_eff", "G_eff", "v_p", "v_s")
+        )
 
 
 class Reuss(BurnManTest):
